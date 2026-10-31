@@ -23,7 +23,11 @@ pub async fn section() -> Result<impl View> {
             id: "fast",
             title: "Fast load",
             <p>
-                "Two steps of starting " <code>"llama-server"</code> " are rarely needed for a 1 GB model: repacking the weights and fitting them to GPU memory. " <code>"smart-commit bench"</code> " keeps whichever is faster."
+                "Two steps of starting "
+                <code>"llama-server"</code>
+                " are rarely needed for a 1 GB model: repacking the weights and fitting them to GPU memory. "
+                <code>"smart-commit bench"</code>
+                " keeps whichever is faster."
             </p>
             chart(
                 label: "Per message without and with fast load",

@@ -44,7 +44,9 @@ pub async fn section() -> Result<impl View> {
             id: "first",
             title: "The first message and the next ones",
             <p>
-                "Most of a commit is loading the model. Kept loaded (" <code>"model.keep_loaded"</code> ", on by default), only the first commit after a pause pays for it."
+                "Most of a commit is loading the model. Kept loaded ("
+                <code>"model.keep_loaded"</code>
+                ", on by default), only the first commit after a pause pays for it."
             </p>
             <p>
                 "End to end through the CLI, on a "
@@ -80,7 +82,8 @@ pub async fn section() -> Result<impl View> {
 
             <h3 class="mt-10">"Five commits in a row"</h3>
             <p class="mt-3">
-                <code>"qwen2.5-coder-1.5b"</code> ", five commits in a row. The first one starts the server (an estimate)."
+                <code>"qwen2.5-coder-1.5b"</code>
+                ", five commits in a row. The first one starts the server (an estimate)."
             </p>
             chart(
                 label: "Five commits in a row, with and without the model kept loaded",

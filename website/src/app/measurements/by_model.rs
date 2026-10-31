@@ -24,7 +24,9 @@ pub async fn section() -> Result<impl View> {
             id: "by-model",
             title: "By model",
             <p>
-                "Per message on the " (RYZEN) ". The fine-tunes write shorter replies, so they are faster."
+                "Per message on the "
+                (RYZEN)
+                ". The fine-tunes write shorter replies, so they are faster."
             </p>
             chart(
                 label: "Per message by model, on the CPU and on Vulkan",

@@ -48,7 +48,11 @@ pub async fn section() -> Result<impl View> {
                 "."
             </p>
             <p>
-                "More in the " <a href=(href!(measurements::page))>"measurements"</a> " and the " doc_link(page: "devices.md", "devices guide") "."
+                "More in the "
+                <a href=(href!(measurements::page))>"measurements"</a>
+                " and the "
+                doc_link(page: "devices.md", "devices guide")
+                "."
             </p>
         )
     })

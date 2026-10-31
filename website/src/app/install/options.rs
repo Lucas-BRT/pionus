@@ -89,7 +89,11 @@ pub async fn section() -> Result<impl View> {
                 )
             )
             <p>
-                "If " <code>"~/.local/bin"</code> " is not on your " <code>"PATH"</code> ", the installer prints the line to add."
+                "If "
+                <code>"~/.local/bin"</code>
+                " is not on your "
+                <code>"PATH"</code>
+                ", the installer prints the line to add."
             </p>
         )
     })

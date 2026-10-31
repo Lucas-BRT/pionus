@@ -35,9 +35,7 @@ pub async fn section() -> Result<impl View> {
                 note("the editor opens with the message written")
                 "git commit"
             )
-            <p>
-                "It works from any git client and never blocks a commit."
-            </p>
+            <p>"It works from any git client and never blocks a commit."</p>
         )
     })
 }

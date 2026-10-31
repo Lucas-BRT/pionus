@@ -68,7 +68,10 @@ pub async fn card_title(
 ) -> Result<impl View> {
     Ok(view! {
         <h3
-            class=(class!("text-base leading-none font-semibold", attrs.remove("class")))
+            class=(class!(
+                "text-base leading-none font-semibold",
+                attrs.remove("class"),
+            ))
             (attrs)
         >
             (child)

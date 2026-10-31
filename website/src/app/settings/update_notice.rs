@@ -20,7 +20,11 @@ pub async fn section() -> Result<impl View> {
                 "smart-commit config set update.check true"
             )
             <p>
-                "Once a day at most, it asks GitHub for the latest release. GitHub sees your IP address and " <code>"smart-commit/<version>"</code> ", nothing else. The hook never checks. " <code>"SMART_COMMIT_UPDATE_CHECK=false"</code> " turns it off for one command."
+                "Once a day at most, it asks GitHub for the latest release. GitHub sees your IP address and "
+                <code>"smart-commit/<version>"</code>
+                ", nothing else. The hook never checks. "
+                <code>"SMART_COMMIT_UPDATE_CHECK=false"</code>
+                " turns it off for one command."
             </p>
         )
     })

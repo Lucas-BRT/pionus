@@ -24,14 +24,18 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        "Run " <code>"smart-commit setup"</code> "."
+                        "Run "
+                        <code>"smart-commit setup"</code>
+                        "."
                     )
                 )
                 row(
                     cell(label: "Message", <code>"no device could run the model"</code>)
                     cell(
                         label: "What to do",
-                        "Run " <code>"smart-commit setup"</code> ". The message lists what each device lacks."
+                        "Run "
+                        <code>"smart-commit setup"</code>
+                        ". The message lists what each device lacks."
                     )
                 )
                 row(
@@ -45,7 +49,11 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        "Run " <code>"smart-commit setup"</code> ", or " <code>"smart-commit model use <id>"</code> "."
+                        "Run "
+                        <code>"smart-commit setup"</code>
+                        ", or "
+                        <code>"smart-commit model use <id>"</code>
+                        "."
                     )
                 )
                 row(
@@ -55,14 +63,30 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        "This model runs on " <code>"vulkan"</code> " and " <code>"cpu"</code> " only. For the NPU: " <code>"smart-commit model use qwen2.5-coder-1.5b"</code> "."
+                        "This model runs on "
+                        <code>"vulkan"</code>
+                        " and "
+                        <code>"cpu"</code>
+                        " only. For the NPU: "
+                        <code>"smart-commit model use qwen2.5-coder-1.5b"</code>
+                        "."
                     )
                 )
                 row(
                     cell(label: "Message", <code>"OpenVINO GenAI not found"</code>)
                     cell(
                         label: "What to do",
-                        "Only " <code>"npu"</code> ", " <code>"intel-gpu"</code> " and " <code>"openvino-cpu"</code> " need it. Use " <code>"vulkan"</code> " or " <code>"cpu"</code> "."
+                        "Only "
+                        <code>"npu"</code>
+                        ", "
+                        <code>"intel-gpu"</code>
+                        " and "
+                        <code>"openvino-cpu"</code>
+                        " need it. Use "
+                        <code>"vulkan"</code>
+                        " or "
+                        <code>"cpu"</code>
+                        "."
                     )
                 )
                 row(
@@ -87,7 +111,11 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        "Run " <code>"~/.local/share/smart-commit/scripts/check-npu.sh"</code> ". After joining the " <code>"render"</code> " group, log out and back in."
+                        "Run "
+                        <code>"~/.local/share/smart-commit/scripts/check-npu.sh"</code>
+                        ". After joining the "
+                        <code>"render"</code>
+                        " group, log out and back in."
                     )
                 )
                 row(
@@ -109,7 +137,13 @@ pub async fn section() -> Result<impl View> {
                     cell(label: "Message", "The hook does nothing")
                     cell(
                         label: "What to do",
-                        "It acts on " <code>"git commit"</code> " without " <code>"-m"</code> ". Reinstall it with " <code>"smart-commit hook install"</code> "."
+                        "It acts on "
+                        <code>"git commit"</code>
+                        " without "
+                        <code>"-m"</code>
+                        ". Reinstall it with "
+                        <code>"smart-commit hook install"</code>
+                        "."
                     )
                 )
                 row(
@@ -119,7 +153,9 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        "Run " <code>"smart-commit doctor"</code> "."
+                        "Run "
+                        <code>"smart-commit doctor"</code>
+                        "."
                     )
                 )
             )

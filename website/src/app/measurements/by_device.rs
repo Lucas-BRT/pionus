@@ -43,7 +43,13 @@ pub async fn section() -> Result<impl View> {
             id: "by-device",
             title: "By device",
             <p>
-                "On a " (CORE_ULTRA) ", per message, end to end. Here " <code>"openvino-cpu"</code> " was still called " <code>"cpu"</code> "."
+                "On a "
+                (CORE_ULTRA)
+                ", per message, end to end. Here "
+                <code>"openvino-cpu"</code>
+                " was still called "
+                <code>"cpu"</code>
+                "."
             </p>
             chart(
                 label: "Per message by device on the Core Ultra 5 225H",

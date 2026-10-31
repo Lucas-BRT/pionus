@@ -29,7 +29,9 @@ pub async fn page() -> Result<impl View> {
                     }
                 </ol>
                 <p>
-                    "The full list is in the " doc_link(page: "roadmap.md", "repository") "."
+                    "The full list is in the "
+                    doc_link(page: "roadmap.md", "repository")
+                    "."
                 </p>
             )
         )

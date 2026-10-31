@@ -169,7 +169,10 @@ pub async fn table_caption(
 ) -> Result<impl View> {
     Ok(view! {
         <caption
-            class=(class!("mt-4 text-sm text-muted-foreground", attrs.remove("class")))
+            class=(class!(
+                "mt-4 text-sm text-muted-foreground",
+                attrs.remove("class"),
+            ))
             (attrs)
         >
             (child)

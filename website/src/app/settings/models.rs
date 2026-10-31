@@ -83,7 +83,11 @@ pub async fn section() -> Result<impl View> {
             id: "models",
             title: "Models",
             <p>
-                "smart-commit ships no model. " <code>"model use"</code> " downloads one from Hugging Face and checks it against a SHA-256. The project's own fine-tunes are on its " <a href="https://huggingface.co/LucasBRT">"Hugging Face account"</a> "."
+                "smart-commit ships no model. "
+                <code>"model use"</code>
+                " downloads one from Hugging Face and checks it against a SHA-256. The project's own fine-tunes are on its "
+                <a href="https://huggingface.co/LucasBRT">"Hugging Face account"</a>
+                "."
             </p>
             terminal(
                 title: "models",
@@ -113,11 +117,10 @@ pub async fn section() -> Result<impl View> {
                 <li>
                     "The default is the only model the NPU and the Intel GPU can run."
                 </li>
+                <li>"Experimental models are not fully tested."</li>
                 <li>
-                    "Experimental models are not fully tested."
-                </li>
-                <li>
-                    <code>"smart-commit-*"</code> " models are fine-tuned for this prompt."
+                    <code>"smart-commit-*"</code>
+                    " models are fine-tuned for this prompt."
                 </li>
                 <li>
                     "After switching, run "

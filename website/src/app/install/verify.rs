@@ -12,7 +12,9 @@ pub async fn section() -> Result<impl View> {
             id: "verify",
             title: "Check the download",
             <p>
-                "The installer checks the archive against " <code>"SHA256SUMS"</code> "."
+                "The installer checks the archive against "
+                <code>"SHA256SUMS"</code>
+                "."
             </p>
             <p>
                 "Releases after 0.14.0 also carry a GitHub build attestation. With the "
@@ -25,7 +27,9 @@ pub async fn section() -> Result<impl View> {
                 "gh attestation verify smart-commit-x86_64-unknown-linux-gnu.tar.gz --repo Lucas-BRT/smart-commit"
             )
             <p>
-                "Or add " <code>"--verify"</code> " to the installer."
+                "Or add "
+                <code>"--verify"</code>
+                " to the installer."
             </p>
         )
     })

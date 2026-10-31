@@ -24,11 +24,11 @@ pub async fn section() -> Result<impl View> {
                 "smart-commit uninstall --system\n"
                 note("and the OpenVINO the setup installed (asks before using sudo)")
             )
+            <p>"It lists what it removes and asks first."</p>
             <p>
-                "It lists what it removes and asks first."
-            </p>
-            <p>
-                "Drivers stay, since other programs may use them. The hook stays in each repository: run " <code>"smart-commit hook uninstall"</code> " first."
+                "Drivers stay, since other programs may use them. The hook stays in each repository: run "
+                <code>"smart-commit hook uninstall"</code>
+                " first."
             </p>
         )
     })

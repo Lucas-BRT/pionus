@@ -23,7 +23,9 @@ pub async fn section() -> Result<impl View> {
                 "git commit"
             )
             <p>
-                "Edit the message as usual. " <code>"smart-commit hook uninstall"</code> " removes the hook."
+                "Edit the message as usual. "
+                <code>"smart-commit hook uninstall"</code>
+                " removes the hook."
             </p>
         )
     })

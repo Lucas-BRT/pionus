@@ -46,7 +46,8 @@ pub async fn section() -> Result<impl View> {
                 }
             )
             <p class="mt-6">
-                <code>"model.ask_type"</code> " costs one more reading of the prompt per commit. More in the "
+                <code>"model.ask_type"</code>
+                " costs one more reading of the prompt per commit. More in the "
                 doc_link(page: "measurements.md", "measurements document")
                 "."
             </p>

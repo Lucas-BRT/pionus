@@ -87,7 +87,6 @@ pub async fn section() -> Result<impl View> {
                         summary: "The AI chip of Intel Core Ultra. Does not keep the model loaded yet.",
                         measured(time: by_device("npu"), machine: "a Core Ultra 5 225H")
                     )
-
                 </div>
                 <p class="mt-6 mb-0 text-sm text-muted-foreground">
                     "See details for: "

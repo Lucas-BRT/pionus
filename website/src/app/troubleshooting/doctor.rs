@@ -24,7 +24,13 @@ pub async fn section() -> Result<impl View> {
                 note("also hash the model file (minutes for a big model)")
             )
             <p>
-                "One line per check: " <code>"ok"</code> ", " <code>"warn"</code> " or " <code>"fail"</code> ", with the fix. It exits 1 if anything fails."
+                "One line per check: "
+                <code>"ok"</code>
+                ", "
+                <code>"warn"</code>
+                " or "
+                <code>"fail"</code>
+                ", with the fix. It exits 1 if anything fails."
             </p>
             data_table(
                 label: "What doctor checks",
@@ -39,24 +45,15 @@ pub async fn section() -> Result<impl View> {
                 )
                 row(
                     cell(label: "Check", <code>"git"</code>)
-                    cell(
-                        label: "Looks at",
-                        "git runs and is 2.20 or newer"
-                    )
+                    cell(label: "Looks at", "git runs and is 2.20 or newer")
                 )
                 row(
                     cell(label: "Check", <code>"config"</code>)
-                    cell(
-                        label: "Looks at",
-                        "config files read fine"
-                    )
+                    cell(label: "Looks at", "config files read fine")
                 )
                 row(
                     cell(label: "Check", <code>"model"</code>)
-                    cell(
-                        label: "Looks at",
-                        "the model files exist and match"
-                    )
+                    cell(label: "Looks at", "the model files exist and match")
                 )
                 row(
                     cell(label: "Check", <code>"llama.cpp"</code>)
@@ -74,10 +71,7 @@ pub async fn section() -> Result<impl View> {
                 )
                 row(
                     cell(label: "Check", <code>"server"</code>)
-                    cell(
-                        label: "Looks at",
-                        "the models kept loaded"
-                    )
+                    cell(label: "Looks at", "the models kept loaded")
                 )
                 row(
                     cell(label: "Check", <code>"hook"</code>)

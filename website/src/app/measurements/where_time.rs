@@ -43,7 +43,9 @@ pub async fn section() -> Result<impl View> {
             id: "where",
             title: "Where the time goes",
             <p>
-                "Reading the prompt dominates: about 90% of a message on the CPU. Milliseconds per message on a " (CORE_ULTRA) ", over 6 real prompts:"
+                "Reading the prompt dominates: about 90% of a message on the CPU. Milliseconds per message on a "
+                (CORE_ULTRA)
+                ", over 6 real prompts:"
             </p>
             chart(
                 label: "Where the time goes, per configuration",
@@ -59,10 +61,14 @@ pub async fn section() -> Result<impl View> {
             )
             <ul class="mt-6">
                 <li>
-                    "One thread per core halves the prefill, so smart-commit sets " <code>"model.threads_batch"</code> "."
+                    "One thread per core halves the prefill, so smart-commit sets "
+                    <code>"model.threads_batch"</code>
+                    "."
                 </li>
                 <li>
-                    "Halving " <code>"model.max_prompt_tokens"</code> " halves the prefill, at a cost in quality."
+                    "Halving "
+                    <code>"model.max_prompt_tokens"</code>
+                    " halves the prefill, at a cost in quality."
                 </li>
                 <li>
                     "No gain from flash attention, weight repacking or speculative decoding."

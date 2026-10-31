@@ -27,9 +27,7 @@ pub async fn section() -> Result<impl View> {
                 )
                 cmd("smart-commit setup --dry-run")
             )
-            <p>
-                "It lists every step and changes nothing."
-            </p>
+            <p>"It lists every step and changes nothing."</p>
         )
     })
 }

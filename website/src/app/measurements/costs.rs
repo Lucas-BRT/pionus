@@ -18,7 +18,9 @@ pub async fn costs() -> Result<impl View> {
         <h3 class="mt-10">"What it costs, and when it is not used"</h3>
         <ul class="mt-3">
             <li>
-                "It is kept only if it takes at most 15% of the RAM (" <code>"model.keep_loaded_max_ram"</code> ")."
+                "It is kept only if it takes at most 15% of the RAM ("
+                <code>"model.keep_loaded_max_ram"</code>
+                ")."
             </li>
             <li>
                 "The NPU and the Intel GPU have no server. On the NPU the first load compiles the graph (11.7s); later loads read the cache (1.7s, 246 MB)."

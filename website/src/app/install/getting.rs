@@ -21,10 +21,18 @@ pub async fn section() -> Result<impl View> {
             title: "Install",
             terminal(title: "install", label: "Install command", cmd((INSTALL_CMD)))
             <p>
-                "This installs version " (VERSION) ". The setup asks before anything that needs " <code>"sudo"</code> "."
+                "This installs version "
+                (VERSION)
+                ". The setup asks before anything that needs "
+                <code>"sudo"</code>
+                "."
             </p>
             <p>
-                "The default model is " <code>(DEFAULT_MODEL)</code> ", " (DEFAULT_MODEL_SIZE) "."
+                "The default model is "
+                <code>(DEFAULT_MODEL)</code>
+                ", "
+                (DEFAULT_MODEL_SIZE)
+                "."
             </p>
             <p>
                 "For a walkthrough, see the "

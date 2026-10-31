@@ -12,7 +12,9 @@ pub async fn section() -> Result<impl View> {
             id: "more",
             title: "More",
             <p>
-                "Everything else is in the " doc_link(page: "usage.md", "usage guide") "."
+                "Everything else is in the "
+                doc_link(page: "usage.md", "usage guide")
+                "."
             </p>
         )
     })

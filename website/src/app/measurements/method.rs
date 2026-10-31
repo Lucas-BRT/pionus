@@ -19,7 +19,9 @@ pub async fn section() -> Result<impl View> {
                     "Core Ultra 5 225H (Arrow Lake-H: Arc iGPU, NPU 37xx), 15 GiB RAM, Pop!_OS 24.04, kernel 7.2."
                 </li>
                 <li>
-                    "Your times will differ: " <code>"smart-commit bench"</code> " measures your machine."
+                    "Your times will differ: "
+                    <code>"smart-commit bench"</code>
+                    " measures your machine."
                 </li>
             </ul>
             <p>

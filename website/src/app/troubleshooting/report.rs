@@ -24,7 +24,11 @@ pub async fn section() -> Result<impl View> {
                 note("checks that it reproduces")
             )
             <p>
-                "A trace holds your staged diff and recent commit subjects. Review it before sharing. " <code>"smart-commit -v"</code> " shows what was decided; " <code>"smart-commit prompt"</code> " shows the prompt."
+                "A trace holds your staged diff and recent commit subjects. Review it before sharing. "
+                <code>"smart-commit -v"</code>
+                " shows what was decided; "
+                <code>"smart-commit prompt"</code>
+                " shows the prompt."
             </p>
             <p>
                 "All commands: the "

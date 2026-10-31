@@ -23,9 +23,7 @@ pub async fn section() -> Result<impl View> {
                 "smart-commit --trace bad.json\n"
                 note("record the generation, to report it")
             )
-            <p>
-                "A trace holds your staged diff. Review it before sharing."
-            </p>
+            <p>"A trace holds your staged diff. Review it before sharing."</p>
         )
     })
 }
