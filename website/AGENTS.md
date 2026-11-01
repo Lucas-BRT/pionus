@@ -1,12 +1,12 @@
-# smart-commit website
+# pionus website
 
 Adds to [../AGENTS.md](../AGENTS.md).
 
 Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript (one
 exception: the inline copy button in `ui/command_line.rs`), one dark theme
-with one violet accent. Run: `cargo run -p smart-commit-website` (or
+with one bronze accent. Run: `cargo run -p pionus-website` (or
 `topcoat dev`; `HOST=0.0.0.0` for a phone). Release build:
-`cargo build --profile website -p smart-commit-website`; image:
+`cargo build --profile website -p pionus-website`; image:
 `docker compose up -d --build` here.
 
 ## Content
@@ -52,7 +52,7 @@ with one violet accent. Run: `cargo run -p smart-commit-website` (or
 
 ## Styles
 
-- `styles.css` is the Tailwind entry (theme + palette: near-black, violet,
+- `styles.css` is the Tailwind entry (theme + palette: near-black, bronze,
   Bricolage Grotesque); `build.rs` builds it from the utilities in
   `src/**/*.rs` and `assets/style.css`. If the served CSS is stale, touch
   `build.rs`.

@@ -47,7 +47,7 @@
    file is installed at the project root, so `./src` is the crate's source. */
 @source "./src/**/*.rs";
 
-/* The site has one theme: dark, with one violet accent. */
+/* The site has one theme: dark, with one bronze accent. */
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
 /* Expose the tokens as Tailwind utilities (`bg-background`, `text-primary`,
@@ -87,35 +87,35 @@
 }
 
 :root {
-  --background: #0c0b10;
-  --foreground: #efecf5;
-  --card: #14121b;
-  --card-foreground: #efecf5;
-  --popover: #14121b;
-  --popover-foreground: #efecf5;
-  --muted-foreground: #9b96a8;
-  --primary: #a371f7;
-  --primary-foreground: #150a26;
+  --background: #0a0d14;
+  --foreground: #efeae0;
+  --card: #10151f;
+  --card-foreground: #efeae0;
+  --popover: #10151f;
+  --popover-foreground: #efeae0;
+  --muted-foreground: #98a0b2;
+  --primary: #d9a35b;
+  --primary-foreground: #1d1204;
   --destructive: oklch(0.66 0.18 25);
   --destructive-foreground: oklch(0.14 0.02 25);
-  --border: #26222f;
-  --ring: #a371f7;
-  --sidebar: #0c0b10;
-  --sidebar-foreground: #efecf5;
-  --sidebar-primary: #a371f7;
-  --sidebar-primary-foreground: #150a26;
-  --sidebar-accent: #1b1824;
-  --sidebar-accent-foreground: #efecf5;
-  --sidebar-border: #26222f;
-  --sidebar-ring: #a371f7;
+  --border: #222a38;
+  --ring: #d9a35b;
+  --sidebar: #0a0d14;
+  --sidebar-foreground: #efeae0;
+  --sidebar-primary: #d9a35b;
+  --sidebar-primary-foreground: #1d1204;
+  --sidebar-accent: #171d2a;
+  --sidebar-accent-foreground: #efeae0;
+  --sidebar-border: #222a38;
+  --sidebar-ring: #d9a35b;
   --shadow-xs: 0 0 #0000;
   --shadow-sm: 0 0 #0000;
 
   /* The terminal: the darkest surface of the page. */
-  --terminal: #08070c;
-  --terminal-foreground: #ebe8f2;
-  --terminal-dim: #8b869a;
-  --terminal-border: #26222f;
+  --terminal: #06080d;
+  --terminal-foreground: #e9e6df;
+  --terminal-dim: #858da0;
+  --terminal-border: #222a38;
 }
 
 
