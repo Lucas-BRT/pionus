@@ -220,6 +220,7 @@ outside a shell, such as git hooks run by GUI clients.
 
 Packages already installed are skipped, `--dry-run` only prints the plan,
 and without `apt` the script lists the packages to install.
+Ubuntu 24.04 and its derivatives are the systems it is tested on.
 
 Intel's compute runtime must be installed by `dpkg`, which runs `ldconfig`:
 without the `libigc.so.2` links that creates, the runtime fails with a

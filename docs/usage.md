@@ -167,6 +167,13 @@ changes the exit code, and counts as a check, so an offline machine does not
 retry at every run. `PIONUS_UPDATE_CHECK=false` turns it off for one
 command.
 
+## Network use
+
+Writing a message is local: the model runs on your machine and nothing leaves
+it. The network is used to install and update pionus and to download the
+models, llama.cpp and, for Intel hardware, OpenVINO. The daily check for a
+newer release is off until you turn it on ([update notice](#update-notice)).
+
 ## Everyday use
 
 ```bash
