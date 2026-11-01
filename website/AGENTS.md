@@ -2,7 +2,8 @@
 
 Adds to [../AGENTS.md](../AGENTS.md).
 
-Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript, one dark theme
+Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript (one
+exception: the inline copy button in `ui/command_line.rs`), one dark theme
 with one violet accent. Run: `cargo run -p smart-commit-website` (or
 `topcoat dev`; `HOST=0.0.0.0` for a phone). Release build:
 `cargo build --profile website -p smart-commit-website`; image:

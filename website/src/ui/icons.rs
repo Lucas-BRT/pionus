@@ -23,6 +23,11 @@ pub const PACKAGE: IconData = iconify_icon!("lucide:package");
 /// A signal crossed out: no network.
 pub const OFFLINE: IconData = iconify_icon!("lucide:wifi-off");
 
+pub const COPY: IconData = iconify_icon!("lucide:copy");
+
+/// Shown once something is copied.
+pub const CHECK: IconData = iconify_icon!("lucide:check");
+
 /// An icon in a small square of its own, for a list of features.
 #[component]
 pub async fn icon_badge(data: IconData) -> Result<impl View> {

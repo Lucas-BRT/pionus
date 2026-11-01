@@ -47,7 +47,7 @@ pub async fn section() -> Result<impl View> {
                     </a>
                 </div>
                 command_line(
-                    attrs: attributes! { class="mx-auto mt-6 w-full max-w-[52rem]" },
+                    attrs: attributes! { class="mx-auto mt-6 w-fit max-w-full" },
                     (INSTALL_CMD)
                 )
             )
