@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "tool_version": "0.13.0",
+  "tool_version": "0.14.0",
   "backend": "mock",
   "options": {
     "max_prompt_tokens": 1024,
@@ -96,7 +96,7 @@
   },
   "generation": {
     "message": {
-      "subject": "feat(training): add sc-training tool to the release",
+      "subject": "feat(training): add pionus-training tool to the release",
       "body": null
     },
     "source": "model",
@@ -106,7 +106,7 @@
           "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: refactor, test, chore, feat.\n- Scopes used here: bench, docs, fixtures. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nrefactor: write the release notes in sc-tools instead of a shell script\nrefactor: move the llama-server timing out of the binary into sc-tools\nfeat(bench): time llama-server on prompt files with `bench --prompts`\nchore: remove scripts/experiments\ntest(fixtures): trace twelve messages from the module splits and the docs\n",
           "user": "Files changed:\nCargo.lock | +583 -2\nCargo.toml | +1 -1\ntraining/tools/Cargo.toml | new, +26 -0\ntraining/tools/src/main.rs | new, +1 -0\n\nDiff:\n--- Cargo.toml\n@@ -1,3 +1,3 @@\n [workspace]\n-members = [\".\", \"tools\"]\n+members = [\".\", \"tools\", \"training/tools\"]\n # What `cargo build` and the release build make: the tools stay out of it.\n--- training/tools/Cargo.toml\n@@ -0,0 +1,26 @@\n+[package]\n+name = \"smart-commit-training\"\n+version = \"0.0.0\"\n+edition = \"2024\"\n+rust-version = \"1.99\"\n+description = \"The data tools for training smart-commit's models; not part of the release\"\n+publish = false\n+\n+[[bin]]\n+name = \"sc-training\"\n+path = \"src/main.rs\"\n+\n+[dependencies]\n+anyhow = \"1\"\n+clap = { version = \"4\", features = [\"derive\"] }\n+fancy-regex = \"0.20\"\n+glob = \"0.3\"\n+parquet = { version = \"60\", default-features = false, features = [\"snap\", \"flate2-zlib-rs\", \"zstd\", \"lz4\", \"brotli\"] }\n+regex = \"1\"\n+serde_json = { version = \"1\", features = [\"preserve_order\"] }\n+sha2 = \"0.10\"\n+toml = \"0.9\"\n+unicode-normalization = \"0.1\"\n+\n+[dev-dependencies]\n+tempfile = \"3\"\n--- training/tools/src/main.rs\n@@ -0,0 +1 @@\n+fn main() {}\n"
         },
-        "raw": "feat(training): add sc-training tool to the release",
+        "raw": "feat(training): add pionus-training tool to the release",
         "rejected": null
       }
     ]
