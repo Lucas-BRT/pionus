@@ -7,7 +7,7 @@ was measured, what was decided, and what is left to do. Read
 
 ## Goal
 
-Fine-tune a small model for smart-commit's exact task and prompt format,
+Fine-tune a small model for pionus's exact task and prompt format,
 publish it on Hugging Face, and add it to the recommended models
 (`cli/src/models/registry.rs`), pinned by revision and SHA-256 like the others.
 
@@ -38,11 +38,11 @@ Two expected gains:
   pipeline. What is published is the merged model; an adapter applied with
   llama.cpp's `--lora` on the upstream GGUF is for evaluation only.
 - **The prompt the model sees in training must be byte-identical to what
-  smart-commit builds at run time.** Never write a second prompt builder in
+  pionus builds at run time.** Never write a second prompt builder in
   Python; generate the inputs with the Rust code (see
   [Dataset](#dataset)).
 - **The fine-tunes are published on Hugging Face by the project**, as
-  `smart-commit-<size>-v<version>` ([models](models.md#where-they-come-from)); other
+  `pionus-<size>-v<version>` ([models](models.md#where-they-come-from)); other
   publishers' models are still never re-hosted.
 - **Evaluation comes before training.** Without a held-out set and metrics
   there is no way to tell whether a fine-tune, a smaller prompt budget or
@@ -76,14 +76,14 @@ shorten the prompt or speed up prefill barely matters. The measurements
   filtered CommitChronicle commits, single-file diffs, English, decoded with
   a GBNF grammar. Its card reports type accuracy 0.131 → 0.637 (LLM judge,
   442 examples) and that the base model answered `feat` 95.5% of the time.
-  It does not know smart-commit's prompt (history examples, scopes), so it is a baseline, not a drop-in.
+  It does not know pionus's prompt (history examples, scopes), so it is a baseline, not a drop-in.
 - [Elib27/qwen2.5-coder-1.5b-commit-msg-lora](https://huggingface.co/Elib27/qwen2.5-coder-1.5b-commit-msg-lora)
   (and [0.5B](https://huggingface.co/Elib27/qwen2.5-coder-0.5b-commit-msg-lora)):
   PEFT LoRA (r=16, alpha=32) on our exact base model, ~11k pairs. No license
   stated, so it cannot be redistributed, only compared.
 - [CommitLLM](https://arxiv.org/abs/2607.17532) (Mistral-7B QLoRA): reports
   that post-processing contributed more than fine-tuning, which matches
-  smart-commit's sanitizer approach.
+  pionus's sanitizer approach.
 
 ## Dataset
 
@@ -107,7 +107,7 @@ v0.1 was trained on English only.
 
 ### From a commit to a training example
 
-smart-commit's traces already record everything the prompt is built from,
+pionus's traces already record everything the prompt is built from,
 as `trace::Inputs` (`cli/src/trace.rs`):
 
 ```json
@@ -132,8 +132,8 @@ as `trace::Inputs` (`cli/src/trace.rs`):
 - Target: the commit's subject (and body, if kept), cleaned the way the
   sanitizer would accept it.
 
-The prompt is then built **by smart-commit**, not by the Python code:
-`smart-commit prompt --inputs FILE` reads JSON Lines of `Inputs` and writes
+The prompt is then built **by pionus**, not by the Python code:
+`pionus prompt --inputs FILE` reads JSON Lines of `Inputs` and writes
 JSON Lines of `{"system", "user"}`, with `prompt::build` and
 `Inputs::context`, as `replay` does ([usage](usage.md)). Run it with an empty
 `XDG_CONFIG_HOME` so the user's config does not leak into the dataset, and
@@ -160,8 +160,8 @@ time.
 ## Evaluation
 
 Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
-`smart-commit eval`, which runs the whole pipeline, and
-`training/sc-training score`, so the same numbers judge every model:
+`pionus eval`, which runs the whole pipeline, and
+`training/pionus-training score`, so the same numbers judge every model:
 
 - **eval-v1**: 500 commits of CommitChronicle's test split, from 70
   repositories never seen in training, 250 Conventional and 250 free;
@@ -171,7 +171,7 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   repositories (Python in Portuguese with free style, TypeScript with
   Conventional Commits; the Portuguese cases no longer test a goal of the
   product, they show what a model does by itself), by level of complexity from a typo to a merge in
-  progress, each with its target; `sc-training score` reports them per level and
+  progress, each with its target; `pionus-training score` reports them per level and
   checks the words a right subject must have (`expected`). Each case is in
   the train or the eval split, never both; those whose target depends on
   what the inputs do not record (merge, revert, file modes) are eval only.
@@ -179,7 +179,7 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
 - Metrics: first_try, fallback, copied, type_match, scope_known,
   scope_fits, word_f1, and two cheap faithfulness checks, `unsupported`
   (specifics found nowhere in the input) and `ungrounded` (a description
-  with no word from the diff); `sc-training score`'s docstring defines them.
+  with no word from the diff); `pionus-training score`'s docstring defines them.
   `type_match` counts only the repository's own type as right, and its noise
   (labels, seeds) is larger than the gains tried so far, so a comparison also
   reads `type_group` (a `build` for a `chore` counts) and `type_behaviour`
@@ -188,7 +188,7 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   ([H13](../training/HYPOTHESES.md)).
 - Always report the base model's scores on the same set and binary.
 - Two versions of a model or a prompt answer the same cases: compare them
-  case by case with `sc-training score EVAL_DIR NEW.jsonl --against OLD.jsonl`,
+  case by case with `pionus-training score EVAL_DIR NEW.jsonl --against OLD.jsonl`,
   which counts the cases each gets right that the other does not and gives
   McNemar's exact p. A change of 1–3 points on eval-v1 is often a handful
   of cases either way.
@@ -220,9 +220,9 @@ before it, matches. The GPU time spent so far on this work:
 
 | Session (kernel) | GPU time | What |
 |---|---|---|
-| mining (`smart-commit-mine`) | 0.69 h | 8 jobs: 2 models x 4 shards of 1,375 inputs, 6 samples each |
-| DPO sweep 1, first try (`smart-commit-dpo`) | 0.07 h | six runs that all failed on Kaggle's old `torchao` |
-| DPO sweep 1 (`smart-commit-dpo`) | 2.59 h | six runs of the 0.5B, three after three on each GPU |
+| mining (`pionus-mine`) | 0.69 h | 8 jobs: 2 models x 4 shards of 1,375 inputs, 6 samples each |
+| DPO sweep 1, first try (`pionus-dpo`) | 0.07 h | six runs that all failed on Kaggle's old `torchao` |
+| DPO sweep 1 (`pionus-dpo`) | 2.59 h | six runs of the 0.5B, three after three on each GPU |
 
 Measured on a T4 (fp16, CUDA 12.8, driver 580): sampling 1,375 inputs with six
 samples takes 657 s for the 1.5B and 432 s for the 0.5B (125 and 190 inputs a
@@ -236,7 +236,7 @@ time inside it:
 1. **Two streams of work, always.** The second GPU is free. Jobs go longest
    first, so neither waits for the other at the end.
 2. **More than one run on a GPU, if it has room.** A 0.5B run uses 1.7 of
-   15 GiB. `sc-training kaggle-bundle dpo --per-gpu N` runs N at once; it pays only if a
+   15 GiB. `pionus-training kaggle-bundle dpo --per-gpu N` runs N at once; it pays only if a
    single run leaves the GPU idle part of the time, which is not measured
    yet: compare each run's time with the 2,220 s alone, and keep the setting
    if the sum of the times of N runs is less than N times that.
@@ -268,15 +268,15 @@ did), `kaggle kernels status`, `kaggle kernels output` for the archives.
 
 ## Export and publication
 
-What is published is one model per size smart-commit offers, named
-`smart-commit-<size>-v<version>` (`smart-commit-1.5b-v0.1`,
-`smart-commit-0.5b-v0.1`), not the experiment runs: those stay in
+What is published is one model per size pionus offers, named
+`pionus-<size>-v<version>` (`pionus-1.5b-v0.1`,
+`pionus-0.5b-v0.1`), not the experiment runs: those stay in
 `training/runs/` and their numbers in HYPOTHESES.md. A later training is a new version, never a replaced file.
 
 1. Merge the adapter and quantize to Q4_K_M with `export_gguf.py` (the
-   llama.cpp tag smart-commit pins, b11381), and judge it against the
+   llama.cpp tag pionus pins, b11381), and judge it against the
    control as H0 explains. The merged GGUF runs with no change to
-   smart-commit (`SMART_COMMIT_GGUF`); the adapter alone
+   pionus (`PIONUS_GGUF`); the adapter alone
    (`export_lora.py`, `llama-server --lora`) is for evaluation only.
 2. For the OpenVINO devices (NPU, Intel GPU), users' machines are to
    export the published safetensors through `scripts/export/`, following
@@ -285,9 +285,9 @@ What is published is one model per size smart-commit offers, named
    `cpu` only.
 3. Upload both to the project's Hugging Face account,
    [LucasBRT](https://huggingface.co/LucasBRT), one repository per model and
-   version (`LucasBRT/smart-commit-1.5b-v0.1`): the merged safetensors, the
+   version (`LucasBRT/pionus-1.5b-v0.1`): the merged safetensors, the
    Q4_K_M GGUF and a model card with the base model (`base_model:` in its
-   metadata), the dataset, the prompt format (smart-commit's), the
+   metadata), the dataset, the prompt format (pionus's), the
    evaluation against the base model (with `type_group` and `type_behaviour`
    beside `type_match`), and the limitations (languages).
    The weights are Apache-2.0, like the base model. CommitChronicle has no
@@ -305,28 +305,28 @@ What is published is one model per size smart-commit offers, named
 
 ## Next steps, in order
 
-1. ~~`smart-commit prompt --inputs` (Rust, with tests).~~ Done.
+1. ~~`pionus prompt --inputs` (Rust, with tests).~~ Done.
 2. ~~Dataset builder: CommitChronicle → `Inputs` → prompts → JSON Lines with
    targets, split by repository.~~ Done: [training/](../training/README.md).
-3. ~~Evaluation, and the base 1.5B and 0.5B scores.~~ Done: `smart-commit
-   eval` and `training/sc-training score`; scores in
+3. ~~Evaluation, and the base 1.5B and 0.5B scores.~~ Done: `pionus
+   eval` and `training/pionus-training score`; scores in
    [training/HYPOTHESES.md](../training/HYPOTHESES.md).
 4. ~~LoRA on the 1.5B; compare; then the 0.5B.~~ Done: H1 to H3 in
    HYPOTHESES.md.
 5. ~~Export, publish, add to the registry.~~ Done for v0.1: the c40k runs
    of H3, published as
-   [smart-commit-1.5b-v0.1](https://huggingface.co/LucasBRT/smart-commit-1.5b-v0.1)
-   and [smart-commit-0.5b-v0.1](https://huggingface.co/LucasBRT/smart-commit-0.5b-v0.1),
+   [pionus-1.5b-v0.1](https://huggingface.co/LucasBRT/pionus-1.5b-v0.1)
+   and [pionus-0.5b-v0.1](https://huggingface.co/LucasBRT/pionus-0.5b-v0.1),
    experimental models in `cli/src/models/registry.rs`.
 6. ~~v0.2: H5 (young repositories), H6 (the rules in the weights), H7's
    release bumps and no type cap (H8) in one bundle of about 20k examples
-   (b3).~~ Done: `smart-commit-0.5b-v0.2` and `smart-commit-1.5b-v0.2`,
+   (b3).~~ Done: `pionus-0.5b-v0.2` and `pionus-1.5b-v0.2`,
    trained and evaluated, on Hugging Face and private (results in
    [HYPOTHESES.md](../training/HYPOTHESES.md), v0.2). The scope map (H4b)
    was not in the bundle.
 7. DPO on the models' own samples ([H12](../training/HYPOTHESES.md)): the
-   pipeline is built (`mine_pairs.py`, `sc-training pairs` and `balance`,
-   `train_dpo.py`, the Kaggle bundles and notebooks, `sc-training compare`). The
+   pipeline is built (`mine_pairs.py`, `pionus-training pairs` and `balance`,
+   `train_dpo.py`, the Kaggle bundles and notebooks, `pionus-training compare`). The
    first run removed the failures its pairs showed and cost the scope; the
    second run's first sweep collapsed onto one type because its pairs were
    unbalanced; its second sweep, on pairs with matched distributions and the

@@ -89,7 +89,7 @@ fn paths_named_in_the_pages_exist() {
 
 #[test]
 fn every_command_is_in_the_usage_guide() {
-    let mut command = Command::new(env!("CARGO_BIN_EXE_smart-commit"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_pionus"));
     let output = common::isolate(command.arg("--help")).output().unwrap();
     let help = String::from_utf8(output.stdout).unwrap();
     let commands: Vec<&str> = help
@@ -105,7 +105,7 @@ fn every_command_is_in_the_usage_guide() {
     let usage = fs::read_to_string(Path::new(ROOT).join("docs/usage.md")).unwrap();
     let missing: Vec<&&str> = commands
         .iter()
-        .filter(|name| !usage.contains(&format!("smart-commit {name}")))
+        .filter(|name| !usage.contains(&format!("pionus {name}")))
         .collect();
     assert!(
         missing.is_empty(),

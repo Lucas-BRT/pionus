@@ -41,7 +41,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "Effect",
                         "only install; run "
-                        <code>"smart-commit setup"</code>
+                        <code>"pionus setup"</code>
                         " later"
                     )
                 )
@@ -68,7 +68,7 @@ pub async fn section() -> Result<impl View> {
                     cell(label: "Option", <code>"--uninstall"</code>)
                     cell(
                         label: "Effect",
-                        "remove smart-commit (models, caches and config are kept)"
+                        "remove pionus (models, caches and config are kept)"
                     )
                 )
                 row(

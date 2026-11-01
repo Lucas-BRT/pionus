@@ -1,6 +1,6 @@
 //! The opt-in notice of a newer release (`update.check`).
 //!
-//! The only request smart-commit makes by itself, so it is off by default,
+//! The only request pionus makes by itself, so it is off by default,
 //! rare (once in 24 hours, failures included), bounded (curl's `--max-time
 //! 2`) and silent when it fails. The clock and the fetch are passed in, so
 //! tests need neither the network nor the time.
@@ -9,7 +9,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 /// Where the latest release is asked for.
-pub const LATEST_URL: &str = "https://api.github.com/repos/Lucas-BRT/smart-commit/releases/latest";
+pub const LATEST_URL: &str = "https://api.github.com/repos/Lucas-BRT/pionus/releases/latest";
 
 /// Seconds between two requests.
 pub const INTERVAL: u64 = 24 * 60 * 60;
@@ -85,8 +85,8 @@ pub fn check(
             let latest = tag.trim().trim_start_matches('v');
             is_newer(&tag, current).then(|| {
                 format!(
-                    "smart-commit {latest} is available (you have {current}); \
-                     run smart-commit update"
+                    "pionus {latest} is available (you have {current}); \
+                     run pionus update"
                 )
             })
         }
@@ -102,7 +102,7 @@ pub fn check(
 pub fn fetch_latest(current: &str) -> Result<String, String> {
     let output = Command::new("curl")
         .args(["-fsSL", "--max-time", "2", "-A"])
-        .arg(format!("smart-commit/{current}"))
+        .arg(format!("pionus/{current}"))
         .arg(LATEST_URL)
         .stdin(Stdio::null())
         .stderr(Stdio::null())
@@ -166,7 +166,7 @@ mod tests {
         let note = check(&cache, "1.1.0", 1000, || Ok(NEWER.into()));
         assert_eq!(
             note.as_deref(),
-            Some("smart-commit 1.2.0 is available (you have 1.1.0); run smart-commit update")
+            Some("pionus 1.2.0 is available (you have 1.1.0); run pionus update")
         );
         assert_eq!(std::fs::read_to_string(&cache).unwrap(), "1000\nv1.2.0\n");
     }

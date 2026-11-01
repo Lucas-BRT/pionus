@@ -61,7 +61,7 @@ impl<K: PartialEq + Clone> Counter<K> {
 }
 
 fn rank(hash: &str) -> String {
-    smart_commit::models::sha256_hex(hash.as_bytes())
+    pionus::models::sha256_hex(hash.as_bytes())
 }
 
 /// The values of `key` in the `meta.jsonl` of each directory.

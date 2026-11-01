@@ -46,11 +46,11 @@ pub async fn costs() -> Result<impl View> {
         terminal(
             title: "keeping the model loaded",
             label: "Commands for the kept model",
-            "smart-commit server status\n"
+            "pionus server status\n"
             note("what is kept loaded, and how long it has been idle")
-            "smart-commit server stop\n"
+            "pionus server stop\n"
             note("free its memory now")
-            "smart-commit config set model.keep_loaded 30\n"
+            "pionus config set model.keep_loaded 30\n"
             note("idle minutes; 0 turns it off")
         )
     })

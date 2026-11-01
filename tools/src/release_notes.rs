@@ -1,4 +1,4 @@
-//! `sc-tools release-notes TAG [REV]`: the notes of a release, from the
+//! `pionus-tools release-notes TAG [REV]`: the notes of a release, from the
 //! commits since the previous `v*` tag, grouped by their Conventional
 //! Commits type, plus how to install. The release workflow publishes them.
 
@@ -71,10 +71,7 @@ const SECTIONS: [(&str, &str); 4] = [
 
 /// The notes of `tag`, given the previous tag and the subjects since it.
 pub fn render(tag: &str, previous: Option<&str>, subjects: &[String]) -> String {
-    let mut text = format!(
-        "## smart-commit {}\n\n",
-        tag.strip_prefix('v').unwrap_or(tag)
-    );
+    let mut text = format!("## pionus {}\n\n", tag.strip_prefix('v').unwrap_or(tag));
     match previous {
         Some(previous) => text.push_str(&format!("Changes since {previous}.\n\n")),
         None => text.push_str("First release.\n\n"),
@@ -103,7 +100,7 @@ pub fn render(tag: &str, previous: Option<&str>, subjects: &[String]) -> String 
     }
     text.push_str(
         "### Install\n\n```bash\n\
-         curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash\n\
+         curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash\n\
          ```\n\n\
          The tarball is reproducible: `scripts/package.sh` on this tag gives the bytes\n\
          in `SHA256SUMS`, on any machine with Docker.\n",

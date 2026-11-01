@@ -30,8 +30,7 @@ fn no_model_drops_the_rules_it_was_not_trained_without() {
     // trained with the full prompt; v0.2 was trained without them. A
     // model trained without them is added here on purpose.
     for model in REGISTRY {
-        let trained_without =
-            ["smart-commit-0.5b-v0.2", "smart-commit-1.5b-v0.2"].contains(&model.id);
+        let trained_without = ["pionus-0.5b-v0.2", "pionus-1.5b-v0.2"].contains(&model.id);
         let expected = if trained_without {
             PromptRules::Omitted
         } else {
@@ -81,8 +80,8 @@ fn own_fine_tunes_follow_the_naming_rule() {
         .collect();
     assert!(!own.is_empty());
     for model in &own {
-        // smart-commit-<size>-v<version>, one repository per version.
-        let rest = model.id.strip_prefix("smart-commit-").unwrap();
+        // pionus-<size>-v<version>, one repository per version.
+        let rest = model.id.strip_prefix("pionus-").unwrap();
         let (size, version) = rest.split_once("-v").unwrap();
         assert!(size.ends_with('b'), "{}", model.id);
         assert!(
@@ -95,8 +94,8 @@ fn own_fine_tunes_follow_the_naming_rule() {
     }
     for model in REGISTRY.iter().filter(|m| !own.contains(m)) {
         assert!(
-            !model.id.starts_with("smart-commit-"),
-            "{}: smart-commit-* names only the project's own fine-tunes",
+            !model.id.starts_with("pionus-"),
+            "{}: pionus-* names only the project's own fine-tunes",
             model.id
         );
     }
@@ -280,10 +279,10 @@ fn local_models_keep_the_most_recent_ones() {
 fn local_models_say_what_they_are() {
     let dir = tempfile::TempDir::new().unwrap();
     let file = Local {
-        path: dir.path().join("smart-commit-0.5b-v0.2-q4_k_m.gguf"),
+        path: dir.path().join("pionus-0.5b-v0.2-q4_k_m.gguf"),
     };
     std::fs::write(&file.path, "GGUF1234").unwrap();
-    assert_eq!(file.name(), "smart-commit-0.5b-v0.2-q4_k_m");
+    assert_eq!(file.name(), "pionus-0.5b-v0.2-q4_k_m");
     assert_eq!(file.key(), "model.gguf");
     assert_eq!(file.size(), Some(8));
     assert_eq!(file.devices(), "vulkan and cpu");

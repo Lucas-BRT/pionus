@@ -2,11 +2,11 @@
 
 Every timing in the documentation comes from this page; the other pages link
 here instead of repeating numbers. How well the fine-tuned models write
-(type match, copies, fallbacks) is measured differently, with `sc-training score` on
+(type match, copies, fallbacks) is measured differently, with `pionus-training score` on
 eval-v1, and lives in [training/HYPOTHESES.md](../training/HYPOTHESES.md).
 Console output shown in other pages is a run recorded here.
 
-`smart-commit bench` measures every device of a machine on four prompts
+`pionus bench` measures every device of a machine on four prompts
 embedded in the binary, sized like real ones, so the numbers of different
 machines compare; the sections below say what else was run, and how to repeat
 it.
@@ -38,7 +38,7 @@ Per prompt:
 | npu (tuned) | ~1.07 s | 74 ms |
 
 Ryzen 5 5500 (6 cores), GeForce RTX 3050 8 GB with the proprietary driver
-595.104, 23 GiB RAM, Pop!_OS 24.04, kernel 7.2; `smart-commit bench` on
+595.104, 23 GiB RAM, Pop!_OS 24.04, kernel 7.2; `pionus bench` on
 the four prompts sized like real ones (fast load on for both devices):
 
 | Device | Per message | Load | Generate | CPU | Per message without fast load |
@@ -66,10 +66,10 @@ Most of the Vulkan load left is copying the weights to the GPU (935 MiB in
 | `qwen2.5-coder-1.5b` (default) | 1.1 GB | validated | all | 4.0 s / 2.4 s | — |
 | `qwen2.5-coder-0.5b` | 491 MB | experimental | `vulkan`, `cpu` | 3.1 s / 1.5 s | — |
 | `qwen2.5-coder-7b` | 4.7 GB | experimental | `vulkan`, `cpu` | — | — |
-| `smart-commit-1.5b-v0.1` | 986 MB | experimental | `vulkan`, `cpu` | 3.8 s / 2.3 s | — |
-| `smart-commit-0.5b-v0.1` | 397 MB | experimental | `vulkan`, `cpu` | 1.9 s / 1.2 s | — |
+| `pionus-1.5b-v0.1` | 986 MB | experimental | `vulkan`, `cpu` | 3.8 s / 2.3 s | — |
+| `pionus-0.5b-v0.1` | 397 MB | experimental | `vulkan`, `cpu` | 1.9 s / 1.2 s | — |
 
-Times are `smart-commit bench` with fast load, on its four prompts sized like
+Times are `pionus bench` with fast load, on its four prompts sized like
 real ones; a dash is a pair not measured on them yet. The fine-tunes are
 faster than their base models mostly because their replies are shorter.
 Earlier measurements, on prompts of about 250 tokens, gave the Core Ultra 5
@@ -90,10 +90,10 @@ are rarely needed for a 1 GB model with a fixed context:
 - **Fitting** (CPU and Vulkan): every GPU is asked for its free memory, and
   the layers and context adjusted to fit, 0.3–0.4 s, even with
   `--device none`. `--fit off` skips it; a GPU short of memory then fails
-  to load instead of loading fewer layers, so smart-commit loads it again
+  to load instead of loading fewer layers, so pionus loads it again
   normally.
 
-Since the gain depends on the processor, `smart-commit bench` measures
+Since the gain depends on the processor, `pionus bench` measures
 each llama.cpp device in both modes, and fast load is used where it saved
 at least 5% per message (more than the noise between runs).
 `model.fast_load = on` or `off` overrides that. The backend's description,
@@ -104,15 +104,15 @@ used before.
 ## Keeping the model loaded
 
 Measured end to end with
-`smart-commit` on one staged file (the release binary, fast load on), on
+`pionus` on one staged file (the release binary, fast load on), on
 the Ryzen 5 5500 with the RTX 3050; the replies were the same either way:
 
 | Model and device | Load every commit | Kept loaded, from the second commit |
 |---|---|---|
 | `qwen2.5-coder-1.5b`, `vulkan` | 2.8 s | 0.20 s |
 | `qwen2.5-coder-1.5b`, `cpu` | 2.6 s | 2.0 s |
-| `smart-commit-0.5b-v0.1`, `vulkan` | 1.4 s | 0.14 s |
-| `smart-commit-0.5b-v0.1`, `cpu` | 1.3 s | 0.8 s |
+| `pionus-0.5b-v0.1`, `vulkan` | 1.4 s | 0.14 s |
+| `pionus-0.5b-v0.1`, `cpu` | 1.3 s | 0.8 s |
 | `qwen2.5-coder-7b`, `vulkan` | 7.5 s | 0.57 s |
 
 What a server holds in RAM, which `model.keep_loaded_max_ram`
@@ -122,8 +122,8 @@ CPU of the 15 GiB machine:
 
 | Model | File | `--no-repack` (fast load) | Without it |
 |---|---|---|---|
-| `smart-commit-0.5b-v0.1` | 380 MB | 564 MB | 593 MB |
-| `smart-commit-1.5b-v0.1` | 941 MB | 1,169 MB | 1,773 MB |
+| `pionus-0.5b-v0.1` | 380 MB | 564 MB | 593 MB |
+| `pionus-1.5b-v0.1` | 941 MB | 1,169 MB | 1,773 MB |
 
 The weights are most of it. The server adds about 195 MB over the 0.5B file
 and 250 MB over the 1.5B one (the estimate is the file and 256 MB); the
@@ -138,7 +138,7 @@ one takes from the same RAM; the estimate counts them there too.
 
 Reading the prompt (prefill) is most of the time per message on the CPU,
 and it scales with the threads doing it. llama.cpp picks that count itself,
-and the pick depends on the processor, so smart-commit passes
+and the pick depends on the processor, so pionus passes
 `--threads-batch` explicitly: one thread per physical core
 (`model.threads_batch` overrides it). The backend's description, which
 traces record, says `threads-batch=N` on the CPU.
@@ -187,7 +187,7 @@ tokens, in milliseconds per message (load + one generation):
 | `vulkan`, `model.max_prompt_tokens = 512` | 650 | 534 | 739 | **1923** |
 | 0.5B, `cpu -tb 14 -b 1024 -ub 1024` | 311 | 1916 | 1966 | **4193** |
 
-End to end with `smart-commit --device ...` on three of the same commits:
+End to end with `pionus --device ...` on three of the same commits:
 `intel-gpu` (OpenVINO) about 2.0 s, `npu` about 6.3 s.
 
 Findings:
@@ -195,10 +195,10 @@ Findings:
 - `llama-server` was started without `--threads`/`--threads-batch`, so it
   used its own default, which on this hybrid CPU was 2 threads. Setting
   `--threads-batch` to the core count halves prefill and gave **identical
-  replies** on all 6 prompts; smart-commit now passes it
+  replies** on all 6 prompts; pionus now passes it
   ([above](#threads-on-the-cpu)). Changing `--threads` (decode)
   changed the replies and made decode slower, so it keeps the default.
-- `smart-commit bench` used the trace fixtures, whose prompts are ~250
+- `pionus bench` used the trace fixtures, whose prompts are ~250
   tokens, so it underestimated prefill: it reported ~2.6 s per message for
   `cpu` on this machine, against ~7.9 s with real prompts. It now uses
   prompts sized like real ones ([devices](devices.md#choosing-a-device)).
@@ -218,16 +218,16 @@ git clone -q . /tmp/sc && cd /tmp/sc
 mkdir -p /tmp/prompts
 for c in 8bc78c6 3df6503 badc90d de0dfed c4687aa 8314005; do
   git checkout -q -f "$c^" && git cherry-pick -n "$c" >/dev/null
-  smart-commit prompt > "/tmp/prompts/$c.txt"
+  pionus prompt > "/tmp/prompts/$c.txt"
   git reset -q --hard
 done
 # The 512 budget: the same loop with XDG_CONFIG_HOME pointing at a config
 # with `[model] max_prompt_tokens = 512`.
 
-# `sc-tools time-server` (the `tools/` crate, not part of the release) starts
-# llama-server as smart-commit does, with the flags after `--` added; the
-# model is `model.gguf` (or SMART_COMMIT_GGUF).
-T="cargo run --release --locked -q -p smart-commit-tools --"
+# `pionus-tools time-server` (the `tools/` crate, not part of the release) starts
+# llama-server as pionus does, with the flags after `--` added; the
+# model is `model.gguf` (or PIONUS_GGUF).
+T="cargo run --release --locked -q -p pionus-tools --"
 FAST="--no-repack --fit off"
 $T time-server /tmp/prompts --device cpu --label warmup -- $FAST >/dev/null
 $T time-server /tmp/prompts --device cpu --label "cpu" -- $FAST
@@ -236,7 +236,7 @@ $T time-server /tmp/prompts --device cpu --label "cpu tb" -- $FAST \
 $T time-server /tmp/prompts --device vulkan --label "vulkan" -- $FAST
 ```
 
-smart-commit already passes `--threads-batch` (one per physical core) and
+pionus already passes `--threads-batch` (one per physical core) and
 `--ctx-size`, which the first measurements left to llama-server's own
 defaults; a flag after `--` comes last, so it wins.
 
@@ -260,10 +260,10 @@ stays within that room.
 
 ## Asking for the type
 
-`model.ask_type` is built on three measurements of `smart-commit-1.5b-v0.1`
+`model.ask_type` is built on three measurements of `pionus-1.5b-v0.1`
 (`vulkan`) on the 250 Conventional commits of eval-v1, from the probabilities
 of the reply's first token (`logprobs` of llama-server on the prompts of
-`smart-commit prompt --inputs`).
+`pionus prompt --inputs`).
 
 **How sure it is tells how often it is right.** The type the model picks
 matched the author's 0.700 of the time, the author's type was among its two
@@ -302,7 +302,7 @@ Why ask at all: the type is where readers disagree, not where the model is
 weak. Two language models read only the file list and diff of 200 of these
 commits and chose the type: they agree with each other 0.880 of the time
 (Cohen's kappa 0.85) and with the author 0.640 and 0.675 (the model of
-smart-commit: 0.715 on the same commits); where the two agree, the author
+pionus: 0.715 on the same commits); where the two agree, the author
 matches them 0.693. The `fix`, `feat` and `refactor` boundary is the author's
 intent, which the diff does not show, and a person can say it. These labels
 come from language models run once, so they are not reproducible byte for

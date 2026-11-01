@@ -18,9 +18,9 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "doctor",
                 label: "Check an installation",
-                "smart-commit doctor\n"
+                "pionus doctor\n"
                 note("offline")
-                "smart-commit doctor --thorough\n"
+                "pionus doctor --thorough\n"
                 note("also hash the model file (minutes for a big model)")
             )
             <p>
@@ -83,17 +83,17 @@ pub async fn section() -> Result<impl View> {
             )
             <p>"Example:"</p>
             terminal(
-                title: "smart-commit doctor",
-                label: "Example output of smart-commit doctor",
+                title: "pionus doctor",
+                label: "Example output of pionus doctor",
                 "ok    path       /home/me/.local/bin is on PATH
 ok    git        git 2.43
 ok    config     no files: the defaults apply
 ok    model      qwen2.5-coder-1.5b-instruct-q4_k_m.gguf: size and record match (--thorough hashes the file)
-ok    llama.cpp  /home/me/.local/share/smart-commit/llama.cpp/llama-b11381/llama-server
+ok    llama.cpp  /home/me/.local/share/pionus/llama.cpp/llama-b11381/llama-server
 ok    device     cpu (auto: no benchmark, the default order)
-warn  device     no benchmark yet - run `smart-commit bench`
+warn  device     no benchmark yet - run `pionus bench`
 ok    server     none running: the next commit starts one
-warn  hook       not installed in this repository - `smart-commit hook install`"
+warn  hook       not installed in this repository - `pionus hook install`"
             )
         )
     })

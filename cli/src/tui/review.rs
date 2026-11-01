@@ -1,4 +1,4 @@
-//! `smart-commit --commit` in a terminal: the message, where it came from
+//! `pionus --commit` in a terminal: the message, where it came from
 //! and what is staged, before committing it, editing it, asking for another
 //! one or giving up.
 

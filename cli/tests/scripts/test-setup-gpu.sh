@@ -37,7 +37,7 @@ scenario() {
     mkdir -p "$sysfs/bus/pci/devices" "$work/icd-$name"
     $setup "$sysfs"
     # Nothing counts as installed, so the plan does not depend on the machine.
-    SMART_COMMIT_SYSFS=$sysfs SMART_COMMIT_VULKAN_ICD_DIRS=$work/icd-$name SMART_COMMIT_DPKG_QUERY=false \
+    PIONUS_SYSFS=$sysfs PIONUS_VULKAN_ICD_DIRS=$work/icd-$name PIONUS_DPKG_QUERY=false \
         XDG_DATA_HOME=$work/data-$name bash "$SCRIPT" --dry-run >"$work/$name.out" 2>&1 || {
         echo "FAIL  $name: exited with $?"
         cat "$work/$name.out"
@@ -86,7 +86,7 @@ expect intel "intel-opencl-icd_26.27.39122.14"
 expect intel "would run: sudo dpkg -i"
 expect intel "would run: sudo apt-get install -y libvulkan1 mesa-vulkan-drivers"
 expect intel "Intel's compute runtime 26.27.39122.14 for OpenVINO"
-# llama.cpp is `smart-commit setup`'s job.
+# llama.cpp is `pionus setup`'s job.
 refute intel "llama-b11381"
 refute intel ".gguf"
 
@@ -128,7 +128,7 @@ printf '#!/bin/sh\necho "install ok installed 26.1"\n' >"$fake_dpkg"
 chmod +x "$fake_dpkg"
 mkdir -p "$work/already/bus/pci/devices" "$work/icd-already"
 amd "$work/already"
-SMART_COMMIT_SYSFS=$work/already SMART_COMMIT_VULKAN_ICD_DIRS=$work/icd-already SMART_COMMIT_DPKG_QUERY=$fake_dpkg \
+PIONUS_SYSFS=$work/already PIONUS_VULKAN_ICD_DIRS=$work/icd-already PIONUS_DPKG_QUERY=$fake_dpkg \
     XDG_DATA_HOME=$work/data-already bash "$SCRIPT" --dry-run >"$work/already.out" 2>&1
 refute already "apt-get install"
 

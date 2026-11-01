@@ -1,4 +1,4 @@
-"""DPO on the pairs of `sc-training pairs`, from a model already fine-tuned by train.py.
+"""DPO on the pairs of `pionus-training pairs`, from a model already fine-tuned by train.py.
 
 The base model gets the SFT adapter merged in (as export_gguf.py does), and a
 new LoRA is trained on top: with it disabled the model is exactly the SFT one,

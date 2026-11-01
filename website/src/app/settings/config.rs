@@ -17,20 +17,20 @@ pub async fn section() -> Result<impl View> {
             id: "settings",
             title: "Settings",
             <p>
-                "smart-commit works without configuration. Settings change the style, the device or the model."
+                "pionus works without configuration. Settings change the style, the device or the model."
             </p>
             terminal(
                 title: "settings",
                 label: "Commands to read and change settings",
-                "smart-commit config list --show-origin\n"
+                "pionus config list --show-origin\n"
                 note("everything, and the layer each value comes from")
-                "smart-commit config set model.device cpu\n"
+                "pionus config set model.device cpu\n"
                 note("global")
-                "smart-commit config set --repo style.convention conventional\n"
-                note(".smart-commit.toml, shared through git")
-                "smart-commit config get style.convention\n"
-                "smart-commit config unset model.device\n"
-                "smart-commit config init\n"
+                "pionus config set --repo style.convention conventional\n"
+                note(".pionus.toml, shared through git")
+                "pionus config get style.convention\n"
+                "pionus config unset model.device\n"
+                "pionus config init\n"
                 note("a file with every key commented out")
             )
             <p>"A value comes from the strongest layer that sets it:"</p>
@@ -46,17 +46,17 @@ pub async fn section() -> Result<impl View> {
                 </li>
                 <li>
                     "environment variables ("
-                    <code>"SMART_COMMIT_*"</code>
+                    <code>"PIONUS_*"</code>
                     ");"
                 </li>
                 <li>
                     "the repository's "
-                    <code>".smart-commit.toml"</code>
+                    <code>".pionus.toml"</code>
                     ", at the root of the work tree;"
                 </li>
                 <li>
                     "the global "
-                    <code>"~/.config/smart-commit/config.toml"</code>
+                    <code>"~/.config/pionus/config.toml"</code>
                     ";"
                 </li>
                 <li>"the built-in defaults."</li>
@@ -70,7 +70,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "Run",
                         <code>
-                            "smart-commit config set --repo style.convention conventional"
+                            "pionus config set --repo style.convention conventional"
                         </code>
                     )
                 )
@@ -82,7 +82,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "Run",
                         <code>
-                            "smart-commit config set model.max_prompt_tokens 512"
+                            "pionus config set model.max_prompt_tokens 512"
                         </code>
                     )
                 )
@@ -90,14 +90,14 @@ pub async fn section() -> Result<impl View> {
                     cell(label: "To", "use another GPU on a multi-GPU machine")
                     cell(
                         label: "Run",
-                        <code>"smart-commit config set model.vulkan_device 1"</code>
+                        <code>"pionus config set model.vulkan_device 1"</code>
                     )
                 )
                 row(
                     cell(label: "To", "keep replies short")
                     cell(
                         label: "Run",
-                        <code>"smart-commit config set model.max_new_tokens 64"</code>
+                        <code>"pionus config set model.max_new_tokens 64"</code>
                     )
                 )
             )

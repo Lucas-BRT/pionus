@@ -1,4 +1,4 @@
-//! Runs the `smart-commit` binary end to end.
+//! Runs the `pionus` binary end to end.
 
 use std::path::Path;
 use std::process::Output;
@@ -6,12 +6,12 @@ use std::process::Output;
 mod common;
 use common::{FakeMachine, TestRepo};
 
-fn smart_commit(args: &[&str], dir: &Path) -> Output {
-    smart_commit_with(args, dir, &[])
+fn pionus(args: &[&str], dir: &Path) -> Output {
+    pionus_with(args, dir, &[])
 }
 
-fn smart_commit_with(args: &[&str], dir: &Path, env: &[(&str, &str)]) -> Output {
-    common::smart_commit(args, dir, env)
+fn pionus_with(args: &[&str], dir: &Path, env: &[(&str, &str)]) -> Output {
+    common::pionus(args, dir, env)
 }
 
 /// A repository with a conventional history and one staged file.
@@ -42,14 +42,14 @@ fn verbose_shows_why_a_reply_was_rejected_and_quiet_runs_do_not() {
         }
         args
     };
-    let quiet = smart_commit(&args(false), repo.path());
+    let quiet = pionus(&args(false), repo.path());
     assert!(!stderr(&quiet).contains("debug:"), "{}", stderr(&quiet));
 
-    let verbose = smart_commit(&args(true), repo.path());
+    let verbose = pionus(&args(true), repo.path());
     assert!(verbose.status.success(), "{}", stderr(&verbose));
     let err = stderr(&verbose);
     assert!(
-        err.contains("debug: smart_commit::generate: reply rejected attempt=1"),
+        err.contains("debug: pionus::generate: reply rejected attempt=1"),
         "{err}"
     );
     assert!(
@@ -64,7 +64,7 @@ fn verbose_shows_why_a_reply_was_rejected_and_quiet_runs_do_not() {
 fn verbose_works_before_and_after_a_subcommand() {
     let repo = staged_repo();
     for args in [&["-v", "context"][..], &["context", "-v"]] {
-        let output = smart_commit(args, repo.path());
+        let output = pionus(args, repo.path());
         assert!(output.status.success(), "{args:?}: {}", stderr(&output));
         assert!(stdout(&output).starts_with("repository:"), "{args:?}");
     }
@@ -78,7 +78,7 @@ fn options_of_the_default_command_conflict_with_a_subcommand() {
         (&["-C", ".", "context"], "--path"),
         (&["--backend", "mock", "context"], "--backend"),
     ] {
-        let output = smart_commit(args, repo.path());
+        let output = pionus(args, repo.path());
         assert_eq!(output.status.code(), Some(2), "{args:?}");
         assert!(
             stderr(&output).starts_with(&format!(
@@ -100,7 +100,7 @@ fn invalid_arguments_are_usage_errors() {
         &["--device", "tpu"],
         &["context", "--commit"],
     ] {
-        let output = smart_commit(args, repo.path());
+        let output = pionus(args, repo.path());
         assert_eq!(output.status.code(), Some(2), "{args:?}");
         assert!(stderr(&output).starts_with("error:"), "{args:?}");
     }
@@ -109,7 +109,7 @@ fn invalid_arguments_are_usage_errors() {
 #[test]
 fn context_outside_a_repository_fails() {
     let dir = tempfile::TempDir::new().unwrap();
-    let output = smart_commit(&["context"], dir.path());
+    let output = pionus(&["context"], dir.path());
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("not a git repository"));
 }
@@ -121,7 +121,7 @@ fn context_reports_the_detected_style() {
     repo.commit("feat(cli): add the context command");
     repo.commit("fix(git): correct the branch reading");
 
-    let output = smart_commit(&["context"], repo.path());
+    let output = pionus(&["context"], repo.path());
     assert!(output.status.success(), "{}", stderr(&output));
     let out = stdout(&output);
     assert!(out.contains("branch:      feature/NPU-7-x"));
@@ -136,7 +136,7 @@ fn context_accepts_a_path() {
     let repo = TestRepo::new();
     let elsewhere = tempfile::TempDir::new().unwrap();
     let path = repo.path().to_str().unwrap();
-    let output = smart_commit(&["context", "-C", path], elsewhere.path());
+    let output = pionus(&["context", "-C", path], elsewhere.path());
     assert!(output.status.success(), "{}", stderr(&output));
 }
 
@@ -144,7 +144,7 @@ fn context_accepts_a_path() {
 fn prompt_without_staged_changes_fails() {
     let repo = TestRepo::new();
     repo.commit("init");
-    let output = smart_commit(&["prompt"], repo.path());
+    let output = pionus(&["prompt"], repo.path());
     assert_eq!(output.status.code(), Some(1));
     assert_eq!(stderr(&output), "error: nothing staged\n");
 }
@@ -157,7 +157,7 @@ fn prompt_shows_style_and_staged_diff() {
     repo.write("main.rs", "fn main() {}\n");
     repo.git(&["add", "main.rs"]);
 
-    let output = smart_commit(&["prompt"], repo.path());
+    let output = pionus(&["prompt"], repo.path());
     assert!(output.status.success(), "{}", stderr(&output));
     let out = stdout(&output);
     assert!(out.contains("Write in English"));
@@ -168,10 +168,10 @@ fn prompt_shows_style_and_staged_diff() {
 }
 
 /// The inputs of a mock generation in [`staged_repo`] as one JSON line, and
-/// the prompt smart-commit sent for them.
+/// the prompt pionus sent for them.
 fn recorded_inputs(repo: &TestRepo) -> (String, serde_json::Value) {
     let trace = repo.path().join("trace.json");
-    let output = smart_commit(
+    let output = pionus(
         &[
             "--backend",
             "mock",
@@ -199,7 +199,7 @@ fn prompt_from_inputs_matches_the_prompt_sent() {
     let file = elsewhere.path().join("inputs.jsonl");
     std::fs::write(&file, format!("{inputs}\n\n{inputs}\n")).unwrap();
 
-    let output = smart_commit(
+    let output = pionus(
         &["prompt", "--inputs", file.to_str().unwrap()],
         elsewhere.path(),
     );
@@ -220,7 +220,7 @@ fn rules_can_be_omitted_for_training_and_evaluation() {
     std::fs::write(&file, format!("{inputs}\n")).unwrap();
     let path = file.to_str().unwrap();
 
-    let output = smart_commit(
+    let output = pionus(
         &["prompt", "--inputs", path, "--rules", "omitted"],
         dir.path(),
     );
@@ -232,12 +232,12 @@ fn rules_can_be_omitted_for_training_and_evaluation() {
         "{system}"
     );
     assert!(system.len() < full["system"].as_str().unwrap().len());
-    let output = smart_commit(&["prompt", "--inputs", path, "--rules", "full"], dir.path());
+    let output = pionus(&["prompt", "--inputs", path, "--rules", "full"], dir.path());
     let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
     assert_eq!(prompt, full);
 
     // The rules are recorded, so the trace replays with the same prompt.
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             path,
@@ -256,7 +256,7 @@ fn rules_can_be_omitted_for_training_and_evaluation() {
     assert_eq!(trace["options"]["rules"], "omitted");
     let file = dir.path().join("trace.json");
     std::fs::write(&file, &line).unwrap();
-    let output = smart_commit(&["replay", file.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", file.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(stdout(&output).starts_with("reproduced: 1 attempt(s)"));
 }
@@ -271,21 +271,21 @@ fn plain_file_list_for_evaluation() {
     std::fs::write(&file, format!("{inputs}\n")).unwrap();
     let path = file.to_str().unwrap();
 
-    let output = smart_commit(
+    let output = pionus(
         &["prompt", "--inputs", path, "--diff", "annotated"],
         dir.path(),
     );
     assert!(output.status.success(), "{}", stderr(&output));
     let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
     assert_eq!(prompt, annotated);
-    let output = smart_commit(&["prompt", "--inputs", path, "--diff", "plain"], dir.path());
+    let output = pionus(&["prompt", "--inputs", path, "--diff", "plain"], dir.path());
     let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
     let user = prompt["user"].as_str().unwrap();
     assert!(user.contains("main.rs | +1 -0\n"), "{user}");
     assert_eq!(prompt["system"], annotated["system"]);
 
     // The format is recorded, so the trace replays with the same prompt.
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             path,
@@ -306,7 +306,7 @@ fn plain_file_list_for_evaluation() {
     assert!(trace["options"]["diff"].is_null(), "{line}");
     let file = dir.path().join("trace.json");
     std::fs::write(&file, &line).unwrap();
-    let output = smart_commit(&["replay", file.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", file.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(stdout(&output).starts_with("reproduced: 1 attempt(s)"));
 }
@@ -314,7 +314,7 @@ fn plain_file_list_for_evaluation() {
 #[test]
 fn a_merge_that_stages_nothing_gets_gits_message() {
     // Found with the commit scenarios: a conflict resolved to HEAD's side
-    // stages nothing, and smart-commit said "nothing staged" while `git
+    // stages nothing, and pionus said "nothing staged" while `git
     // commit` would make the merge.
     let repo = TestRepo::new();
     repo.write("f", "a\n");
@@ -333,7 +333,7 @@ fn a_merge_that_stages_nothing_gets_gits_message() {
     let dir = tempfile::TempDir::new().unwrap();
     let trace = dir.path().join("trace.json");
     // No mock reply: the model must not be asked.
-    let output = smart_commit(
+    let output = pionus(
         &["--backend", "mock", "--trace", trace.to_str().unwrap()],
         repo.path(),
     );
@@ -343,7 +343,7 @@ fn a_merge_that_stages_nothing_gets_gits_message() {
         serde_json::from_str(&std::fs::read_to_string(&trace).unwrap()).unwrap();
     assert_eq!(recorded["generation"]["source"], "git");
     assert_eq!(recorded["inputs"]["prepared"]["operation"], "merge");
-    let output = smart_commit(&["replay", trace.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", trace.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
 }
 
@@ -352,12 +352,12 @@ fn prompt_from_inputs_reads_stdin_and_global_settings() {
     let repo = staged_repo();
     let (inputs, _) = recorded_inputs(&repo);
     let config_home = tempfile::TempDir::new().unwrap();
-    let config = config_home.path().join("smart-commit/config.toml");
+    let config = config_home.path().join("pionus/config.toml");
     std::fs::create_dir_all(config.parent().unwrap()).unwrap();
     std::fs::write(&config, "[style]\nconvention = \"gitmoji\"\n").unwrap();
 
     let mut child = common::isolate(
-        std::process::Command::new(env!("CARGO_BIN_EXE_smart-commit"))
+        std::process::Command::new(env!("CARGO_BIN_EXE_pionus"))
             .args(["prompt", "--inputs", "-"])
             .current_dir(config_home.path()),
     )
@@ -386,7 +386,7 @@ fn prompt_from_empty_inputs_prints_nothing() {
     let dir = tempfile::TempDir::new().unwrap();
     let file = dir.path().join("inputs.jsonl");
     std::fs::write(&file, "").unwrap();
-    let output = smart_commit(&["prompt", "--inputs", file.to_str().unwrap()], dir.path());
+    let output = pionus(&["prompt", "--inputs", file.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(stdout(&output), "");
 }
@@ -400,7 +400,7 @@ fn prompt_from_invalid_inputs_names_the_line() {
     std::fs::write(&file, format!("{inputs}\n{{\"branch\": null}}\n")).unwrap();
     let path = file.to_str().unwrap();
 
-    let output = smart_commit(&["prompt", "--inputs", path], dir.path());
+    let output = pionus(&["prompt", "--inputs", path], dir.path());
     assert_eq!(output.status.code(), Some(1));
     assert!(
         stderr(&output).starts_with(&format!("error: {path}:2: invalid inputs: missing field")),
@@ -409,14 +409,14 @@ fn prompt_from_invalid_inputs_names_the_line() {
     );
 
     let missing = dir.path().join("missing.jsonl");
-    let output = smart_commit(
+    let output = pionus(
         &["prompt", "--inputs", missing.to_str().unwrap()],
         dir.path(),
     );
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("cannot read"));
 
-    let output = smart_commit(&["prompt", "--inputs", path, "-C", "."], dir.path());
+    let output = pionus(&["prompt", "--inputs", path, "-C", "."], dir.path());
     assert_eq!(output.status.code(), Some(2));
 }
 
@@ -432,12 +432,12 @@ fn the_scope_map_is_for_evaluation_and_replays() {
     std::fs::write(&file, format!("{inputs}\n")).unwrap();
     let path = file.to_str().unwrap();
 
-    let output = smart_commit(&["prompt", "--inputs", path], dir.path());
+    let output = pionus(&["prompt", "--inputs", path], dir.path());
     let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
     let list = prompt["system"].as_str().unwrap();
     assert!(list.contains("Scopes used here: cli, git."), "{list}");
 
-    let output = smart_commit(&["prompt", "--inputs", path, "--scopes", "map"], dir.path());
+    let output = pionus(&["prompt", "--inputs", path, "--scopes", "map"], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
     let map = prompt["system"].as_str().unwrap();
@@ -447,7 +447,7 @@ fn the_scope_map_is_for_evaluation_and_replays() {
     );
 
     // The option is recorded, so the trace replays with the same prompt.
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             path,
@@ -463,7 +463,7 @@ fn the_scope_map_is_for_evaluation_and_replays() {
     assert!(output.status.success(), "{}", stderr(&output));
     let trace = dir.path().join("trace.json");
     std::fs::write(&trace, stdout(&output).lines().next().unwrap()).unwrap();
-    let output = smart_commit(&["replay", trace.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", trace.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(
         stdout(&output).starts_with("reproduced:"),
@@ -502,7 +502,7 @@ fn similar_examples_are_for_evaluation_and_replay() {
     let system = |extra: &[&str]| {
         let mut args = vec!["prompt", "--inputs", path];
         args.extend_from_slice(extra);
-        let output = smart_commit(&args, dir.path());
+        let output = pionus(&args, dir.path());
         assert!(output.status.success(), "{}", stderr(&output));
         let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
         prompt["system"].as_str().unwrap().to_owned()
@@ -530,7 +530,7 @@ fn similar_examples_are_for_evaluation_and_replay() {
     }
 
     // The option is recorded, so the trace replays with the same prompt.
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             path,
@@ -548,7 +548,7 @@ fn similar_examples_are_for_evaluation_and_replay() {
     assert!(line.contains("\"examples\":\"similar\""), "{line}");
     let trace = dir.path().join("trace.json");
     std::fs::write(&trace, line).unwrap();
-    let output = smart_commit(&["replay", trace.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", trace.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(
         stdout(&output).starts_with("reproduced:"),
@@ -569,7 +569,7 @@ fn the_names_line_is_for_evaluation_and_replays() {
     let user = |extra: &[&str]| {
         let mut args = vec!["prompt", "--inputs", path];
         args.extend_from_slice(extra);
-        let output = smart_commit(&args, dir.path());
+        let output = pionus(&args, dir.path());
         assert!(output.status.success(), "{}", stderr(&output));
         let prompt: serde_json::Value = serde_json::from_str(stdout(&output).trim()).unwrap();
         prompt["user"].as_str().unwrap().to_owned()
@@ -582,7 +582,7 @@ fn the_names_line_is_for_evaluation_and_replays() {
     assert!(on.find("Names touched").unwrap() < on.find("Diff:").unwrap());
 
     // The option is recorded, so the trace replays with the same prompt.
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             path,
@@ -600,7 +600,7 @@ fn the_names_line_is_for_evaluation_and_replays() {
     assert!(line.contains("\"names\":\"on\""), "{line}");
     let trace = dir.path().join("trace.json");
     std::fs::write(&trace, line).unwrap();
-    let output = smart_commit(&["replay", trace.to_str().unwrap()], dir.path());
+    let output = pionus(&["replay", trace.to_str().unwrap()], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(
         stdout(&output).starts_with("reproduced:"),
@@ -617,7 +617,7 @@ fn eval_writes_a_replayable_trace_per_input() {
     let file = dir.path().join("inputs.jsonl");
     std::fs::write(&file, format!("{inputs}\n{inputs}\n")).unwrap();
 
-    let output = smart_commit(
+    let output = pionus(
         &[
             "eval",
             file.to_str().unwrap(),
@@ -646,7 +646,7 @@ fn eval_writes_a_replayable_trace_per_input() {
     {
         let trace = dir.path().join("trace.json");
         std::fs::write(&trace, line).unwrap();
-        let output = smart_commit(&["replay", trace.to_str().unwrap()], dir.path());
+        let output = pionus(&["replay", trace.to_str().unwrap()], dir.path());
         assert!(output.status.success(), "{}", stderr(&output));
         assert_eq!(
             stdout(&output),
@@ -661,11 +661,11 @@ fn eval_of_no_inputs_prints_nothing() {
     let file = dir.path().join("inputs.jsonl");
     std::fs::write(&file, "\n").unwrap();
     let path = file.to_str().unwrap();
-    let output = smart_commit(&["eval", path, "--backend", "mock"], dir.path());
+    let output = pionus(&["eval", path, "--backend", "mock"], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(stdout(&output), "");
 
-    let output = smart_commit(
+    let output = pionus(
         &["eval", path, "--backend", "mock", "--trace", "t.json"],
         dir.path(),
     );
@@ -683,10 +683,10 @@ fn lockfiles_alone_get_a_message_without_loading_a_model() {
     );
     repo.git(&["add", "Cargo.lock"]);
     // A server that does not exist: loading a model would fail.
-    let output = smart_commit_with(
+    let output = pionus_with(
         &["--backend", "llamacpp", "--device", "cpu"],
         repo.path(),
-        &[("SMART_COMMIT_LLAMA_SERVER", "/nonexistent/llama-server")],
+        &[("PIONUS_LLAMA_SERVER", "/nonexistent/llama-server")],
     );
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(stdout(&output), "chore: add Cargo.lock\n");
@@ -696,7 +696,7 @@ fn lockfiles_alone_get_a_message_without_loading_a_model() {
 #[test]
 fn repeating_the_history_twice_says_so() {
     let repo = staged_repo();
-    let output = smart_commit(
+    let output = pionus(
         &[
             "--backend",
             "mock",
@@ -719,7 +719,7 @@ fn repeating_the_history_twice_says_so() {
 fn generate_prints_the_sanitized_reply() {
     let repo = staged_repo();
     let reply = "Here is the commit message:\n```\nFeat(cli): add the main entry point.\n```";
-    let output = smart_commit(
+    let output = pionus(
         &["--backend", "mock", "--mock-response", reply],
         repo.path(),
     );
@@ -731,7 +731,7 @@ fn generate_prints_the_sanitized_reply() {
 #[test]
 fn generate_retries_then_falls_back_with_a_warning() {
     let repo = staged_repo();
-    let output = smart_commit(
+    let output = pionus(
         &[
             "--backend",
             "mock",
@@ -748,7 +748,7 @@ fn generate_retries_then_falls_back_with_a_warning() {
 #[test]
 fn generate_uses_the_second_reply_when_the_first_is_rejected() {
     let repo = staged_repo();
-    let output = smart_commit(
+    let output = pionus(
         &[
             "--backend",
             "mock",
@@ -768,7 +768,7 @@ fn generate_uses_the_second_reply_when_the_first_is_rejected() {
 fn on_machine(machine: &FakeMachine, args: &[&str], dir: &Path) -> Output {
     let env = machine.env();
     let env: Vec<(&str, &str)> = env.iter().map(|(n, v)| (*n, v.as_str())).collect();
-    smart_commit_with(args, dir, &env)
+    pionus_with(args, dir, &env)
 }
 
 #[test]
@@ -779,8 +779,8 @@ fn auto_without_any_model_says_once_that_it_is_not_set_up() {
     assert_eq!(output.status.code(), Some(1));
     assert_eq!(
         stderr(&output),
-        "error: smart-commit is not set up yet: no model or llama.cpp found.\n\
-         Run `smart-commit setup` to download them and pick the fastest device.\n"
+        "error: pionus is not set up yet: no model or llama.cpp found.\n\
+         Run `pionus setup` to download them and pick the fastest device.\n"
     );
 }
 
@@ -791,15 +791,12 @@ fn verbose_shows_why_each_device_was_skipped() {
     let output = on_machine(&machine, &["-v"], repo.path());
     assert_eq!(output.status.code(), Some(1));
     let err = stderr(&output);
-    assert!(
-        err.contains("error: smart-commit is not set up yet"),
-        "{err}"
-    );
+    assert!(err.contains("error: pionus is not set up yet"), "{err}");
     for device in ["intel-gpu", "npu", "vulkan", "cpu", "openvino-cpu"] {
         assert!(
             err.lines().any(|l| l.starts_with("debug:")
                 && l.contains(&format!("target={device} "))
-                && l.contains("`smart-commit setup`")),
+                && l.contains("`pionus setup`")),
             "{device}: {err}"
         );
     }
@@ -808,32 +805,32 @@ fn verbose_shows_why_each_device_was_skipped() {
 #[test]
 fn a_fixed_device_reports_only_its_own_problem() {
     let repo = staged_repo();
-    let output = smart_commit(&["--device", "openvino-cpu"], repo.path());
+    let output = pionus(&["--device", "openvino-cpu"], repo.path());
     assert!(
         stderr(&output).starts_with("error: backend unavailable: no model in"),
         "{}",
         stderr(&output)
     );
-    let output = smart_commit(&["--device", "cpu"], repo.path());
+    let output = pionus(&["--device", "cpu"], repo.path());
     assert!(
         stderr(&output).starts_with("error: backend unavailable: no GGUF model at"),
         "{}",
         stderr(&output)
     );
     // The old name of intel-gpu is still a valid flag.
-    let output = smart_commit(&["--device", "gpu"], repo.path());
+    let output = pionus(&["--device", "gpu"], repo.path());
     assert!(
         stderr(&output).starts_with("error: backend unavailable: no model in"),
         "{}",
         stderr(&output)
     );
-    let output = smart_commit(&["--device", "vulkan"], repo.path());
+    let output = pionus(&["--device", "vulkan"], repo.path());
     assert!(
         stderr(&output).starts_with("error: backend unavailable: no GGUF model at"),
         "{}",
         stderr(&output)
     );
-    let output = smart_commit(
+    let output = pionus(
         &["--backend", "openvino", "--device", "vulkan"],
         repo.path(),
     );
@@ -850,14 +847,14 @@ fn model_dir_can_be_given() {
     let dir = empty.path().to_str().unwrap();
     for (mut args, env) in [
         (vec!["--model-dir", dir], vec![]),
-        (vec![], vec![("SMART_COMMIT_MODEL_DIR", dir)]),
+        (vec![], vec![("PIONUS_MODEL_DIR", dir)]),
     ] {
         let machine = FakeMachine::all_intel();
         let mut env = env;
         args.push("-v");
         let pinned = machine.env();
         env.extend(pinned.iter().map(|(name, value)| (*name, value.as_str())));
-        let output = smart_commit_with(&args, repo.path(), &env);
+        let output = pionus_with(&args, repo.path(), &env);
         assert_eq!(output.status.code(), Some(1));
         assert!(
             stderr(&output).contains(&format!("no model in {dir};")),
@@ -872,7 +869,7 @@ fn replay_with_model_needs_the_model() {
     let repo = staged_repo();
     let trace = repo.path().join("trace.json");
     let path = trace.to_str().unwrap();
-    smart_commit(
+    pionus(
         &[
             "--backend",
             "mock",
@@ -901,7 +898,7 @@ fn replay_with_model_needs_the_model() {
 fn generate_with_nothing_staged_fails() {
     let repo = TestRepo::new();
     repo.commit("init");
-    let output = smart_commit(&["--backend", "mock"], repo.path());
+    let output = pionus(&["--backend", "mock"], repo.path());
     assert_eq!(output.status.code(), Some(1));
     assert_eq!(stderr(&output), "error: nothing staged\n");
 }
@@ -911,7 +908,7 @@ fn generate_accepts_a_path() {
     let repo = staged_repo();
     let elsewhere = tempfile::TempDir::new().unwrap();
     let path = repo.path().to_str().unwrap();
-    let output = smart_commit(
+    let output = pionus(
         &[
             "-C",
             path,
@@ -929,7 +926,7 @@ fn generate_accepts_a_path() {
 fn commit_goes_through_the_editor() {
     let repo = staged_repo();
     // `true` accepts the pre-filled message unchanged.
-    let output = smart_commit_with(
+    let output = pionus_with(
         &[
             "--commit",
             "--backend",
@@ -951,7 +948,7 @@ fn commit_goes_through_the_editor() {
 #[test]
 fn failed_editor_aborts_the_commit() {
     let repo = staged_repo();
-    let output = smart_commit_with(
+    let output = pionus_with(
         &[
             "--commit",
             "--backend",
@@ -971,7 +968,7 @@ fn failed_editor_aborts_the_commit() {
 fn trace_is_written_and_replays() {
     let repo = staged_repo();
     let trace = repo.path().join("trace.json");
-    let output = smart_commit(
+    let output = pionus(
         &[
             "--backend",
             "mock",
@@ -991,7 +988,7 @@ fn trace_is_written_and_replays() {
 
     // Replays anywhere, without the repository.
     let elsewhere = tempfile::TempDir::new().unwrap();
-    let output = smart_commit(&["replay", trace.to_str().unwrap()], elsewhere.path());
+    let output = pionus(&["replay", trace.to_str().unwrap()], elsewhere.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(
         stdout(&output),
@@ -1004,7 +1001,7 @@ fn replay_reports_differences() {
     let repo = staged_repo();
     let trace = repo.path().join("trace.json");
     let path = trace.to_str().unwrap();
-    smart_commit(
+    pionus(
         &[
             "--backend",
             "mock",
@@ -1024,7 +1021,7 @@ fn replay_reports_differences() {
     assert_ne!(tampered, json);
     std::fs::write(&trace, tampered).unwrap();
 
-    let output = smart_commit(&["replay", path], repo.path());
+    let output = pionus(&["replay", path], repo.path());
     assert_eq!(output.status.code(), Some(1));
     let err = stderr(&output);
     assert!(err.contains("differs: message: recorded"), "{err}");
@@ -1034,7 +1031,7 @@ fn replay_reports_differences() {
 #[test]
 fn replay_of_a_missing_file_fails() {
     let repo = TestRepo::new();
-    let output = smart_commit(&["replay", "missing.json"], repo.path());
+    let output = pionus(&["replay", "missing.json"], repo.path());
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).starts_with("error: cannot read missing.json"));
 }
@@ -1043,16 +1040,16 @@ fn replay_of_a_missing_file_fails() {
 fn backend_options_can_come_from_the_environment() {
     let repo = staged_repo();
     let trace = repo.path().join("env-trace.json");
-    let output = smart_commit_with(
+    let output = pionus_with(
         &[],
         repo.path(),
         &[
-            ("SMART_COMMIT_BACKEND", "mock"),
+            ("PIONUS_BACKEND", "mock"),
             (
-                "SMART_COMMIT_MOCK_RESPONSE",
+                "PIONUS_MOCK_RESPONSE",
                 "feat: add the entry point\n\nWith a body, too.",
             ),
-            ("SMART_COMMIT_TRACE", trace.to_str().unwrap()),
+            ("PIONUS_TRACE", trace.to_str().unwrap()),
         ],
     );
     assert!(output.status.success(), "{}", stderr(&output));
@@ -1066,18 +1063,18 @@ fn backend_options_can_come_from_the_environment() {
 #[test]
 fn flags_override_the_environment() {
     let repo = staged_repo();
-    let output = smart_commit_with(
+    let output = pionus_with(
         &["--mock-response", "fix: from the flag"],
         repo.path(),
         &[
-            ("SMART_COMMIT_BACKEND", "mock"),
-            ("SMART_COMMIT_MOCK_RESPONSE", "feat: from the environment"),
+            ("PIONUS_BACKEND", "mock"),
+            ("PIONUS_MOCK_RESPONSE", "feat: from the environment"),
         ],
     );
     assert_eq!(stdout(&output), "fix: from the flag\n");
 }
 
-/// `smart-commit setup` on an empty machine (no GPU, no NPU), without
+/// `pionus setup` on an empty machine (no GPU, no NPU), without
 /// drivers or a benchmark, and with downloads that do not exist: llama.cpp
 /// fails gracefully and nothing touches the network or depends on this
 /// machine's hardware.
@@ -1092,19 +1089,16 @@ fn offline_setup(extra: &[(&str, &str)]) -> Output {
     )
     .unwrap();
     let mut env = vec![
-        ("SMART_COMMIT_SYSFS", sysfs.path().to_str().unwrap()),
-        ("SMART_COMMIT_CPUINFO", cpuinfo.to_str().unwrap()),
-        ("SMART_COMMIT_OPENVINO_DIR", "/nonexistent/openvino"),
-        (
-            "SMART_COMMIT_LLAMACPP_URL",
-            "file:///nonexistent/llama.tar.gz",
-        ),
-        ("SMART_COMMIT_HF_BASE", "file:///nonexistent/hf"),
-        ("SMART_COMMIT_RELEASE_BASE", "file:///nonexistent/releases"),
+        ("PIONUS_SYSFS", sysfs.path().to_str().unwrap()),
+        ("PIONUS_CPUINFO", cpuinfo.to_str().unwrap()),
+        ("PIONUS_OPENVINO_DIR", "/nonexistent/openvino"),
+        ("PIONUS_LLAMACPP_URL", "file:///nonexistent/llama.tar.gz"),
+        ("PIONUS_HF_BASE", "file:///nonexistent/hf"),
+        ("PIONUS_RELEASE_BASE", "file:///nonexistent/releases"),
         ("XDG_DATA_HOME", data.path().to_str().unwrap()),
     ];
     env.extend_from_slice(extra);
-    smart_commit_with(&["setup", "--no-drivers", "--no-bench"], dir.path(), &env)
+    pionus_with(&["setup", "--no-drivers", "--no-bench"], dir.path(), &env)
 }
 
 #[test]
@@ -1125,20 +1119,18 @@ fn setup_runs_the_guided_setup_next_to_the_binary() {
 #[test]
 fn setup_removes_a_setting_this_version_cannot_read() {
     let config_home = tempfile::TempDir::new().unwrap();
-    let file = config_home.path().join("smart-commit/config.toml");
+    let file = config_home.path().join("pionus/config.toml");
     std::fs::create_dir_all(file.parent().unwrap()).unwrap();
     std::fs::write(
         &file,
-        "[model]\ndevice = \"cpu\"\nname = \"smart-commit-9b-v9\"\n",
+        "[model]\ndevice = \"cpu\"\nname = \"pionus-9b-v9\"\n",
     )
     .unwrap();
     let output = offline_setup(&[("XDG_CONFIG_HOME", config_home.path().to_str().unwrap())]);
     assert!(output.status.success(), "{}", stderr(&output));
     let err = stderr(&output);
     assert!(
-        err.contains("`model.name`")
-            && err.contains("\"smart-commit-9b-v9\"")
-            && err.contains("removed"),
+        err.contains("`model.name`") && err.contains("\"pionus-9b-v9\"") && err.contains("removed"),
         "{err}"
     );
     assert!(stdout(&output).contains("==> Hardware"));
@@ -1151,16 +1143,16 @@ fn setup_removes_a_setting_this_version_cannot_read() {
 #[test]
 fn server_commands_with_nothing_kept_loaded() {
     let dir = tempfile::TempDir::new().unwrap();
-    let output = smart_commit(&["server", "status"], dir.path());
+    let output = pionus(&["server", "status"], dir.path());
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(
         stdout(&output),
         "No model is kept loaded (model.keep_loaded).\n"
     );
-    let output = smart_commit(&["server", "stop"], dir.path());
+    let output = pionus(&["server", "stop"], dir.path());
     assert_eq!(stdout(&output), "Stopped 0 model(s).\n");
     // Without a runtime directory nothing can be kept, and that is said.
-    let output = smart_commit_with(
+    let output = pionus_with(
         &["server", "status"],
         dir.path(),
         &[("XDG_RUNTIME_DIR", "")],
@@ -1209,15 +1201,15 @@ fn changing_a_model_setting_stops_the_model_kept_loaded() {
         ("XDG_CONFIG_HOME", dir.path().to_str().unwrap()),
         ("XDG_RUNTIME_DIR", runtime.path().to_str().unwrap()),
     ];
-    let kept = fake_kept_model(&runtime.path().join("smart-commit"));
-    let output = smart_commit_with(
+    let kept = fake_kept_model(&runtime.path().join("pionus"));
+    let output = pionus_with(
         &["config", "set", "style.convention", "free"],
         dir.path(),
         &env,
     );
     assert!(!stdout(&output).contains("stopped"), "{}", stdout(&output));
     assert!(kept.exists());
-    let output = smart_commit_with(
+    let output = pionus_with(
         &["config", "set", "model.keep_loaded", "0"],
         dir.path(),
         &env,
@@ -1228,8 +1220,8 @@ fn changing_a_model_setting_stops_the_model_kept_loaded() {
         stdout(&output)
     );
     assert!(!kept.exists());
-    let kept = fake_kept_model(&runtime.path().join("smart-commit"));
-    let output = smart_commit_with(&["device", "use", "cpu"], dir.path(), &env);
+    let kept = fake_kept_model(&runtime.path().join("pionus"));
+    let output = pionus_with(&["device", "use", "cpu"], dir.path(), &env);
     assert!(
         stdout(&output).contains("since model.device changed"),
         "{}",
@@ -1242,18 +1234,18 @@ fn changing_a_model_setting_stops_the_model_kept_loaded() {
 fn a_failed_load_points_at_the_model_kept_loaded() {
     let repo = staged_repo();
     let runtime = tempfile::TempDir::new().unwrap();
-    fake_kept_model(&runtime.path().join("smart-commit"));
-    let output = smart_commit_with(
+    fake_kept_model(&runtime.path().join("pionus"));
+    let output = pionus_with(
         &["--device", "cpu"],
         repo.path(),
         &[
             ("XDG_RUNTIME_DIR", runtime.path().to_str().unwrap()),
-            ("SMART_COMMIT_LLAMA_SERVER", "/nonexistent/llama-server"),
+            ("PIONUS_LLAMA_SERVER", "/nonexistent/llama-server"),
         ],
     );
     assert!(!output.status.success());
     assert!(
-        stderr(&output).contains("`smart-commit server stop` frees it"),
+        stderr(&output).contains("`pionus server stop` frees it"),
         "{}",
         stderr(&output)
     );
@@ -1274,12 +1266,12 @@ fn the_type_is_only_asked_in_a_terminal() {
             "--commit",
         ],
     ] {
-        let output = smart_commit_with(
+        let output = pionus_with(
             &args,
             repo.path(),
             &[
-                ("SMART_COMMIT_ASK_TYPE", "low_confidence"),
-                ("SMART_COMMIT_ASK_TYPE_BELOW", "99"),
+                ("PIONUS_ASK_TYPE", "low_confidence"),
+                ("PIONUS_ASK_TYPE_BELOW", "99"),
                 ("GIT_EDITOR", "true"),
             ],
         );
@@ -1308,17 +1300,17 @@ fn cpu_with_a_large_model(extra: &[(&str, &str)]) -> (String, bool) {
     let runtime = dir.path().join("run");
     std::fs::create_dir(&runtime).unwrap();
     let mut env = vec![
-        ("SMART_COMMIT_GGUF", model.to_str().unwrap()),
-        ("SMART_COMMIT_LLAMA_SERVER", "/bin/false"),
-        ("SMART_COMMIT_MEMINFO", meminfo.to_str().unwrap()),
+        ("PIONUS_GGUF", model.to_str().unwrap()),
+        ("PIONUS_LLAMA_SERVER", "/bin/false"),
+        ("PIONUS_MEMINFO", meminfo.to_str().unwrap()),
         ("XDG_RUNTIME_DIR", runtime.to_str().unwrap()),
     ];
     env.extend_from_slice(extra);
-    let output = smart_commit_with(&["--device", "cpu"], repo.path(), &env);
+    let output = pionus_with(&["--device", "cpu"], repo.path(), &env);
     assert!(!output.status.success());
     // A kept server is a directory (its lock file is only a file).
     let kept = runtime
-        .join("smart-commit")
+        .join("pionus")
         .read_dir()
         .is_ok_and(|entries| entries.flatten().any(|entry| entry.path().is_dir()));
     (stderr(&output), kept)
@@ -1326,7 +1318,7 @@ fn cpu_with_a_large_model(extra: &[(&str, &str)]) -> (String, bool) {
 
 #[test]
 fn a_model_too_large_for_the_ram_is_not_kept_loaded_and_whoever_asked_is_told() {
-    let (err, kept) = cpu_with_a_large_model(&[("SMART_COMMIT_KEEP_LOADED", "10")]);
+    let (err, kept) = cpu_with_a_large_model(&[("PIONUS_KEEP_LOADED", "10")]);
     assert!(
         err.contains(
             "note: not keeping the model loaded (it would take 19% of the RAM; \
@@ -1338,8 +1330,8 @@ fn a_model_too_large_for_the_ram_is_not_kept_loaded_and_whoever_asked_is_told() 
     // A larger share keeps it: the supervisor then fails to start, which is a
     // different note.
     let (err, _) = cpu_with_a_large_model(&[
-        ("SMART_COMMIT_KEEP_LOADED", "10"),
-        ("SMART_COMMIT_KEEP_LOADED_MAX_RAM", "30"),
+        ("PIONUS_KEEP_LOADED", "10"),
+        ("PIONUS_KEEP_LOADED_MAX_RAM", "30"),
     ]);
     assert!(err.contains("cannot keep the model loaded"), "{err}");
     assert!(!err.contains("not keeping"), "{err}");
@@ -1365,12 +1357,12 @@ fn eval_does_not_use_the_server_kept_loaded() {
     let runtime = dir.path().join("run");
     std::fs::create_dir(&runtime).unwrap();
     let env = [
-        ("SMART_COMMIT_GGUF", model.to_str().unwrap()),
-        ("SMART_COMMIT_LLAMA_SERVER", "/bin/false"),
-        ("SMART_COMMIT_KEEP_LOADED", "1"),
+        ("PIONUS_GGUF", model.to_str().unwrap()),
+        ("PIONUS_LLAMA_SERVER", "/bin/false"),
+        ("PIONUS_KEEP_LOADED", "1"),
         ("XDG_RUNTIME_DIR", runtime.to_str().unwrap()),
     ];
-    let output = smart_commit_with(
+    let output = pionus_with(
         &["eval", file.to_str().unwrap(), "--device", "cpu"],
         dir.path(),
         &env,
@@ -1381,12 +1373,12 @@ fn eval_does_not_use_the_server_kept_loaded() {
     );
     let err = stderr(&output);
     assert!(!err.contains("keep"), "{err}");
-    assert!(!runtime.join("smart-commit").exists(), "nothing is kept");
+    assert!(!runtime.join("pionus").exists(), "nothing is kept");
     // The commit, with the same settings, does ask for a kept server.
     let repo = staged_repo();
-    let output = smart_commit_with(&["--device", "cpu"], repo.path(), &env);
+    let output = pionus_with(&["--device", "cpu"], repo.path(), &env);
     assert!(!output.status.success());
-    assert!(runtime.join("smart-commit").exists());
+    assert!(runtime.join("pionus").exists());
 }
 
 #[test]

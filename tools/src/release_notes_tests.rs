@@ -19,7 +19,7 @@ fn subjects_are_grouped_by_type_and_the_scope_is_bold() {
             "perf(diff)!: corta menos",
         ]),
     );
-    assert!(notes.starts_with("## smart-commit 0.2.0\n\nChanges since v0.1.0.\n\n"));
+    assert!(notes.starts_with("## pionus 0.2.0\n\nChanges since v0.1.0.\n\n"));
     assert!(notes.contains("### Features\n\n- **cli** adiciona o comando bench\n\n"));
     assert!(notes.contains("### Fixes\n\n- corrige o parse\n\n"));
     assert!(notes.contains("### Performance\n\n- **diff** corta menos\n\n"));

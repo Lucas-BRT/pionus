@@ -9,7 +9,7 @@
 set -euo pipefail
 ROOT="$(pwd)"
 cargo build --quiet --locked
-BIN="$ROOT/target/debug/smart-commit"
+BIN="$ROOT/target/debug/pionus"
 OUT="$ROOT/cli/tests/fixtures/traces"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -95,7 +95,7 @@ printf '# AGENTS.md\n\n## Commits\n\nOne purpose per commit.\n' > AGENTS.md; git
 commit "docs(agents): add the commit rules"
 mkdir -p tests/fixtures; printf 'x\n' > tests/fixtures/make-traces.sh; git add .
 commit "test(fixtures): trace a docs-only change answered with fix"
-printf '# AGENTS.md\n\n## Commits\n\nOne purpose per commit.\n\n### Ask smart-commit first\n\nBefore each commit, run smart-commit on the staged change with --trace\nand compare its message with yours.\n' > AGENTS.md; git add AGENTS.md
+printf '# AGENTS.md\n\n## Commits\n\nOne purpose per commit.\n\n### Ask pionus first\n\nBefore each commit, run pionus on the staged change with --trace\nand compare its message with yours.\n' > AGENTS.md; git add AGENTS.md
 "$BIN" --backend mock --mock-response "fix(agents): trace a docs-only change" \
   --trace "$OUT/conventional-en-partial-copy.json" >/dev/null
 
@@ -107,7 +107,7 @@ mkdir docs
 printf '# AGENTS.md\n\nModels are never hosted here.\n' > AGENTS.md; printf '# Training\n' > docs/training.md; git add .
 commit "docs(agents): add the model rules"
 printf '# AGENTS.md\n\nFine-tunes are published on Hugging Face.\n' > AGENTS.md
-printf '# Training\n\nPublish smart-commit-1.5b-v1.\n' > docs/training.md; git add .
+printf '# Training\n\nPublish pionus-1.5b-v1.\n' > docs/training.md; git add .
 "$BIN" --backend mock \
   --mock-response "fix(agents): update AGENTS.md and docs/training.md to reflect the changes" \
   --trace "$OUT/conventional-en-too-long.json" >/dev/null
@@ -119,25 +119,25 @@ mkdir docs
 printf '# AGENTS.md\n' > AGENTS.md; printf '# Training\n' > docs/training.md; git add .
 commit "docs: add AGENTS.md and the training page"
 printf '# AGENTS.md\n\nFine-tunes are published on Hugging Face.\n' > AGENTS.md
-printf '# Training\n\nPublish smart-commit-1.5b-v1.\n' > docs/training.md; git add .
+printf '# Training\n\nPublish pionus-1.5b-v1.\n' > docs/training.md; git add .
 "$BIN" --backend mock \
   --mock-response $'fix(AGENTS.md): update AGENTS.md with the latest changes\nfix(docs/training.md): update docs/training.md with the latest changes' \
   --trace "$OUT/conventional-en-two-subjects.json" >/dev/null
 
-# Found in real use, with smart-commit-0.5b-v0.1: a root config change in a
+# Found in real use, with pionus-0.5b-v0.1: a root config change in a
 # repository whose history is all scoped and never uses `chore`; the model
 # kept to the listed types and took the most frequent scope.
 fresh closed-types
 mkdir -p training docs src
 printf 'x\n' > training/export_gguf.py; git add .; commit "feat(training): keep the merged safetensors with export_gguf --merged"
 printf 'x\n' > AGENTS.md; git add .; commit "docs(agents): version fine-tunes as v0.x while the recipe changes"
-printf 'x\n' > src/models.rs; git add .; commit "feat(model): add the smart-commit-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
+printf 'x\n' > src/models.rs; git add .; commit "feat(model): add the pionus-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
 printf 'x\n' > docs/training.md; git add .; commit "docs(training): v0.1 is published and registered, H5 and H6 come next"
 printf 'x\n' > training/filter_supported.py; git add .; commit "fix(training): make h3a reproducible with filter_supported.py"
 printf '[tools]\nrust = "1.99"\n' > mise.toml; git add mise.toml
 "$BIN" --backend mock --mock-response "feat(training): add rust 1.99 to mise.toml" \
   --trace "$OUT/conventional-en-closed-types.json" >/dev/null
-# The same change, with smart-commit-1.5b-v0.1: still a listed type, and a
+# The same change, with pionus-1.5b-v0.1: still a listed type, and a
 # scope made from the file name.
 "$BIN" --backend mock --mock-response "docs(mise): add rust to tools" \
   --trace "$OUT/conventional-en-file-scope.json" >/dev/null
@@ -157,29 +157,29 @@ git add .
 "$BIN" --backend mock --mock-response "refactor(prompt): move the prompt into its own module" \
   --trace "$OUT/conventional-en-refactor-as-feat.json" >/dev/null
 
-# Found in real use, with smart-commit-0.5b-v0.1: a release's version bump;
+# Found in real use, with pionus-0.5b-v0.1: a release's version bump;
 # the model answered `feat` and took a model name from the last subject for
 # the version.
 fresh release
 mkdir -p src docs
-printf '[package]\nname = "smart-commit"\nversion = "0.4.0"\nedition = "2024"\n' > Cargo.toml
-printf '[[package]]\nname = "smart-commit"\nversion = "0.4.0"\n' > Cargo.lock
+printf '[package]\nname = "pionus"\nversion = "0.4.0"\nedition = "2024"\n' > Cargo.toml
+printf '[[package]]\nname = "pionus"\nversion = "0.4.0"\n' > Cargo.lock
 git add .; commit "chore: release 0.4.0"
 printf 'x\n' > docs/roadmap.md; git add .; commit "docs(roadmap): plan a model server that stays up, KV caching and grammars"
 printf 'x\n' > AGENTS.md; git add .; commit "docs(agents): publish the project's fine-tunes on Hugging Face"
 printf 'y\n' > AGENTS.md; git add .; commit "docs(agents): host the fine-tunes on the LucasBRT Hugging Face account"
 printf 'z\n' > AGENTS.md; git add .; commit "docs(agents): version fine-tunes as v0.x while the recipe changes"
-printf 'x\n' > src/models.rs; git add .; commit "feat(model): add the smart-commit-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
+printf 'x\n' > src/models.rs; git add .; commit "feat(model): add the pionus-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
 sed -i 's/0\.4\.0/0.5.0/' Cargo.toml Cargo.lock; git add Cargo.toml Cargo.lock
-"$BIN" --backend mock --mock-response "feat(model): update smart-commit to 0.5b-v0.1" \
+"$BIN" --backend mock --mock-response "feat(model): update pionus to 0.5b-v0.1" \
   --trace "$OUT/conventional-en-release.json" >/dev/null
 
-# Found in real use, with smart-commit-0.5b-v0.1: a change much like the last
+# Found in real use, with pionus-0.5b-v0.1: a change much like the last
 # commit's; the model repeated that commit's subject, and again after the
 # retry named it, so the message came from the file list.
 fresh copied-twice
 mkdir -p tests/fixtures/traces
-printf 'x\n' > tests/fixtures/make-traces.sh; git add .; commit "feat(model): add the smart-commit-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
+printf 'x\n' > tests/fixtures/make-traces.sh; git add .; commit "feat(model): add the pionus-1.5b-v0.1 and 0.5b-v0.1 fine-tunes"
 printf 'y\n' > tests/fixtures/make-traces.sh; printf '{}\n' > tests/fixtures/traces/closed-types.json; git add .
 commit "test(fixtures): trace a config change kept to the listed types"
 printf 'z\n' > tests/fixtures/make-traces.sh; printf '{}\n' > tests/fixtures/traces/file-scope.json; git add .
@@ -188,7 +188,7 @@ printf 'z\n' > tests/fixtures/make-traces.sh; printf '{}\n' > tests/fixtures/tra
   --mock-response "test(fixtures): trace a config change kept to the listed types" \
   --trace "$OUT/conventional-en-copied-twice.json" >/dev/null 2>&1
 
-# Found in real use, with smart-commit-0.5b-v0.2: a fix in a script with its
+# Found in real use, with pionus-0.5b-v0.2: a fix in a script with its
 # regression test; the model answered `test` and described the bug instead
 # of the fix.
 fresh fix-as-test
@@ -204,7 +204,7 @@ git add .
 "$BIN" --backend mock --mock-response "test(training): score.py crashes when reading rule messages" \
   --trace "$OUT/conventional-en-fix-as-test.json" >/dev/null
 
-# Found in real use, with smart-commit-0.5b-v0.2: about forty new files shared
+# Found in real use, with pionus-0.5b-v0.2: about forty new files shared
 # the diff budget, so every section was cut to its header and the prompt
 # showed no code; the model took a version from the history ("0.6.0"). The
 # prompt now shows the first lines of the files that fit, and only those.
@@ -226,7 +226,7 @@ git add .
   --trace "$OUT/conventional-en-empty-diff.json" >/dev/null
 
 # Found with the commit scenarios: a merge whose conflict was resolved to
-# HEAD's side stages nothing; smart-commit said "nothing staged" while `git
+# HEAD's side stages nothing; pionus said "nothing staged" while `git
 # commit` makes the merge. Git's prepared message is used, without a model.
 fresh merge
 printf 'a\n' > f; git add f; commit "feat: add f"
@@ -237,7 +237,7 @@ git checkout -q --ours f; git add f
 "$BIN" --backend mock --trace "$OUT/conventional-en-merge.json" >/dev/null
 
 # Changes of this repository, from pinned commits, answered as the model
-# answered them in real use (smart-commit-1.5b-v0.2): the history is the six
+# answered them in real use (pionus-1.5b-v0.2): the history is the six
 # subjects before the commit, and the staged change is the commit's own, so
 # the prompt has what the model saw. The fixtures record the replies as the
 # pipeline handles them today, wrong or not; the comments say what the commit
@@ -285,7 +285,7 @@ real_change conventional-en-split-diff d1ba19d "refactor(diff): split diff into 
 # directory, which says nothing of what the split separated.
 real_change conventional-en-split-models 00f23be "feat(models): move models to a new directory"
 # The rest of the module split and the docs work around it, answered by
-# smart-commit-1.5b-v0.2 on the commit's own change.
+# pionus-1.5b-v0.2 on the commit's own change.
 # A split of annotate.rs into comments, rename and tests: the reply names
 # `annotate` and `comments` as the parts, and drops the rest.
 real_change conventional-en-split-annotate 3bb320e "refactor(annotate): split the module into annotate, comments"
@@ -300,7 +300,7 @@ real_change conventional-en-split-server d38a34c "refactor(server): split the mo
 real_change conventional-en-move-annotate ce9645e "refactor(diff): split the module into the diff and tests"
 # Grouping four modules under backend, answered as splitting the whole
 # crate into one.
-real_change conventional-en-group-backend c617f1d "refactor: split smart_commit into backend"
+real_change conventional-en-group-backend c617f1d "refactor: split pionus into backend"
 # Docs commits: path fixes, answered as typos and "more info"; a test
 # answered as docs; the roadmap brought up to v0.2, answered as typos; the
 # timings gathered in measurements.md, answered as a roadmap change; a test
@@ -314,7 +314,7 @@ real_change conventional-en-docs-links-test 64e7f02 "test(docs): check that ever
 # which cases they document.
 real_change conventional-en-fixtures-of-splits 646b4d1 "test(fixtures): add a few more traces for split modules"
 # The move of the tools out of the binary and into crates of their own, and
-# the setup in Rust, answered by smart-commit-1.5b-v0.2 on each commit's own
+# the setup in Rust, answered by pionus-1.5b-v0.2 on each commit's own
 # change.
 # Three experiment scripts removed: not documentation, and not "all".
 real_change conventional-en-remove-experiments 3da2923 "docs: remove all experiments scripts"
@@ -325,13 +325,13 @@ real_change conventional-en-bench-prompts 9b13c12 "chore(bench): add a server fo
 # crate and the workspace named.
 real_change conventional-en-move-to-tools-crate 95b3281 "chore: move tools to a separate crate"
 # release-notes.sh rewritten in Rust: nothing is added, it replaces a script.
-real_change conventional-en-release-notes-in-rust 536804f "feat(release): add \`sc-tools release-notes\`"
+real_change conventional-en-release-notes-in-rust 536804f "feat(release): add \`pionus-tools release-notes\`"
 # A crate and its dependencies added to the workspace, answered as a tool
 # added to the release, which it must not be.
-real_change conventional-en-training-tools-deps 66a9288 "feat(training): add sc-training tool to the release"
+real_change conventional-en-training-tools-deps 66a9288 "feat(training): add pionus-training tool to the release"
 # build_inputs.py in Rust: a new subcommand, not a crate named build_inputs.
 real_change conventional-en-build-inputs-in-rust c2c2305 "feat(training): add \`build_inputs\` crate"
-real_change conventional-en-scenarios-in-rust 812abde "feat(training): build commit scenarios with sc-training build-scenarios"
+real_change conventional-en-scenarios-in-rust 812abde "feat(training): build commit scenarios with pionus-training build-scenarios"
 # The Python tools removed once their Rust version exists.
 real_change conventional-en-remove-python-tools d82042f "chore(training): remove the training tools"
 # Three setup scripts replaced by the binary, answered as a dependency
@@ -348,7 +348,7 @@ real_change conventional-en-fix-as-feat-budget ae339ad "feat(generate): add prom
 # Devices limited to the machine's hardware, answered as a new backend.
 real_change conventional-en-invented-backend 87533ac "feat: add a device backend that can run benchmarks on NPU and GPU"
 
-# Prompts the size of real ones, for `smart-commit bench`: a change of one of
+# Prompts the size of real ones, for `pionus bench`: a change of one of
 # this repository's files, from a pinned commit, sized like the 25th, 50th,
 # 75th and 90th percentiles of eval-v1's prompts (the last fills the budget).
 # The fixtures above are a few hundred tokens; prefill grows with the
@@ -376,7 +376,7 @@ bench_fixture p90 482ba4d src/style.rs "feat(style): find where each scope's com
 fresh dense
 for s in "feat: publish the 1.0 archives" "docs: list the mirrors"; do commit "$s"; done
 for n in $(seq 1 60); do
-    printf '%s  smart-commit-%s.tar.gz\n' "$(printf 'archive %s' "$n" | sha256sum | cut -c1-64)" "$n"
+    printf '%s  pionus-%s.tar.gz\n' "$(printf 'archive %s' "$n" | sha256sum | cut -c1-64)" "$n"
 done > SHA256SUMS
 git add SHA256SUMS
 "$BIN" --backend mock --mock-response "chore: add the checksums of the archives" \
@@ -403,7 +403,7 @@ real_change conventional-en-dpo-validation-as-loss a8cf80a "feat(training): add 
 # that pins both, answered as a test that fails when torchao is used.
 real_change conventional-en-notebook-fix-as-test 5635f71 "test(training): add a test that fails when Kaggle's torchao is used"
 
-# A fix to a script that passed a relative path to smart-commit, with the test
+# A fix to a script that passed a relative path to pionus, with the test
 # that pins it, answered as a test: again the type of a fix with its test.
 real_change conventional-en-script-fix-as-test 401d67c "test(training): make sure relative gguf paths are made absolute"
 
@@ -431,7 +431,7 @@ real_change conventional-en-results-as-h12 2cd40f7 "docs(training): add H12 to t
 # shellcheck disable=SC2016  # the backticks are the reply's own
 real_change conventional-en-eval-keep-loaded-as-keep-option 26006ac 'feat(cli): add `--keep` option to keep a loaded model between commits'
 
-# A new option passed by the data tools to smart-commit (and the tests that pin
+# A new option passed by the data tools to pionus (and the tests that pin
 # it), answered as documentation of the option: a docs type for code.
 real_change conventional-en-tools-option-as-docs 0fa700e 'docs(training): explain how to use the --scopes option'
 

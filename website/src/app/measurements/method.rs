@@ -20,7 +20,7 @@ pub async fn section() -> Result<impl View> {
                 </li>
                 <li>
                     "Your times will differ: "
-                    <code>"smart-commit bench"</code>
+                    <code>"pionus bench"</code>
                     " measures your machine."
                 </li>
             </ul>

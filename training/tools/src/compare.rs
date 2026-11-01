@@ -1,4 +1,4 @@
-//! Models on evaluation sets, against a baseline: `smart-commit eval` for
+//! Models on evaluation sets, against a baseline: `pionus eval` for
 //! each model once (the traces stay in `OUT/SET/NAME.jsonl`, and a model
 //! already evaluated is not run again), then the metrics of `score` for each,
 //! and, for each metric, how many cases a model gains and loses against the
@@ -109,7 +109,7 @@ impl Model {
 #[derive(Clone)]
 pub struct Options {
     pub out: PathBuf,
-    /// `smart-commit`.
+    /// `pionus`.
     pub binary: PathBuf,
     pub sets: Vec<PathBuf>,
     pub baseline: Model,
@@ -139,7 +139,7 @@ fn line_count(path: &Path) -> usize {
 }
 
 /// Writes the traces of `gguf` on `inputs` to `out` unless they are all there;
-/// whether it ran. `smart-commit` takes an absolute model path only, and this
+/// whether it ran. `pionus` takes an absolute model path only, and this
 /// may run from anywhere; a failed run leaves no file and says what it said.
 pub fn run_eval(
     binary: &Path,
@@ -184,7 +184,7 @@ pub fn run_eval(
             &options.scopes,
         ])
         .env("XDG_CONFIG_HOME", config_home.path())
-        .env("SMART_COMMIT_GGUF", &gguf)
+        .env("PIONUS_GGUF", &gguf)
         .output()
         .with_context(|| format!("cannot run {}", binary.display()))?;
     if !done.status.success() {

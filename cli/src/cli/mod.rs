@@ -148,18 +148,18 @@ enum Command {
     /// Install the latest release, if it is newer than this one (checked
     /// against its SHA256SUMS; models, settings and the benchmark are kept).
     Update,
-    /// Remove smart-commit from this machine: the binary, the models,
+    /// Remove pionus from this machine: the binary, the models,
     /// llama.cpp, the benchmark, the caches and the configuration.
     Uninstall {
         /// Remove without asking.
         #[arg(long)]
         yes: bool,
-        /// Also remove OpenVINO, if smart-commit's setup installed it (uses
+        /// Also remove OpenVINO, if pionus's setup installed it (uses
         /// sudo). Driver packages are kept.
         #[arg(long)]
         system: bool,
     },
-    /// Runs a model kept loaded until it is idle; started by smart-commit.
+    /// Runs a model kept loaded until it is idle; started by pionus.
     #[command(name = "keep-server", hide = true)]
     KeepServer { dir: PathBuf },
 }
@@ -253,7 +253,7 @@ pub fn run() -> ExitCode {
         Some(Command::Update) => install::update(),
         Some(Command::Uninstall { yes, system }) => install::uninstall(yes, system),
         Some(Command::KeepServer { dir }) => {
-            smart_commit::backend::server::serve(&dir).map_err(Into::into)
+            pionus::backend::server::serve(&dir).map_err(Into::into)
         }
         None => suggest::run(&cli.generate),
     };

@@ -5,15 +5,15 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::{Context as _, Result, bail};
-use smart_commit::backend::device::Target;
-use smart_commit::backend::{Backend, GenerationConfig, MockBackend, NoModel, TypeChoice};
-use smart_commit::config::{AskType, BackendKind, Origin, Resolved, Value};
-use smart_commit::context::RepoContext;
-use smart_commit::diff::FileDiff;
-use smart_commit::generate::{self, Generation, TypeAsk};
-use smart_commit::git::Repo;
-use smart_commit::prompt::PromptOptions;
-use smart_commit::trace::Trace;
+use pionus::backend::device::Target;
+use pionus::backend::{Backend, GenerationConfig, MockBackend, NoModel, TypeChoice};
+use pionus::config::{AskType, BackendKind, Origin, Resolved, Value};
+use pionus::context::RepoContext;
+use pionus::diff::FileDiff;
+use pionus::generate::{self, Generation, TypeAsk};
+use pionus::git::Repo;
+use pionus::prompt::PromptOptions;
+use pionus::trace::Trace;
 
 use super::args::BackendArgs;
 use super::load::load_model;

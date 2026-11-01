@@ -1,16 +1,16 @@
-//! The commands that show what smart-commit sees or would do: `context`,
+//! The commands that show what pionus sees or would do: `context`,
 //! `prompt`, `replay`, `eval` and `hardware`.
 
 use std::io::Write as _;
 use std::path::Path;
 
 use anyhow::{Context as _, Result, bail};
-use smart_commit::config::Settings;
-use smart_commit::context::RepoContext;
-use smart_commit::git::Repo;
-use smart_commit::hardware::Hardware;
-use smart_commit::trace::{Inputs, Trace};
-use smart_commit::{diff, generate, prompt};
+use pionus::config::Settings;
+use pionus::context::RepoContext;
+use pionus::git::Repo;
+use pionus::hardware::Hardware;
+use pionus::trace::{Inputs, Trace};
+use pionus::{diff, generate, prompt};
 
 use super::args::{BackendArgs, ModelArgs, PromptArgs};
 use super::load::load_model;
@@ -46,7 +46,7 @@ pub(super) fn prompt(path: &Path, prompt_args: &PromptArgs) -> Result<()> {
 }
 
 /// `prompt --inputs`: the prompts of many recorded inputs, e.g. to build a
-/// training set with the exact prompts smart-commit sends. Only the user's
+/// training set with the exact prompts pionus sends. Only the user's
 /// global settings apply, since there is no repository.
 pub(super) fn prompt_inputs(path: &Path, prompt_args: &PromptArgs) -> Result<()> {
     let inputs = read_inputs(path)?;
@@ -142,7 +142,7 @@ pub(super) fn replay(path: &Path, model: Option<&ModelArgs>) -> Result<()> {
             eprintln!("differs: {difference}");
         }
         bail!(
-            "not reproduced (trace written by smart-commit {}, this is {})",
+            "not reproduced (trace written by pionus {}, this is {})",
             trace.tool_version,
             env!("CARGO_PKG_VERSION")
         );

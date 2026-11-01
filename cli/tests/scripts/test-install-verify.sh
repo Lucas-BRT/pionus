@@ -8,18 +8,18 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-ASSET=smart-commit-x86_64-unknown-linux-gnu.tar.gz
+ASSET=pionus-x86_64-unknown-linux-gnu.tar.gz
 failures=0
 SETSID=$(command -v setsid)
 
-stage=$work/stage/smart-commit-x86_64-unknown-linux-gnu
-mkdir -p "$stage/bin" "$stage/share/smart-commit/scripts" "$stage/share/doc/smart-commit"
-printf '#!/bin/sh\necho "smart-commit 1.0.0"\n' >"$stage/bin/smart-commit"
-chmod +x "$stage/bin/smart-commit"
-echo 1.0.0 >"$stage/share/smart-commit/VERSION"
-echo licence >"$stage/share/doc/smart-commit/LICENSE"
+stage=$work/stage/pionus-x86_64-unknown-linux-gnu
+mkdir -p "$stage/bin" "$stage/share/pionus/scripts" "$stage/share/doc/pionus"
+printf '#!/bin/sh\necho "pionus 1.0.0"\n' >"$stage/bin/pionus"
+chmod +x "$stage/bin/pionus"
+echo 1.0.0 >"$stage/share/pionus/VERSION"
+echo licence >"$stage/share/doc/pionus/LICENSE"
 mkdir -p "$work/releases/latest/download"
-tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" smart-commit-x86_64-unknown-linux-gnu
+tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" pionus-x86_64-unknown-linux-gnu
 (cd "$work/releases/latest/download" && sha256sum "$ASSET" >SHA256SUMS)
 
 home=$work/home
@@ -53,7 +53,7 @@ run() {
     shift
     rm -rf "$prefix" "$work/gh-args"
     HOME=$home XDG_DATA_HOME=$prefix/share XDG_CACHE_HOME=$home/.cache XDG_CONFIG_HOME=$home/.config \
-        SMART_COMMIT_RELEASE_BASE=file://$work/releases PATH=$path \
+        PIONUS_RELEASE_BASE=file://$work/releases PATH=$path \
         "$SETSID" "$BASH" "$ROOT/install.sh" --no-setup "$@" </dev/null >"$work/out" 2>&1
 }
 
@@ -69,14 +69,14 @@ check() {
     fi
 }
 not() { ! "$@"; }
-installed() { [ -x "$prefix/bin/smart-commit" ]; }
+installed() { [ -x "$prefix/bin/pionus" ]; }
 said() { grep -qF -- "$1" "$work/out"; }
 
 fake_gh accept
 run "$work/bin:$work/tools" --verify
 check "--verify installs when gh accepts" installed
 check "--verify asks gh about the download and the repository" \
-    grep -Eq "^attestation verify .*$ASSET --repo Lucas-BRT/smart-commit$" "$work/gh-args"
+    grep -Eq "^attestation verify .*$ASSET --repo Lucas-BRT/pionus$" "$work/gh-args"
 
 fake_gh reject
 check "--verify fails when gh rejects" not run "$work/bin:$work/tools" --verify

@@ -4,7 +4,6 @@
 pub mod chart;
 pub mod command_line;
 pub mod container;
-pub mod cut_cable;
 pub mod data_table;
 pub mod doc_link;
 pub mod docs;

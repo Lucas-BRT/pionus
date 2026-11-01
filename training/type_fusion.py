@@ -17,7 +17,7 @@ The weight (`lam`, `w`, `tau`) is chosen on the calibration set and read on the 
     python -I type_fusion.py cascade SMALL_CAL.json SMALL_CAL_TRACES.jsonl BIG_CAL.json BIG_CAL_TRACES.jsonl \\
         SMALL_TEST.json SMALL_TEST_TRACES.jsonl BIG_TEST.json BIG_TEST_TRACES.jsonl SET_CAL SET_TEST
 
-`*_TRACES.jsonl` are the `smart-commit eval` traces of the same set (the history is in their inputs); `*_CLF.json`
+`*_TRACES.jsonl` are the `pionus eval` traces of the same set (the history is in their inputs); `*_CLF.json`
 is the file `type_probe.py` writes beside the predictions (`.proba`: classes and one row of probabilities per
 Conventional commit, in order). Standard library only.
 """

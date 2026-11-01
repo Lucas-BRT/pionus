@@ -1,12 +1,12 @@
-# smart-commit
+# pionus
 
-[![CI](https://github.com/Lucas-BRT/smart-commit/actions/workflows/ci.yml/badge.svg)](https://github.com/Lucas-BRT/smart-commit/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/tag/Lucas-BRT/smart-commit?filter=v*&label=release&sort=semver)](https://github.com/Lucas-BRT/smart-commit/releases/latest)
+[![CI](https://github.com/Lucas-BRT/pionus/actions/workflows/ci.yml/badge.svg)](https://github.com/Lucas-BRT/pionus/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/tag/Lucas-BRT/pionus?filter=v*&label=release&sort=semver)](https://github.com/Lucas-BRT/pionus/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust 1.99](https://img.shields.io/badge/rust-1.99-orange?logo=rust)](rust-toolchain.toml)
 [![Linux x86_64](https://img.shields.io/badge/platform-linux%20x86__64-lightgrey?logo=linux&logoColor=white)](docs/usage.md#install)
 
-**smart-commit** writes git commit messages in the style of your repository
+**pionus** writes git commit messages in the style of your repository
 with a small language model that runs entirely on your machine: on an Intel
 NPU, on a GPU (Intel, AMD or NVIDIA) or on the CPU. No account, no API key,
 and nothing leaves your computer. (The one request it can make by itself, a
@@ -15,7 +15,7 @@ daily look for a newer release, is off until you turn it on:
 
 ```console
 $ git add -p
-$ smart-commit
+$ pionus
 feat(diff): share the token budget between files by priority
 ```
 
@@ -41,10 +41,10 @@ feat(diff): share the token budget between files by priority
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash
 ```
 
-This installs smart-commit in `~/.local` without `sudo`, then runs the
+This installs pionus in `~/.local` without `sudo`, then runs the
 guided setup. The setup lists the machine's CPU, GPUs and NPU, plans what
 they need, asks before installing drivers, downloads the models and ends
 with a benchmark that shows which device will be used:
@@ -59,34 +59,34 @@ with a benchmark that shows which device will be used:
 unavailable there.)
 
 To read the plan before installing anything, use `--no-setup` and then
-`smart-commit setup --dry-run` ([usage](docs/usage.md#install)).
+`pionus setup --dry-run` ([usage](docs/usage.md#install)).
 
 Requirements: Linux on x86_64. Drivers are installed with `apt`
 (Ubuntu 24.04 and derivatives are tested); on other distributions the setup
 lists the packages to install. See the [usage guide](docs/usage.md) for the
 installer's options and for building from source.
 
-`smart-commit update` installs a newer release, keeping the models and the
-settings; `smart-commit uninstall` removes smart-commit and everything it
+`pionus update` installs a newer release, keeping the models and the
+settings; `pionus uninstall` removes pionus and everything it
 downloaded, after listing it.
 
 ## Usage
 
 | Command | Does |
 |---|---|
-| `smart-commit` | print a message for what is staged |
-| `smart-commit --commit` | review the message (commit, edit, ask for another), then commit |
-| `smart-commit hook install` | fill in the message of every `git commit` in this repository |
-| `smart-commit device` / `device use <device>` | show or change the device |
-| `smart-commit model` / `model use <id>` | show or change the [model](docs/models.md), including smart-commit's fine-tunes |
-| `smart-commit bench` | measure this machine's devices |
-| `smart-commit config list --show-origin` | show every setting and where it comes from |
-| `smart-commit context` / `prompt` | show the detected style and the exact prompt |
-| `smart-commit --trace FILE` / `replay FILE` | record and replay a generation |
-| `smart-commit setup` | install drivers and models, then benchmark (`--dry-run` only prints the plan) |
-| `smart-commit doctor` | check the installation (model, llama.cpp, device, hook, ...) and say how to fix what is wrong |
-| `smart-commit hardware` | list the CPU, GPUs and NPU, and the devices each gives |
-| `smart-commit server status` / `stop` | the model kept loaded between commits (`model.keep_loaded`) |
+| `pionus` | print a message for what is staged |
+| `pionus --commit` | review the message (commit, edit, ask for another), then commit |
+| `pionus hook install` | fill in the message of every `git commit` in this repository |
+| `pionus device` / `device use <device>` | show or change the device |
+| `pionus model` / `model use <id>` | show or change the [model](docs/models.md), including pionus's fine-tunes |
+| `pionus bench` | measure this machine's devices |
+| `pionus config list --show-origin` | show every setting and where it comes from |
+| `pionus context` / `prompt` | show the detected style and the exact prompt |
+| `pionus --trace FILE` / `replay FILE` | record and replay a generation |
+| `pionus setup` | install drivers and models, then benchmark (`--dry-run` only prints the plan) |
+| `pionus doctor` | check the installation (model, llama.cpp, device, hook, ...) and say how to fix what is wrong |
+| `pionus hardware` | list the CPU, GPUs and NPU, and the devices each gives |
+| `pionus server status` / `stop` | the model kept loaded between commits (`model.keep_loaded`) |
 
 ## Supported hardware
 
@@ -111,7 +111,7 @@ see [devices](docs/devices.md) for how the device is chosen.
 - [Models](docs/models.md): the recommended models, where they come from, using your own
 - [Architecture](docs/architecture.md): how a message is made
 - [Reproducibility](docs/reproducibility.md): what is pinned and how it is checked
-- [Training](docs/training.md): how smart-commit's own models are trained and measured
+- [Training](docs/training.md): how pionus's own models are trained and measured
 - [Roadmap](docs/roadmap.md): what comes next, and the model candidates
 - [Contributing](docs/contributing.md): checks, tests, commits and releases
 
@@ -127,7 +127,7 @@ The tests need no hardware. [AGENTS.md](AGENTS.md) has the rules for changes
 
 ## License
 
-smart-commit is released under the [MIT License](LICENSE). The models are
+pionus is released under the [MIT License](LICENSE). The models are
 not part of it: they are downloaded from Hugging Face under their own
 licences (the recommended ones are Apache-2.0), from their publishers, or
-for smart-commit's own fine-tunes from the project's account.
+for pionus's own fine-tunes from the project's account.

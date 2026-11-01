@@ -1,13 +1,10 @@
 use topcoat::{
     Result,
-    router::href,
     view::{View, attributes, component, view},
 };
 
 use crate::{
-    app::tutorial,
-    components::button::{ButtonSize, ButtonVariant, button_variants},
-    facts::{INSTALL_CMD, REPO},
+    facts::INSTALL_CMD,
     ui::{command_line::command_line, container::container},
 };
 
@@ -26,28 +23,8 @@ pub async fn section() -> Result<impl View> {
                 <p class="mx-auto mt-5 max-w-[32rem] text-base text-muted-foreground">
                     "One command writes the commit message from your staged diff and your history."
                 </p>
-                <div class="mt-9 flex flex-wrap justify-center gap-3">
-                    <a
-                        href=(href!(tutorial::page))
-                        class=(button_variants(
-                            ButtonVariant::Primary,
-                            ButtonSize::Lg,
-                        ))
-                    >
-                        "Get started"
-                    </a>
-                    <a
-                        href=(REPO)
-                        class=(button_variants(
-                            ButtonVariant::Outline,
-                            ButtonSize::Lg,
-                        ))
-                    >
-                        "GitHub"
-                    </a>
-                </div>
                 command_line(
-                    attrs: attributes! { class="mx-auto mt-6 w-full max-w-[52rem]" },
+                    attrs: attributes! { class="mx-auto mt-9 w-fit max-w-full" },
                     (INSTALL_CMD)
                 )
             )

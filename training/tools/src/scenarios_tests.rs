@@ -600,10 +600,10 @@ fn the_meta_line_says_what_scoring_and_training_read() {
 /// Every case builds, twice to the same bytes, and lines up with its meta.
 /// Needs the debug binary: `cargo build`, then `cargo test -- --ignored`.
 #[test]
-#[ignore = "needs the smart-commit binary: cargo build -p smart-commit first"]
+#[ignore = "needs the pionus binary: cargo build -p pionus first"]
 fn every_case_builds_twice_to_the_same_bytes() {
-    let binary = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/smart-commit");
-    assert!(binary.is_file(), "build smart-commit first");
+    let binary = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/pionus");
+    assert!(binary.is_file(), "build pionus first");
     let dir = tempfile::TempDir::new().unwrap();
     let (first, second) = (dir.path().join("a"), dir.path().join("b"));
     for out in [&first, &second] {

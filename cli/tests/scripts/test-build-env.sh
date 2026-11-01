@@ -38,7 +38,7 @@ package libc6-dev 2.35-0ubuntu3.15
 REF
 
 run() {
-    SMART_COMMIT_ENV_FILE=$work/ENV PATH=$bin:/usr/bin:/bin sh "$ROOT/scripts/build/check-env.sh" >"$work/out" 2>&1
+    PIONUS_ENV_FILE=$work/ENV PATH=$bin:/usr/bin:/bin sh "$ROOT/scripts/build/check-env.sh" >"$work/out" 2>&1
 }
 check() {
     local name=$1

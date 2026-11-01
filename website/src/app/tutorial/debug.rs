@@ -18,9 +18,9 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "debug",
                 label: "See what was decided, or record a generation",
-                "smart-commit -v\n"
+                "pionus -v\n"
                 note("also print what was decided and why")
-                "smart-commit --trace bad.json\n"
+                "pionus --trace bad.json\n"
                 note("record the generation, to report it")
             )
             <p>"A trace holds your staged diff. Review it before sharing."</p>

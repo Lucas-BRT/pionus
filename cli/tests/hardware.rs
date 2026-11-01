@@ -3,10 +3,10 @@
 //!
 //!   cargo test --test hardware -- --ignored --test-threads 1
 //!
-//! `SMART_COMMIT_TEST_DEVICE` picks the device: `npu` (the default),
+//! `PIONUS_TEST_DEVICE` picks the device: `npu` (the default),
 //! `intel-gpu` or `openvino-cpu` through OpenVINO, or `vulkan` or `cpu`
 //! through llama.cpp.
-//! `SMART_COMMIT_MODEL_DIR`, `SMART_COMMIT_GGUF` and `SMART_COMMIT_LLAMA_SERVER`
+//! `PIONUS_MODEL_DIR`, `PIONUS_GGUF` and `PIONUS_LLAMA_SERVER`
 //! override where the models and the server are. The prompts
 //! come from the recorded traces in tests/fixtures/traces, so every run sees
 //! the same inputs.
@@ -14,15 +14,13 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use smart_commit::backend::genai::{
-    Device, GenaiBackend, GenaiOptions, NpuTuning, device_prompt_budget,
-};
-use smart_commit::backend::llamacpp::{LlamaCppBackend, LlamaCppOptions, LlamaDevice};
-use smart_commit::backend::{Backend, GenerationConfig};
-use smart_commit::diff::estimate_tokens;
-use smart_commit::paths;
-use smart_commit::prompt::{self, DEFAULT_MAX_PROMPT_TOKENS, Prompt, PromptOptions};
-use smart_commit::trace::Trace;
+use pionus::backend::genai::{Device, GenaiBackend, GenaiOptions, NpuTuning, device_prompt_budget};
+use pionus::backend::llamacpp::{LlamaCppBackend, LlamaCppOptions, LlamaDevice};
+use pionus::backend::{Backend, GenerationConfig};
+use pionus::diff::estimate_tokens;
+use pionus::paths;
+use pionus::prompt::{self, DEFAULT_MAX_PROMPT_TOKENS, Prompt, PromptOptions};
+use pionus::trace::Trace;
 
 fn env(name: &str) -> Option<String> {
     std::env::var(name).ok()
@@ -35,25 +33,21 @@ fn path(var: &str, default: Option<PathBuf>) -> PathBuf {
         .expect("HOME or the override variable")
 }
 
-/// The llama.cpp options of `SMART_COMMIT_TEST_DEVICE`, if it is one of
+/// The llama.cpp options of `PIONUS_TEST_DEVICE`, if it is one of
 /// llama.cpp's devices.
 fn llamacpp_options() -> Option<LlamaCppOptions> {
-    let device = match env("SMART_COMMIT_TEST_DEVICE").as_deref() {
+    let device = match env("PIONUS_TEST_DEVICE").as_deref() {
         Some("cpu") => LlamaDevice::Cpu,
         Some("vulkan") => LlamaDevice::Vulkan(0),
         _ => return None,
     };
     Some(LlamaCppOptions {
-        server: path(
-            "SMART_COMMIT_LLAMA_SERVER",
-            paths::default_llama_server(env),
-        ),
-        model: path("SMART_COMMIT_GGUF", paths::default_gguf_file(env)),
+        server: path("PIONUS_LLAMA_SERVER", paths::default_llama_server(env)),
+        model: path("PIONUS_GGUF", paths::default_gguf_file(env)),
         device,
         max_prompt_tokens: DEFAULT_MAX_PROMPT_TOKENS,
         max_new_tokens: GenerationConfig::default().max_new_tokens,
-        threads_batch: smart_commit::hardware::physical_cores(std::path::Path::new("/sys"))
-            .unwrap_or(1),
+        threads_batch: pionus::hardware::physical_cores(std::path::Path::new("/sys")).unwrap_or(1),
         startup_timeout: std::time::Duration::from_secs(120),
         fast_load: false,
     })
@@ -64,14 +58,14 @@ fn backend() -> Box<dyn Backend> {
         let backend = LlamaCppBackend::start(&options);
         return Box::new(backend.unwrap_or_else(|err| panic!("{err}")));
     }
-    let device = match env("SMART_COMMIT_TEST_DEVICE").as_deref() {
+    let device = match env("PIONUS_TEST_DEVICE").as_deref() {
         Some("openvino-cpu") => Device::Cpu,
         Some("intel-gpu") => Device::Gpu,
         Some("npu") | None => Device::Npu,
-        Some(other) => panic!("unknown SMART_COMMIT_TEST_DEVICE {other:?}"),
+        Some(other) => panic!("unknown PIONUS_TEST_DEVICE {other:?}"),
     };
     let backend = GenaiBackend::load(&GenaiOptions {
-        model_dir: path("SMART_COMMIT_MODEL_DIR", paths::default_model_dir(env)),
+        model_dir: path("PIONUS_MODEL_DIR", paths::default_model_dir(env)),
         device,
         cache_dir: paths::default_cache_dir(env).expect("HOME"),
         max_prompt_tokens: DEFAULT_MAX_PROMPT_TOKENS,
@@ -84,7 +78,7 @@ fn backend() -> Box<dyn Backend> {
 /// The prompt budget the device under test is given, when it is less than
 /// the one the fixtures were recorded with: the NPU's.
 fn device_budget(recorded: usize) -> Option<usize> {
-    match env("SMART_COMMIT_TEST_DEVICE").as_deref() {
+    match env("PIONUS_TEST_DEVICE").as_deref() {
         Some("npu") | None => Some(device_prompt_budget(Device::Npu, recorded)),
         _ => None,
     }
@@ -157,7 +151,7 @@ fn a_model_kept_loaded_gives_the_same_replies() {
     };
     let config = GenerationConfig::default();
     let runtime = tempfile::TempDir::new().unwrap();
-    let exe = Path::new(env!("CARGO_BIN_EXE_smart-commit"));
+    let exe = Path::new(env!("CARGO_BIN_EXE_pionus"));
     let keep = std::time::Duration::from_secs(120);
     let mut replies = Vec::new();
     for (name, prompt) in fixture_prompts() {
@@ -165,17 +159,17 @@ fn a_model_kept_loaded_gives_the_same_replies() {
         let expected = fresh.generate(&prompt, &config).unwrap();
         drop(fresh);
         // Connects to the same kept server for every prompt but the first.
-        let kept = smart_commit::backend::server::connect(
+        let kept = pionus::backend::server::connect(
             runtime.path(),
             &options,
             keep,
-            &smart_commit::backend::server::Share::default(),
+            &pionus::backend::server::Share::default(),
             exe,
         )
         .unwrap();
         replies.push((name, expected, kept.generate(&prompt, &config).unwrap()));
     }
-    assert_eq!(smart_commit::backend::server::stop(runtime.path()), 1);
+    assert_eq!(pionus::backend::server::stop(runtime.path()), 1);
     for (name, expected, kept) in replies {
         assert_eq!(kept, expected, "{name}");
     }
@@ -260,13 +254,13 @@ fn token_estimate_is_at_most_a_quarter_short() {
 #[test]
 #[ignore = "needs an NPU, OpenVINO GenAI and an exported model"]
 fn npu_tuning_does_not_change_most_replies() {
-    if std::env::var("SMART_COMMIT_TEST_DEVICE").is_ok_and(|d| d != "npu") {
+    if std::env::var("PIONUS_TEST_DEVICE").is_ok_and(|d| d != "npu") {
         return;
     }
     let env = |name: &str| std::env::var(name).ok();
     let load = |npu: NpuTuning| {
         GenaiBackend::load(&GenaiOptions {
-            model_dir: env("SMART_COMMIT_MODEL_DIR")
+            model_dir: env("PIONUS_MODEL_DIR")
                 .map(PathBuf::from)
                 .or_else(|| paths::default_model_dir(env))
                 .unwrap(),

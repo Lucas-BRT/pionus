@@ -1,5 +1,5 @@
-//! What `smart-commit setup` does on a machine: the steps its hardware
-//! needs, and only those, as `smart-commit setup` plans them.
+//! What `pionus setup` does on a machine: the steps its hardware
+//! needs, and only those, as `pionus setup` plans them.
 //!
 //!   always              llama.cpp and the chosen model, no sudo
 //!   per GPU             its system drivers (setup-gpu.sh)
@@ -192,7 +192,7 @@ pub fn not_needed(hw: &Hardware) -> Option<&'static str> {
     )
 }
 
-/// The plan as `smart-commit setup --dry-run` prints it: every step with its
+/// The plan as `pionus setup --dry-run` prints it: every step with its
 /// sudo and download, nothing applied.
 pub fn dry_run_text(inventory: &str, not_needed: Option<&str>, steps: &[Step]) -> String {
     let mut out = format!(
@@ -235,7 +235,7 @@ pub fn dry_run_text(inventory: &str, not_needed: Option<&str>, steps: &[Step]) -
             .sum();
         out.push_str(&format!("\nTotal download: {}\n", models::size(total)));
     }
-    out.push_str("\nNothing was changed. Run `smart-commit setup` to apply it.\n");
+    out.push_str("\nNothing was changed. Run `pionus setup` to apply it.\n");
     out
 }
 
@@ -400,7 +400,7 @@ mod tests {
         // The GPU drivers' size is not known here, so there is no total.
         assert!(!out.contains("Total download"), "{out}");
         assert!(out.contains("Not needed: OpenVINO"), "{out}");
-        assert!(out.ends_with("Nothing was changed. Run `smart-commit setup` to apply it.\n"));
+        assert!(out.ends_with("Nothing was changed. Run `pionus setup` to apply it.\n"));
     }
 
     #[test]

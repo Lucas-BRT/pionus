@@ -31,18 +31,18 @@ Docker. Website changes also need the visual check of
 | Unit | under `cli/src/`: `tests.rs` beside `mod.rs` for a module with its own directory, else `#[cfg(test)] mod tests` |
 | Prompt snapshots | `insta::assert_snapshot!`, files in `snapshots/` beside the module; update with `INSTA_UPDATE=always cargo test` and review the diff |
 | Git integration | `cli/tests/git_context.rs`, with `TestRepo` from `cli/tests/common/` |
-| CLI end to end | `cli/tests/{cli,config_cli,bench_cli,hook,setup_cli}.rs`, running `CARGO_BIN_EXE_smart-commit` |
+| CLI end to end | `cli/tests/{cli,config_cli,bench_cli,hook,setup_cli}.rs`, running `CARGO_BIN_EXE_pionus` |
 | Trace fixtures | `cli/tests/replay_fixtures.rs` |
 | Docs | `cli/tests/docs.rs`: the paths the pages name exist, every command is in `docs/usage.md`, links resolve |
 | Tools | inside `tools/` and `training/tools/`; the scenarios built twice need `cargo test -- --ignored` after `cargo build` |
 | Scripts | `cli/tests/scripts/test-*.sh`, against fake sysfs trees, releases and binaries; no network, sudo or hardware; each one is a step of `.github/workflows/ci.yml` |
 | Python | `training/test_*.py`, run with `python3 -I` |
 | Website | `website/tests/routes.rs`: every page, and the facts it takes from the product |
-| Hardware | `cli/tests/hardware.rs`, ignored by default: `cargo test --test hardware -- --ignored --test-threads 1` with `SMART_COMMIT_TEST_DEVICE=npu\|intel-gpu\|vulkan\|cpu\|openvino-cpu`; fixture prompts only, never ad hoc inputs |
+| Hardware | `cli/tests/hardware.rs`, ignored by default: `cargo test --test hardware -- --ignored --test-threads 1` with `PIONUS_TEST_DEVICE=npu\|intel-gpu\|vulkan\|cpu\|openvino-cpu`; fixture prompts only, never ad hoc inputs |
 
 `cargo test` depends on no NPU or GPU, network, clock or randomness, and on
-none of the machine's git config, smart-commit config, models or
-`SMART_COMMIT_*` variables: run commands through `cli/tests/common::isolate`.
+none of the machine's git config, pionus config, models or
+`PIONUS_*` variables: run commands through `cli/tests/common::isolate`.
 Nothing that reaches the output depends on `HashMap` iteration order.
 
 ## Commits
@@ -58,11 +58,11 @@ Nothing that reaches the output depends on `HashMap` iteration order.
   `fix(diff): ...`, `docs: ...`, `test: ...`), subject of at most 72
   columns; a breaking change adds `!` and a `Breaking:` paragraph. The body
   says why when that is not obvious. Release notes are made from subjects.
-- **Ask smart-commit first.** With only the commit's changes staged:
+- **Ask pionus first.** With only the commit's changes staged:
 
   ```bash
-  smart-commit --trace /tmp/trace.json                      # the installed release
-  target/release/smart-commit --trace /tmp/trace-dev.json   # this tree
+  pionus --trace /tmp/trace.json                      # the installed release
+  target/release/pionus --trace /tmp/trace-dev.json   # this tree
   ```
 
   Compare its message with yours. A wrong one (type, scope, invented details,
@@ -77,7 +77,7 @@ Nothing that reaches the output depends on `HashMap` iteration order.
 Bump `version` in `cli/Cargo.toml` (semver) in a commit
 `chore: release X.Y.Z` on `main`. `.github/workflows/release.yml` tests,
 packages and publishes the release, with notes from the commit subjects
-(`sc-tools release-notes`). Tags and releases are never made by hand. The
+(`pionus-tools release-notes`). Tags and releases are never made by hand. The
 tarball is reproducible: `cli/tests/scripts/test-install.sh` packages twice
 and requires identical bytes, and CI prints the hash of every commit
 ([reproducibility](reproducibility.md#builds-and-releases)).

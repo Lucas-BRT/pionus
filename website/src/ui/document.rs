@@ -22,7 +22,7 @@ pub async fn document(
                 <title>(title)</title>
                 <meta name="description" content=(description)>
                 <meta name="color-scheme" content="dark">
-                <meta name="theme-color" content="#0d0c0b">
+                <meta name="theme-color" content="#0a0d14">
                 <link rel="icon" href="/logo.svg" type="image/svg+xml">
                 <link rel="stylesheet" href="/style.css">
                 topcoat::dev::script()

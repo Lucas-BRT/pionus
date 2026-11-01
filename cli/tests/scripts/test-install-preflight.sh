@@ -9,16 +9,16 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-ASSET=smart-commit-x86_64-unknown-linux-gnu.tar.gz
+ASSET=pionus-x86_64-unknown-linux-gnu.tar.gz
 failures=0
 
-stage=$work/stage/smart-commit-x86_64-unknown-linux-gnu
-mkdir -p "$stage/bin" "$stage/share/smart-commit/scripts" "$stage/share/doc/smart-commit" "$work/releases/latest/download"
-printf '#!/bin/sh\necho "smart-commit 1.0.0"\n' >"$stage/bin/smart-commit"
-chmod +x "$stage/bin/smart-commit"
-echo 1.0.0 >"$stage/share/smart-commit/VERSION"
-echo licence >"$stage/share/doc/smart-commit/LICENSE"
-tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" smart-commit-x86_64-unknown-linux-gnu
+stage=$work/stage/pionus-x86_64-unknown-linux-gnu
+mkdir -p "$stage/bin" "$stage/share/pionus/scripts" "$stage/share/doc/pionus" "$work/releases/latest/download"
+printf '#!/bin/sh\necho "pionus 1.0.0"\n' >"$stage/bin/pionus"
+chmod +x "$stage/bin/pionus"
+echo 1.0.0 >"$stage/share/pionus/VERSION"
+echo licence >"$stage/share/doc/pionus/LICENSE"
+tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" pionus-x86_64-unknown-linux-gnu
 (cd "$work/releases/latest/download" && sha256sum "$ASSET" >SHA256SUMS)
 
 # A PATH of symlinks to the real tools the installer uses, without git; the
@@ -45,8 +45,8 @@ run() {
     printf '%s\n' "${OSR-ID=ubuntu}" >"$work/os-release"
     [ -n "${KEEP:-}" ] || rm -rf "$home/.local"
     HOME=$home XDG_DATA_HOME=$home/.local/share XDG_CACHE_HOME=$home/.cache XDG_CONFIG_HOME=$home/.config \
-        SMART_COMMIT_RELEASE_BASE=file://$work/releases SMART_COMMIT_OS_RELEASE=$work/os-release \
-        SMART_COMMIT_GETCONF=$bin/getconf PATH=$bin \
+        PIONUS_RELEASE_BASE=file://$work/releases PIONUS_OS_RELEASE=$work/os-release \
+        PIONUS_GETCONF=$bin/getconf PATH=$bin \
         bash "$ROOT/install.sh" "$@" </dev/null >"$work/out" 2>&1
 }
 
@@ -64,7 +64,7 @@ check() {
 fails() { ! run "$@"; }
 said() { grep -qF -- "$1" "$work/out"; }
 not() { ! "$@"; }
-installed() { [ -x "$home/.local/bin/smart-commit" ]; }
+installed() { [ -x "$home/.local/bin/pionus" ]; }
 
 # git
 git_case() {
@@ -88,8 +88,8 @@ check "no os-release: still says git is required" said "git is required"
 
 # An old version is there: --update of a first install ends with status 1.
 GIT=yes run --no-setup
-mkdir -p "$home/.local/share/smart-commit"
-echo 0.9.0 >"$home/.local/share/smart-commit/VERSION"
+mkdir -p "$home/.local/share/pionus"
+echo 0.9.0 >"$home/.local/share/pionus/VERSION"
 KEEP=1 GIT=no run --update
 check "--update without git installs" installed
 check "--update without git warns" said "warning: git is not installed"

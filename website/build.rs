@@ -12,6 +12,12 @@ fn main() {
         config
     };
     config.render().unwrap();
+    // Pinned and committed in icons/, so the build reads it offline.
+    topcoat::icon::iconify::BuildConfig::new()
+        .cache_dir("icons")
+        .icon_set_version("lucide", "1.2.144")
+        .stage()
+        .unwrap();
     facts();
 }
 
@@ -185,7 +191,7 @@ fn devices_table(devices: &str) -> Vec<[String; 3]> {
     rows
 }
 
-/// The machine of the guide's `smart-commit bench` example ("Ryzen 5 5500
+/// The machine of the guide's `pionus bench` example ("Ryzen 5 5500
 /// with an RTX 3050") and its rows: device, time per message and whether it
 /// was selected.
 fn bench_example(devices: &str) -> (String, Vec<(String, String, bool)>) {

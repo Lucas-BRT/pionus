@@ -22,7 +22,7 @@ esac
 DOCKER
 chmod +x "$work/bin/docker"
 
-DIGEST=ghcr.io/lucas-brt/smart-commit-build@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+DIGEST=ghcr.io/lucas-brt/pionus-build@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 
 # resolve [LOCAL]: runs resolve_image with scripts/build/IMAGE as set up by the case.
 resolve() {
@@ -62,20 +62,20 @@ check "a reference that is here is not pulled" not ran "pull"
 
 printf '# no image published yet\n' >"$work/root/scripts/build/IMAGE"
 resolve
-check "no reference: the image is built from the Dockerfile" ran "build --quiet --tag smart-commit-build $work/root/scripts/build"
-check "no reference: its tag is the image" used smart-commit-build
+check "no reference: the image is built from the Dockerfile" ran "build --quiet --tag pionus-build $work/root/scripts/build"
+check "no reference: its tag is the image" used pionus-build
 check "no reference: nothing is pulled" not ran "pull"
 
 rm "$work/root/scripts/build/IMAGE"
 resolve
-check "no IMAGE file: built from the Dockerfile" used smart-commit-build
+check "no IMAGE file: built from the Dockerfile" used pionus-build
 
 printf '%s\n' "$DIGEST" >"$work/root/scripts/build/IMAGE"
-SMART_COMMIT_BUILD_IMAGE=my/image:1 resolve
+PIONUS_BUILD_IMAGE=my/image:1 resolve
 check "the variable overrides IMAGE" used my/image:1
 check "the variable's image is pulled when it is not here" ran "pull --quiet my/image:1"
 check "the variable's image does not build" not ran "build --quiet"
-SMART_COMMIT_BUILD_IMAGE=my/image:1 resolve local
+PIONUS_BUILD_IMAGE=my/image:1 resolve local
 check "the variable's image is used as it is when it is here" not ran "pull"
 
 if [ "$failures" -gt 0 ]; then

@@ -65,7 +65,7 @@ fn defaults_match_the_built_in_options() {
 fn the_model_is_kept_loaded_for_ten_minutes_unless_set() {
     let settings = resolve(None, None, HOME, vec![]).unwrap().settings();
     assert_eq!(settings.keep_loaded, std::time::Duration::from_secs(600));
-    let off = [("HOME", "/home/me"), ("SMART_COMMIT_KEEP_LOADED", "0")];
+    let off = [("HOME", "/home/me"), ("PIONUS_KEEP_LOADED", "0")];
     let settings = resolve(None, None, &off, vec![]).unwrap().settings();
     assert!(settings.keep_loaded.is_zero());
 }
@@ -74,7 +74,7 @@ fn the_model_is_kept_loaded_for_ten_minutes_unless_set() {
 fn layers_override_in_order() {
     let global = "backend = \"mock\"\n[model]\ndevice = \"gpu\"\n[style]\ndefault_convention = \"free\"\nhistory_depth = 10\n";
     let repo = "[style]\ndefault_convention = \"gitmoji\"\n";
-    let vars = [("HOME", "/home/me"), ("SMART_COMMIT_DEVICE", "cpu")];
+    let vars = [("HOME", "/home/me"), ("PIONUS_DEVICE", "cpu")];
     let resolved = resolve(
         Some(global),
         Some(repo),
@@ -88,7 +88,7 @@ fn layers_override_in_order() {
         origin("style.default_convention"),
         Origin::Repo(_)
     ));
-    assert_eq!(origin("model.device"), Origin::Env("SMART_COMMIT_DEVICE"));
+    assert_eq!(origin("model.device"), Origin::Env("PIONUS_DEVICE"));
     assert_eq!(origin("backend"), Origin::Flag);
     assert_eq!(origin("style.convention"), Origin::Default);
 
@@ -168,13 +168,13 @@ fn invalid_values_are_errors() {
     let err = resolve(
         None,
         None,
-        &[("HOME", "/h"), ("SMART_COMMIT_BACKEND", "gpt")],
+        &[("HOME", "/h"), ("PIONUS_BACKEND", "gpt")],
         vec![],
     )
     .unwrap_err();
     assert!(
         err.to_string()
-            .contains("environment variable SMART_COMMIT_BACKEND"),
+            .contains("environment variable PIONUS_BACKEND"),
         "{err}"
     );
 }
@@ -206,7 +206,7 @@ fn paths_expand_home() {
 
 #[test]
 fn empty_environment_variables_are_ignored() {
-    let vars = [("HOME", "/h"), ("SMART_COMMIT_DEVICE", "")];
+    let vars = [("HOME", "/h"), ("PIONUS_DEVICE", "")];
     let resolved = resolve(None, None, &vars, vec![]).unwrap();
     assert_eq!(resolved.get("model.device").unwrap().1, Origin::Default);
 }
@@ -266,12 +266,12 @@ fn fast_load_follows_the_benchmark_unless_set() {
     assert!(FastLoad::Auto.enabled(|| true));
     assert!(!FastLoad::Auto.enabled(|| false));
 
-    let on = settings(&[("SMART_COMMIT_FAST_LOAD", "on")]);
+    let on = settings(&[("PIONUS_FAST_LOAD", "on")]);
     assert_eq!(on, FastLoad::On);
     assert!(on.enabled(|| panic!("the benchmark is not asked")));
-    let off = settings(&[("SMART_COMMIT_FAST_LOAD", "off")]);
+    let off = settings(&[("PIONUS_FAST_LOAD", "off")]);
     assert!(!off.enabled(|| panic!("the benchmark is not asked")));
-    assert!(resolve(None, None, &[("SMART_COMMIT_FAST_LOAD", "yes")], vec![]).is_err());
+    assert!(resolve(None, None, &[("PIONUS_FAST_LOAD", "yes")], vec![]).is_err());
 
     let repo = "[model]\nfast_load = \"on\"\n";
     assert!(
@@ -289,11 +289,11 @@ fn fast_load_follows_the_benchmark_unless_set() {
 #[test]
 fn every_device_name_is_accepted() {
     for target in device::DEFAULT_ORDER {
-        let vars = [("SMART_COMMIT_DEVICE", target.name())];
+        let vars = [("PIONUS_DEVICE", target.name())];
         let settings = resolve(None, None, &vars, vec![]).unwrap().settings();
         assert_eq!(settings.device, DeviceSetting::Fixed(target));
     }
-    let vars = [("SMART_COMMIT_DEVICE", "tpu")];
+    let vars = [("PIONUS_DEVICE", "tpu")];
     assert!(resolve(None, None, &vars, vec![]).is_err());
 }
 
@@ -311,12 +311,12 @@ fn the_old_gpu_name_still_works_with_a_warning() {
         warnings[0].starts_with("model.device = gpu (global ")
             && warnings[0].ends_with(
                 "is the old name of intel-gpu; \
-                     `smart-commit config set model.device intel-gpu` renames it"
+                     `pionus config set model.device intel-gpu` renames it"
             ),
         "{}",
         warnings[0]
     );
-    let current = resolve(None, None, &[("SMART_COMMIT_DEVICE", "intel-gpu")], vec![]);
+    let current = resolve(None, None, &[("PIONUS_DEVICE", "intel-gpu")], vec![]);
     assert!(current.unwrap().renamed_values().is_empty());
 }
 
@@ -395,14 +395,14 @@ fn set_aside_invalid_removes_only_values_this_version_cannot_read() {
     let path = dir.path().join("config.toml");
     std::fs::write(
         &path,
-        "# mine\n[model]\ndevice = \"vulkan\"\nname = \"smart-commit-9b-v9\"\n\
+        "# mine\n[model]\ndevice = \"vulkan\"\nname = \"pionus-9b-v9\"\n\
              max_new_tokens = 5000\n[style]\ndefault_convention = \"free\"\n",
     )
     .unwrap();
     let removed = set_aside_invalid(&path, None).unwrap();
     let messages: Vec<_> = removed.iter().map(ToString::to_string).collect();
     assert_eq!(messages.len(), 2, "{messages:?}");
-    assert!(messages[0].contains("`model.name`") && messages[0].contains("\"smart-commit-9b-v9\""));
+    assert!(messages[0].contains("`model.name`") && messages[0].contains("\"pionus-9b-v9\""));
     assert!(messages[1].contains("`model.max_new_tokens`"));
     let text = std::fs::read_to_string(&path).unwrap();
     assert_eq!(
@@ -479,10 +479,10 @@ fn set_uncomments_the_template_line() {
     set_in_file(&path, &origin, "style.history_depth", "12", None).unwrap();
     let text = std::fs::read_to_string(&path).unwrap();
     assert!(
-        text.contains("# Environment: SMART_COMMIT_DEVICE.\ndevice = \"cpu\"\n"),
+        text.contains("# Environment: PIONUS_DEVICE.\ndevice = \"cpu\"\n"),
         "{text}"
     );
-    assert!(text.contains("# Environment: SMART_COMMIT_BACKEND.\nbackend = \"mock\"\n"));
+    assert!(text.contains("# Environment: PIONUS_BACKEND.\nbackend = \"mock\"\n"));
     assert!(text.contains("history_depth = 12\n"));
     assert!(
         !text.contains("# device = "),
@@ -498,7 +498,7 @@ fn set_uncomments_the_template_line() {
     set_in_file(&path, &origin, "model.device", "gpu", None).unwrap();
     let text = std::fs::read_to_string(&path).unwrap();
     assert!(
-        text.contains("SMART_COMMIT_DEVICE.\ndevice = \"intel-gpu\""),
+        text.contains("PIONUS_DEVICE.\ndevice = \"intel-gpu\""),
         "{text}"
     );
 }
@@ -569,8 +569,8 @@ fn asking_for_the_type_is_set_by_file_or_environment() {
 
     let vars = [
         ("HOME", "/home/me"),
-        ("SMART_COMMIT_ASK_TYPE", "low_confidence"),
-        ("SMART_COMMIT_ASK_TYPE_BELOW", "30"),
+        ("PIONUS_ASK_TYPE", "low_confidence"),
+        ("PIONUS_ASK_TYPE_BELOW", "30"),
     ];
     let settings = resolve(Some("[model]\nask_type_below = 90\n"), None, &vars, vec![])
         .unwrap()
@@ -619,10 +619,7 @@ fn a_kept_model_may_take_a_sixth_of_the_ram_unless_set() {
     let file = "[model]\nkeep_loaded_max_ram = 40\n";
     let settings = resolve(Some(file), None, HOME, vec![]).unwrap().settings();
     assert_eq!(settings.keep_loaded_max_ram, 40);
-    let vars = [
-        ("HOME", "/home/me"),
-        ("SMART_COMMIT_KEEP_LOADED_MAX_RAM", "25"),
-    ];
+    let vars = [("HOME", "/home/me"), ("PIONUS_KEEP_LOADED_MAX_RAM", "25")];
     let settings = resolve(Some(file), None, &vars, vec![]).unwrap().settings();
     assert_eq!(settings.keep_loaded_max_ram, 25, "the environment wins");
 }
@@ -653,7 +650,7 @@ fn only_a_keep_loaded_someone_set_counts_as_asked_for() {
     let file = "[model]\nkeep_loaded = 10\n";
     let settings = resolve(Some(file), None, HOME, vec![]).unwrap().settings();
     assert!(settings.keep_loaded_explicit, "even to the default's value");
-    let vars = [("HOME", "/home/me"), ("SMART_COMMIT_KEEP_LOADED", "0")];
+    let vars = [("HOME", "/home/me"), ("PIONUS_KEEP_LOADED", "0")];
     let settings = resolve(None, None, &vars, vec![]).unwrap().settings();
     assert!(settings.keep_loaded_explicit);
     assert!(settings.keep_loaded.is_zero());

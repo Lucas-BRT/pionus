@@ -53,11 +53,11 @@ chmod +x "$work/bin/uv"
 
 data=$work/data
 cache=$work/cache
-out=$data/smart-commit/models/$NAME
+out=$data/pionus/models/$NAME
 export LOG=$work/log
 run() {
     : >"$LOG"
-    XDG_DATA_HOME=$data XDG_CACHE_HOME=$cache SMART_COMMIT_UV=$work/bin/uv \
+    XDG_DATA_HOME=$data XDG_CACHE_HOME=$cache PIONUS_UV=$work/bin/uv \
         bash "$work/scripts/export-model.sh" "$@" >"$work/out" 2>&1
 }
 
@@ -77,7 +77,7 @@ fails() { ! "$@"; }
 logged() { grep -qF -- "$1" "$LOG"; }
 said() { grep -qF -- "$1" "$work/out"; }
 exported() { [ -f "$out/openvino_model.xml" ] && [ -f "$out/LICENSE" ] && [ -f "$out/MANIFEST.sha256" ]; }
-cleaned() { [ ! -e "$cache/smart-commit/export-venv" ] && [ ! -e "$cache/smart-commit/sources" ]; }
+cleaned() { [ ! -e "$cache/pionus/export-venv" ] && [ ! -e "$cache/pionus/sources" ]; }
 
 # A result other than the committed manifest is refused and left aside.
 check "an unexpected export fails" fails run
@@ -104,7 +104,7 @@ check "without downloading" fails logged "hf download"
 echo tampered >"$out/openvino_model.bin"
 check "--check fails on a changed file" fails run --check
 check "--keep exports again" run --keep
-check "and keeps the environment and the source" test -d "$cache/smart-commit/export-venv" -a -d "$cache/smart-commit/sources"
+check "and keeps the environment and the source" test -d "$cache/pionus/export-venv" -a -d "$cache/pionus/sources"
 
 # A uv download with another checksum is refused.
 mkdir -p "$work/fake-uv/uv-x86_64-unknown-linux-gnu"
@@ -112,7 +112,7 @@ cp "$work/bin/uv" "$work/fake-uv/uv-x86_64-unknown-linux-gnu/uv"
 tar -C "$work/fake-uv" -czf "$work/uv.tar.gz" uv-x86_64-unknown-linux-gnu
 rm -rf "$out"
 : >"$LOG"
-if XDG_DATA_HOME=$data XDG_CACHE_HOME=$cache SMART_COMMIT_UV_URL=file://$work/uv.tar.gz \
+if XDG_DATA_HOME=$data XDG_CACHE_HOME=$cache PIONUS_UV_URL=file://$work/uv.tar.gz \
     bash "$work/scripts/export-model.sh" >"$work/out" 2>&1; then
     uv_status=0
 else
@@ -120,7 +120,7 @@ else
 fi
 check "a uv with another checksum is refused" test "$uv_status" -ne 0
 check "and named" said "is not the pinned uv 0.13.1"
-check "and not kept" test ! -e "$cache/smart-commit/uv-0.13.1/uv"
+check "and not kept" test ! -e "$cache/pionus/uv-0.13.1/uv"
 
 if [ "$failures" -gt 0 ]; then
     echo "$failures failure(s)"

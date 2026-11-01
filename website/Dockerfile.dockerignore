@@ -19,4 +19,5 @@
 !website/build.rs
 !website/src
 !website/assets
+!website/icons
 !website/styles.css

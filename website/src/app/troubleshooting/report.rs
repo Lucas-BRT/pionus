@@ -18,16 +18,16 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "trace",
                 label: "Record a generation and replay it",
-                "smart-commit --trace bad.json\n"
-                note("or: SMART_COMMIT_TRACE=bad.json git commit")
-                "smart-commit replay bad.json\n"
+                "pionus --trace bad.json\n"
+                note("or: PIONUS_TRACE=bad.json git commit")
+                "pionus replay bad.json\n"
                 note("checks that it reproduces")
             )
             <p>
                 "A trace holds your staged diff and recent commit subjects. Review it before sharing. "
-                <code>"smart-commit -v"</code>
+                <code>"pionus -v"</code>
                 " shows what was decided; "
-                <code>"smart-commit prompt"</code>
+                <code>"pionus prompt"</code>
                 " shows the prompt."
             </p>
             <p>

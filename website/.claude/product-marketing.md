@@ -1,4 +1,4 @@
-# Product marketing context: smart-commit
+# Product marketing context: pionus
 
 ## What it is
 A support tool for naming git commits. It reads the staged diff and the repository's

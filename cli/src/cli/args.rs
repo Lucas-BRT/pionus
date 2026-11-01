@@ -4,8 +4,8 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::{Args, ValueEnum};
-use smart_commit::backend::device::Target;
-use smart_commit::prompt::{
+use pionus::backend::device::Target;
+use pionus::prompt::{
     DiffFormat, PromptExamples, PromptNames, PromptOptions, PromptRules, PromptScopes,
 };
 
@@ -23,10 +23,10 @@ pub(super) struct GenerateArgs {
 }
 
 /// How messages are generated. Unset options come from the environment,
-/// then the config files (see `smart-commit config list --show-origin`).
+/// then the config files (see `pionus config list --show-origin`).
 #[derive(Debug, Args)]
 pub(super) struct BackendArgs {
-    /// [config: backend; env: SMART_COMMIT_BACKEND]
+    /// [config: backend; env: PIONUS_BACKEND]
     #[arg(long, value_enum)]
     backend: Option<BackendArg>,
     #[command(flatten)]
@@ -35,13 +35,13 @@ pub(super) struct BackendArgs {
     /// The environment variable holds a single reply.
     #[arg(
         long = "mock-response",
-        env = "SMART_COMMIT_MOCK_RESPONSE",
+        env = "PIONUS_MOCK_RESPONSE",
         value_name = "TEXT"
     )]
     pub(super) mock_responses: Vec<String>,
     /// Record inputs, prompts and replies to FILE, for `replay`. It
     /// includes the staged diff and recent commit subjects.
-    #[arg(long, env = "SMART_COMMIT_TRACE", value_name = "FILE")]
+    #[arg(long, env = "PIONUS_TRACE", value_name = "FILE")]
     pub(super) trace: Option<PathBuf>,
 }
 
@@ -158,10 +158,10 @@ enum BackendArg {
 /// Which model runs where, for the OpenVINO backend.
 #[derive(Debug, Args)]
 pub(super) struct ModelArgs {
-    /// [config: model.device; env: SMART_COMMIT_DEVICE]
+    /// [config: model.device; env: PIONUS_DEVICE]
     #[arg(long, value_enum)]
     device: Option<DeviceArg>,
-    /// [config: model.dir; env: SMART_COMMIT_MODEL_DIR]
+    /// [config: model.dir; env: PIONUS_MODEL_DIR]
     #[arg(long, value_name = "DIR")]
     model_dir: Option<PathBuf>,
 }

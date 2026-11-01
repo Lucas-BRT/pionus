@@ -1,7 +1,7 @@
 {
-  "id": "lucasbrt/smart-commit-dpo",
-  "title": "smart-commit dpo",
-  "code_file": "smart-commit-dpo.ipynb",
+  "id": "lucasbrt/pionus-dpo",
+  "title": "pionus dpo",
+  "code_file": "pionus-dpo.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": true,
@@ -12,7 +12,7 @@
     "gpu"
   ],
   "dataset_sources": [
-    "lucasbrt/smart-commit-training-dpo2-sweep2"
+    "lucasbrt/pionus-training-dpo2-sweep2"
   ],
   "kernel_sources": [],
   "competition_sources": [],

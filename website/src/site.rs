@@ -48,70 +48,70 @@ pub static PAGES: [Page; 9] = [
     Page {
         target: &app::page,
         label: "Home",
-        title: "smart-commit: commit messages in your repo's style, run locally",
+        title: "pionus: commit messages in your repo's style, run locally",
         description: "Commit messages in your repo's style, from a small local model.",
         section: None,
     },
     Page {
         target: &tutorial::page,
         label: "Tutorial",
-        title: "Your first commit - smart-commit",
-        description: "Install smart-commit, stage, review and commit.",
+        title: "Your first commit - pionus",
+        description: "Install pionus, stage, review and commit.",
         section: Some(Section::Start),
     },
     Page {
         target: &install::page,
         label: "Install",
-        title: "Install and use smart-commit",
-        description: "Install smart-commit and write your first message.",
+        title: "Install and use pionus",
+        description: "Install pionus and write your first message.",
         section: Some(Section::Start),
     },
     Page {
         target: &settings::page,
         label: "Settings and models",
-        title: "Settings and models - smart-commit",
+        title: "Settings and models - pionus",
         description: "Change settings and choose a model.",
         section: Some(Section::Guides),
     },
     Page {
         target: &troubleshooting::page,
         label: "Troubleshooting",
-        title: "Troubleshooting - smart-commit",
+        title: "Troubleshooting - pionus",
         description: "Check an installation and fix common errors.",
         section: Some(Section::Guides),
     },
     Page {
         target: &devices::page,
         label: "Devices",
-        title: "Devices: NPU, GPU and CPU - smart-commit",
-        description: "The hardware smart-commit runs on.",
+        title: "Devices: NPU, GPU and CPU - pionus",
+        description: "The hardware pionus runs on.",
         section: Some(Section::Reference),
     },
     Page {
         target: &measurements::page,
         label: "Measurements",
-        title: "Measurements - smart-commit",
+        title: "Measurements - pionus",
         description: "How long a message takes, by device and model.",
         section: Some(Section::Reference),
     },
     Page {
         target: &how_it_works::page,
         label: "How it works",
-        title: "How smart-commit works",
+        title: "How pionus works",
         description: "From your history and diff to the commit message.",
         section: Some(Section::Reference),
     },
     Page {
         target: &roadmap::page,
         label: "Roadmap",
-        title: "Roadmap - smart-commit",
+        title: "Roadmap - pionus",
         description: "What comes next.",
         section: Some(Section::Project),
     },
 ];
 
 /// What a request for a page that does not exist is answered with.
-pub const NOT_FOUND: (&str, &str) = ("Page not found - smart-commit", "This page does not exist.");
+pub const NOT_FOUND: (&str, &str) = ("Page not found - pionus", "This page does not exist.");
 
 /// The page this request is for, if it is one of ours.
 pub fn current(cx: &Cx) -> Option<&'static Page> {

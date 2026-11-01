@@ -14,7 +14,7 @@ pub async fn section() -> Result<impl View> {
             title: "Asking for the type",
             <p>
                 "With "
-                <code>"smart-commit config set model.ask_type low_confidence"</code>
+                <code>"pionus config set model.ask_type low_confidence"</code>
                 ", "
                 <code>"--commit"</code>
                 " asks for the type when the model is unsure."

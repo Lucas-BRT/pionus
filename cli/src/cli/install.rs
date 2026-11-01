@@ -1,5 +1,5 @@
-//! `smart-commit update` and `smart-commit uninstall`: they run the
-//! install.sh that came with this release (in `share/smart-commit/scripts`),
+//! `pionus update` and `pionus uninstall`: they run the
+//! install.sh that came with this release (in `share/pionus/scripts`),
 //! which downloads releases, checks them against their SHA256SUMS and knows
 //! which files it installed. Only an install made by install.sh has one: a
 //! build from source updates with git and cargo.
@@ -9,16 +9,16 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::{Context as _, Result, anyhow, bail};
-use smart_commit::backend::server;
-use smart_commit::{paths, tui};
+use pionus::backend::server;
+use pionus::{paths, tui};
 
 use super::settings::{env, resolve};
 
 const INSTALL: &str =
-    "curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash";
+    "curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash";
 
-/// An installation made by install.sh: `PREFIX/bin/smart-commit`, with the
-/// release's files in `PREFIX/share/smart-commit`.
+/// An installation made by install.sh: `PREFIX/bin/pionus`, with the
+/// release's files in `PREFIX/share/pionus`.
 #[derive(Debug, PartialEq, Eq)]
 struct Installed {
     prefix: PathBuf,
@@ -39,13 +39,13 @@ fn installed(exe: &Path) -> Result<Installed> {
         return Err(not_installed());
     }
     let prefix = bin.parent().ok_or_else(not_installed)?.to_path_buf();
-    let share = prefix.join("share/smart-commit");
+    let share = prefix.join("share/pionus");
     let version = std::fs::read_to_string(share.join("VERSION")).map_err(|_| not_installed())?;
     let version = version.trim().to_owned();
     let installer = share.join("scripts/install.sh");
     if !installer.is_file() {
         bail!(
-            "smart-commit {version} predates `smart-commit update` and `uninstall`; update once \
+            "pionus {version} predates `pionus update` and `uninstall`; update once \
              with `{INSTALL} -s -- --no-setup`, or remove it with `{INSTALL} -s -- --purge`"
         );
     }
@@ -82,11 +82,7 @@ fn run_installer(install: &Installed, args: &[&str]) -> Result<()> {
 
 pub(super) fn update() -> Result<()> {
     let install = installed(&std::env::current_exe()?.canonicalize()?)?;
-    println!(
-        "smart-commit {} in {}",
-        install.version,
-        install.prefix.display()
-    );
+    println!("pionus {} in {}", install.version, install.prefix.display());
     stop_kept_models();
     run_installer(&install, &["--update"])
 }
@@ -122,9 +118,9 @@ pub(super) fn uninstall(yes: bool, system: bool) -> Result<()> {
 fn plan(install: &Installed, system: bool) -> String {
     let data = paths::data_dir(env);
     let mut text = format!(
-        "This removes smart-commit {} from this machine:\n  binary:        {}\n",
+        "This removes pionus {} from this machine:\n  binary:        {}\n",
         install.version,
-        install.prefix.join("bin/smart-commit").display()
+        install.prefix.join("bin/pionus").display()
     );
     if let Some(data) = &data {
         let size = size_of(data);
@@ -145,17 +141,17 @@ fn plan(install: &Installed, system: bool) -> String {
         text += &format!("  configuration: {}\n", config.display());
     }
     if system {
-        text += "  OpenVINO, if smart-commit's setup installed it (asks for sudo)\n";
+        text += "  OpenVINO, if pionus's setup installed it (asks for sudo)\n";
     }
-    text += "Kept: driver packages, repositories' .smart-commit.toml and their \
+    text += "Kept: driver packages, repositories' .pionus.toml and their \
              prepare-commit-msg hooks (remove .git/hooks/prepare-commit-msg by hand).\n";
     for file in models_elsewhere(data.as_deref()) {
-        text += &format!("Kept, not downloaded by smart-commit: {}\n", file.display());
+        text += &format!("Kept, not downloaded by pionus: {}\n", file.display());
     }
     text
 }
 
-/// Model files the settings name outside smart-commit's data directory
+/// Model files the settings name outside pionus's data directory
 /// (`model.gguf`, `model.dir`): the user's own, which uninstall leaves.
 fn models_elsewhere(data: Option<&Path>) -> Vec<PathBuf> {
     let Ok(resolved) = resolve(None, Vec::new()) else {
@@ -195,14 +191,14 @@ mod tests {
     use super::*;
 
     fn layout(dir: &Path, installer: bool) -> PathBuf {
-        let share = dir.join("share/smart-commit/scripts");
+        let share = dir.join("share/pionus/scripts");
         std::fs::create_dir_all(&share).unwrap();
         std::fs::create_dir_all(dir.join("bin")).unwrap();
-        std::fs::write(dir.join("share/smart-commit/VERSION"), "0.8.0\n").unwrap();
+        std::fs::write(dir.join("share/pionus/VERSION"), "0.8.0\n").unwrap();
         if installer {
             std::fs::write(share.join("install.sh"), "").unwrap();
         }
-        dir.join("bin/smart-commit")
+        dir.join("bin/pionus")
     }
 
     #[test]
@@ -214,7 +210,7 @@ mod tests {
             Installed {
                 prefix: dir.path().to_path_buf(),
                 version: "0.8.0".into(),
-                installer: dir.path().join("share/smart-commit/scripts/install.sh"),
+                installer: dir.path().join("share/pionus/scripts/install.sh"),
             }
         );
     }
@@ -222,15 +218,15 @@ mod tests {
     #[test]
     fn refuses_builds_and_older_installs() {
         let dir = tempfile::TempDir::new().unwrap();
-        // A build from source: target/release/smart-commit.
-        let err = installed(&dir.path().join("target/release/smart-commit")).unwrap_err();
+        // A build from source: target/release/pionus.
+        let err = installed(&dir.path().join("target/release/pionus")).unwrap_err();
         assert!(
             err.to_string().contains("not installed by install.sh"),
             "{err}"
         );
         // bin/ without the release's files.
         std::fs::create_dir_all(dir.path().join("bin")).unwrap();
-        let err = installed(&dir.path().join("bin/smart-commit")).unwrap_err();
+        let err = installed(&dir.path().join("bin/pionus")).unwrap_err();
         assert!(
             err.to_string().contains("not installed by install.sh"),
             "{err}"
@@ -239,8 +235,7 @@ mod tests {
         let exe = layout(dir.path(), false);
         let err = installed(&exe).unwrap_err();
         assert!(
-            err.to_string()
-                .contains("0.8.0 predates `smart-commit update`"),
+            err.to_string().contains("0.8.0 predates `pionus update`"),
             "{err}"
         );
         assert!(err.to_string().contains("--purge"), "{err}");

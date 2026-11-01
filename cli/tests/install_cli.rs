@@ -19,12 +19,12 @@ struct FakeInstall {
 impl FakeInstall {
     fn new(with_installer: bool) -> Self {
         let dir = TempDir::new().unwrap();
-        let share = dir.path().join("prefix/share/smart-commit");
+        let share = dir.path().join("prefix/share/pionus");
         std::fs::create_dir_all(share.join("scripts")).unwrap();
         std::fs::create_dir_all(dir.path().join("prefix/bin")).unwrap();
         std::fs::write(share.join("VERSION"), "0.8.0\n").unwrap();
-        let bin = dir.path().join("prefix/bin/smart-commit");
-        std::fs::copy(env!("CARGO_BIN_EXE_smart-commit"), &bin).unwrap();
+        let bin = dir.path().join("prefix/bin/pionus");
+        std::fs::copy(env!("CARGO_BIN_EXE_pionus"), &bin).unwrap();
         if with_installer {
             let calls = dir.path().join("calls");
             std::fs::write(
@@ -42,7 +42,7 @@ impl FakeInstall {
 
     fn run(&self, args: &[&str]) -> Output {
         output(common::isolate(
-            Command::new(self.prefix().join("bin/smart-commit"))
+            Command::new(self.prefix().join("bin/pionus"))
                 .args(args)
                 .current_dir(self.dir.path())
                 .stdin(Stdio::null()),
@@ -78,7 +78,7 @@ fn update_runs_the_installer_of_this_release() {
     let install = FakeInstall::new(true);
     let output = install.run(&["update"]);
     assert!(output.status.success(), "{}", text(&output.stderr));
-    assert!(text(&output.stdout).contains("smart-commit 0.8.0 in "));
+    assert!(text(&output.stdout).contains("pionus 0.8.0 in "));
     let prefix = install.prefix().canonicalize().unwrap();
     assert_eq!(
         install.calls(),
@@ -100,28 +100,25 @@ fn uninstall_says_what_goes_and_asks() {
     assert_eq!(install.calls(), "");
     let plan = text(&output.stdout);
     assert!(
-        plan.contains("This removes smart-commit 0.8.0 from this machine:"),
+        plan.contains("This removes pionus 0.8.0 from this machine:"),
         "{plan}"
     );
     assert!(
         plan.contains(&format!(
-            "models, llama.cpp and the benchmark: {}/smart-commit",
+            "models, llama.cpp and the benchmark: {}/pionus",
             common::DATA_HOME
         )),
         "{plan}"
     );
     assert!(
-        plan.contains(&format!(
-            "configuration: {}/smart-commit",
-            common::CONFIG_HOME
-        )),
+        plan.contains(&format!("configuration: {}/pionus", common::CONFIG_HOME)),
         "{plan}"
     );
     assert!(plan.contains("prepare-commit-msg"), "{plan}");
 
     let output = install.run(&["uninstall", "--yes", "--system"]);
     assert!(output.status.success(), "{}", text(&output.stderr));
-    assert!(text(&output.stdout).contains("OpenVINO, if smart-commit's setup installed it"));
+    assert!(text(&output.stdout).contains("OpenVINO, if pionus's setup installed it"));
     let prefix = install.prefix().canonicalize().unwrap();
     assert_eq!(
         install.calls(),
@@ -133,18 +130,18 @@ fn uninstall_says_what_goes_and_asks() {
 fn uninstall_keeps_the_users_own_model_files() {
     let install = FakeInstall::new(true);
     let config = install.dir.path().join("config");
-    std::fs::create_dir_all(config.join("smart-commit")).unwrap();
+    std::fs::create_dir_all(config.join("pionus")).unwrap();
     let own = install.dir.path().join("Models/mine.gguf");
     std::fs::create_dir_all(own.parent().unwrap()).unwrap();
     std::fs::write(&own, "gguf").unwrap();
     std::fs::write(
-        config.join("smart-commit/config.toml"),
+        config.join("pionus/config.toml"),
         format!("[model]\ngguf = \"{}\"\n", own.display()),
     )
     .unwrap();
     let output = output(
         common::isolate(
-            Command::new(install.prefix().join("bin/smart-commit"))
+            Command::new(install.prefix().join("bin/pionus"))
                 .args(["uninstall"])
                 .stdin(Stdio::null()),
         )
@@ -153,7 +150,7 @@ fn uninstall_keeps_the_users_own_model_files() {
     let plan = text(&output.stdout);
     assert!(
         plan.contains(&format!(
-            "Kept, not downloaded by smart-commit: {}",
+            "Kept, not downloaded by pionus: {}",
             own.display()
         )),
         "{plan}"
@@ -164,7 +161,7 @@ fn uninstall_keeps_the_users_own_model_files() {
 fn a_build_from_source_is_refused() {
     let dir = TempDir::new().unwrap();
     for command in ["update", "uninstall"] {
-        let output = common::smart_commit(
+        let output = common::pionus(
             &[command, "--yes"][..if command == "update" { 1 } else { 2 }],
             dir.path(),
             &[],
@@ -184,10 +181,7 @@ fn an_install_from_before_the_commands_points_to_install_sh() {
     let output = install.run(&["update"]);
     assert!(!output.status.success());
     let err = text(&output.stderr);
-    assert!(
-        err.contains("0.8.0 predates `smart-commit update`"),
-        "{err}"
-    );
+    assert!(err.contains("0.8.0 predates `pionus update`"), "{err}");
     assert!(err.contains("install.sh | bash -s -- --no-setup"), "{err}");
     assert!(!Path::new(&install.dir.path().join("calls")).exists());
 }
@@ -197,9 +191,7 @@ fn the_installer_is_run_with_bash() {
     // A release's install.sh is executable, but the copy may not be (a
     // prefix copied without modes): bash runs it either way.
     let install = FakeInstall::new(true);
-    let script = install
-        .prefix()
-        .join("share/smart-commit/scripts/install.sh");
+    let script = install.prefix().join("share/pionus/scripts/install.sh");
     std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o644)).unwrap();
     assert!(install.run(&["update"]).status.success());
 }

@@ -1,4 +1,4 @@
-//! The data tools for training smart-commit's models. They are a crate of
+//! The data tools for training pionus's models. They are a crate of
 //! their own so that what they need (parquet, above all) never reaches the
 //! binary users install.
 
@@ -23,8 +23,8 @@ use clap::{Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "sc-training",
-    about = "The data tools for training smart-commit's models"
+    name = "pionus-training",
+    about = "The data tools for training pionus's models"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -133,15 +133,15 @@ enum Command {
         marginal_tolerance: f64,
     },
     /// Training examples (`DIR/examples.jsonl`) from selected inputs, with the
-    /// prompts `smart-commit prompt --inputs` builds.
+    /// prompts `pionus prompt --inputs` builds.
     MakeExamples {
         /// With `inputs.jsonl` and `meta.jsonl`.
         dir: PathBuf,
-        /// `smart-commit`.
+        /// `pionus`.
         binary: PathBuf,
         #[arg(long, default_value = "full")]
         rules: String,
-        /// Always passed: smart-commit's default list is `annotated`, and every
+        /// Always passed: pionus's default list is `annotated`, and every
         /// model so far was trained on `plain`.
         #[arg(long, default_value = "plain")]
         diff: String,
@@ -166,7 +166,7 @@ enum Command {
     Compare {
         /// Where the traces (OUT/SET/NAME.jsonl) and `summary.json` go.
         out: PathBuf,
-        /// `smart-commit`, which makes the traces.
+        /// `pionus`, which makes the traces.
         binary: PathBuf,
         /// Evaluation sets: directories with `inputs.jsonl` and `meta.jsonl`.
         #[arg(long, num_args = 1.., required = true, value_name = "DIR")]
@@ -189,7 +189,7 @@ enum Command {
         #[arg(long, default_value_t = 0)]
         read: usize,
     },
-    /// Scores `smart-commit eval` traces against the real subjects.
+    /// Scores `pionus eval` traces against the real subjects.
     Score {
         eval_dir: PathBuf,
         traces: PathBuf,
@@ -243,7 +243,7 @@ enum ScenarioCommand {
     /// Writes DIR/inputs.jsonl and DIR/meta.jsonl from the cases.
     Build {
         out: PathBuf,
-        /// The smart-commit binary that records each case's inputs.
+        /// The pionus binary that records each case's inputs.
         binary: String,
         #[arg(long, default_value = "all", value_parser = ["train", "eval", "all"])]
         split: String,

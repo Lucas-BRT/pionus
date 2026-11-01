@@ -933,7 +933,7 @@ wheels = [
 ]
 
 [[package]]
-name = "smart-commit-training"
+name = "pionus-training"
 version = "0"
 source = { virtual = "." }
 dependencies = [

@@ -12,7 +12,7 @@
 #                     (the driver itself is never changed)
 #   NVIDIA (nouveau)  Mesa NVK (vulkan; Turing / GTX 16xx or newer)
 #
-# llama.cpp itself, which runs the vulkan device, is `smart-commit setup`'s job;
+# llama.cpp itself, which runs the vulkan device, is `pionus setup`'s job;
 # OpenVINO, which intel-gpu also needs, is setup-npu.sh --openvino-only's.
 #
 #   scripts/setup-gpu.sh [--dry-run] [--yes]
@@ -22,8 +22,8 @@
 #
 # System packages need apt (Ubuntu, Debian, Pop!_OS); elsewhere the script
 # says which packages to install and still sets up the user-space parts.
-# SMART_COMMIT_SYSFS overrides /sys, SMART_COMMIT_VULKAN_ICD_DIRS the Vulkan ICD
-# directories and SMART_COMMIT_DPKG_QUERY the installed-package check, for
+# PIONUS_SYSFS overrides /sys, PIONUS_VULKAN_ICD_DIRS the Vulkan ICD
+# directories and PIONUS_DPKG_QUERY the installed-package check, for
 # tests.
 set -euo pipefail
 
@@ -37,7 +37,7 @@ INTEL_DEBS=(
     "i/intel-gmmlib/libigdgmm12_22.10.0-1~24.04~ppa1_amd64.deb 63fe9e124c3394193226c6cb8398dcabdc9306b5a10f63668118f7c799f5d792"
 )
 
-SYSFS=${SMART_COMMIT_SYSFS:-/sys}
+SYSFS=${PIONUS_SYSFS:-/sys}
 DRY_RUN=0
 ASSUME_YES=0
 for arg in "$@"; do
@@ -103,7 +103,7 @@ installed() {
     local status
     # The format is dpkg-query's, not the shell's.
     # shellcheck disable=SC2016
-    status=$(${SMART_COMMIT_DPKG_QUERY:-dpkg-query} -W -f='${Status} ${Version}' "$1" 2>/dev/null) || return 1
+    status=$(${PIONUS_DPKG_QUERY:-dpkg-query} -W -f='${Status} ${Version}' "$1" 2>/dev/null) || return 1
     case $status in
         "install ok installed ${2:-}"*) return 0 ;;
         *) return 1 ;;
@@ -136,7 +136,7 @@ nvidia_driver_version() {
 
 nvidia_vulkan_icd_present() {
     local dir
-    for dir in ${SMART_COMMIT_VULKAN_ICD_DIRS:-/usr/share/vulkan/icd.d /etc/vulkan/icd.d}; do
+    for dir in ${PIONUS_VULKAN_ICD_DIRS:-/usr/share/vulkan/icd.d /etc/vulkan/icd.d}; do
         [ -e "$dir/nvidia_icd.json" ] && return 0
     done
     return 1
@@ -203,7 +203,7 @@ setup_nvidia() {
 
 gpus=$(list_gpus)
 if [ -z "$gpus" ]; then
-    echo "No GPU found: nothing to install here; smart-commit will use the CPU (or an Intel NPU)."
+    echo "No GPU found: nothing to install here; pionus will use the CPU (or an Intel NPU)."
     exit 0
 fi
 while read -r vendor driver slot; do
@@ -262,5 +262,5 @@ fi
 
 echo
 echo "Done. If you were added to the render group, log out and back in."
-echo "The vulkan device also needs llama.cpp (\`smart-commit setup\` installs it); then"
-echo "\`smart-commit bench\` measures every device and picks the fastest."
+echo "The vulkan device also needs llama.cpp (\`pionus setup\` installs it); then"
+echo "\`pionus bench\` measures every device and picks the fastest."

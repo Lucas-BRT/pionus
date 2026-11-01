@@ -1,6 +1,6 @@
 """Checks the code of the Kaggle notebooks that cannot run anywhere but on Kaggle
 without these stand-ins: the scheduler cells, and what a kernel must do when its
-runs fail. (The bundles the notebooks read are made by `sc-training kaggle-bundle`
+runs fail. (The bundles the notebooks read are made by `pionus-training kaggle-bundle`
 and tested in Rust.)
 
     python -I test_kaggle_notebooks.py

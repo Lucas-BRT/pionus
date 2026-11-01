@@ -1,11 +1,12 @@
-# smart-commit website
+# pionus website
 
 Adds to [../AGENTS.md](../AGENTS.md).
 
-Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript, one dark theme
-with one violet accent. Run: `cargo run -p smart-commit-website` (or
+Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript (one
+exception: the inline copy button in `ui/command_line.rs`), one dark theme
+with one bronze accent. Run: `cargo run -p pionus-website` (or
 `topcoat dev`; `HOST=0.0.0.0` for a phone). Release build:
-`cargo build --profile website -p smart-commit-website`; image:
+`cargo build --profile website -p pionus-website`; image:
 `docker compose up -d --build` here.
 
 ## Content
@@ -45,13 +46,13 @@ with one violet accent. Run: `cargo run -p smart-commit-website` (or
 - Interpolate numbers directly, `(count)`; a non-text value gets its own
   type (`ui::chart::Share`). Compute `let` values before the `view!`.
 - Links: `href!(handler)`, `.fragment("id")`, `.is_current(cx)`; only
-  external URLs are strings. Icons: `IconData` in `ui/icons.rs` via
-  `icon(...)`.
+  external URLs are strings. Icons: lucide constants in `ui/icons.rs`
+  (`iconify_icon!`, set pinned and committed in `icons/`) via `icon(...)`.
 - `cargo fmt` always; `topcoat fmt` only if the installed CLI handles 0.11.
 
 ## Styles
 
-- `styles.css` is the Tailwind entry (theme + palette: near-black, violet,
+- `styles.css` is the Tailwind entry (theme + palette: near-black, bronze,
   Bricolage Grotesque); `build.rs` builds it from the utilities in
   `src/**/*.rs` and `assets/style.css`. If the served CSS is stale, touch
   `build.rs`.

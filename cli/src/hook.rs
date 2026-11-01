@@ -8,7 +8,7 @@
 use std::path::Path;
 
 /// Identifies hooks we installed, so we never overwrite or remove others.
-pub const MARKER: &str = "# smart-commit prepare-commit-msg hook";
+pub const MARKER: &str = "# pionus prepare-commit-msg hook";
 
 /// The hook script, calling `binary` by absolute path: GUI git clients
 /// often run hooks without the user's shell `PATH`.
@@ -19,7 +19,7 @@ pub fn script(binary: &Path) -> String {
     format!(
         "#!/bin/sh\n\
          {MARKER}\n\
-         # Fills in the commit message; `smart-commit hook uninstall` removes it.\n\
+         # Fills in the commit message; `pionus hook uninstall` removes it.\n\
          [ -x {binary} ] || exit 0\n\
          exec {binary} hook run \"$@\"\n"
     )
@@ -70,14 +70,14 @@ mod tests {
 
     #[test]
     fn script_calls_the_binary_by_absolute_path() {
-        let script = script(Path::new("/opt/npu commit/bin/smart-commit"));
+        let script = script(Path::new("/opt/npu commit/bin/pionus"));
         assert_eq!(
             script,
             "#!/bin/sh\n\
-             # smart-commit prepare-commit-msg hook\n\
-             # Fills in the commit message; `smart-commit hook uninstall` removes it.\n\
-             [ -x '/opt/npu commit/bin/smart-commit' ] || exit 0\n\
-             exec '/opt/npu commit/bin/smart-commit' hook run \"$@\"\n"
+             # pionus prepare-commit-msg hook\n\
+             # Fills in the commit message; `pionus hook uninstall` removes it.\n\
+             [ -x '/opt/npu commit/bin/pionus' ] || exit 0\n\
+             exec '/opt/npu commit/bin/pionus' hook run \"$@\"\n"
         );
         assert!(is_ours(&script));
     }

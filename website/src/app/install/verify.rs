@@ -24,7 +24,7 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "verify",
                 label: "Verify the build provenance of a download",
-                "gh attestation verify smart-commit-x86_64-unknown-linux-gnu.tar.gz --repo Lucas-BRT/smart-commit"
+                "gh attestation verify pionus-x86_64-unknown-linux-gnu.tar.gz --repo Lucas-BRT/pionus"
             )
             <p>
                 "Or add "

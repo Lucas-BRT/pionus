@@ -3,7 +3,7 @@ name: Model
 # Exports the OpenVINO model with scripts/export-model.sh, which fails unless
 # the result is byte for byte scripts/export/MANIFEST.sha256: this proves the
 # export reproduces on another machine, as every user's machine exports it
-# (smart-commit hosts no models). Run by hand after changing the pinned
+# (pionus hosts no models). Run by hand after changing the pinned
 # export.
 on:
   workflow_dispatch:

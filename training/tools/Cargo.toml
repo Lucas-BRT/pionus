@@ -1,18 +1,18 @@
 [package]
-name = "smart-commit-training"
+name = "pionus-training"
 version = "0.0.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "The data tools for training smart-commit's models; not part of the release"
+description = "The data tools for training pionus's models; not part of the release"
 publish = false
 
 [[bin]]
-name = "sc-training"
+name = "pionus-training"
 path = "src/main.rs"
 
 [dependencies]
 # The models of the registry, which the Kaggle bundles pin their downloads to.
-smart-commit = { path = "../../cli" }
+pionus = { path = "../../cli" }
 anyhow.workspace = true
 clap.workspace = true
 fancy-regex = "0.20"

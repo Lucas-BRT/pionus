@@ -1,19 +1,19 @@
 use super::*;
 use std::os::unix::fs::PermissionsExt as _;
 
-/// The `smart-commit` of the tests is a shell script, and a script just
+/// The `pionus` of the tests is a shell script, and a script just
 /// written can fail to run ("text file busy") when another thread forks while
 /// the file is open. So it is written once, under a name made from its
 /// content, and every test after the first only runs it.
 const FAKE: &str = r#"#!/bin/sh
-case "$SMART_COMMIT_GGUF" in
-  *..*) echo "error: not a clean path: $SMART_COMMIT_GGUF" >&2; exit 1;;
+case "$PIONUS_GGUF" in
+  *..*) echo "error: not a clean path: $PIONUS_GGUF" >&2; exit 1;;
   /*) ;;
-  *) echo "error: expected an absolute path, got $SMART_COMMIT_GGUF" >&2; exit 1;;
+  *) echo "error: expected an absolute path, got $PIONUS_GGUF" >&2; exit 1;;
 esac
 echo x >> "$(dirname "$2")/runs"
 echo "$*" >> "$(dirname "$2")/args"
-case "$(basename "$SMART_COMMIT_GGUF")" in
+case "$(basename "$PIONUS_GGUF")" in
   good.gguf) s="fix: add a";;
   broken.gguf) echo "error: no such model" >&2; exit 1;;
   *) s="feat: add b";;
@@ -26,10 +26,10 @@ while [ "$i" -lt "$n" ]; do
 done
 "#;
 
-/// A `smart-commit` that wants a clean absolute path, counts its runs in the
+/// A `pionus` that wants a clean absolute path, counts its runs in the
 /// file `runs` beside the inputs it is given, and answers `fix: add a` to
 /// `good.gguf`, an error to `broken.gguf` and `feat: add b` to the rest.
-fn fake_smart_commit() -> PathBuf {
+fn fake_pionus() -> PathBuf {
     use sha2::{Digest as _, Sha256};
     // Once per process: the tests run in threads, and two creating the file at
     // once would fight over the same temporary name.
@@ -40,7 +40,7 @@ fn fake_smart_commit() -> PathBuf {
             .take(6)
             .map(|b| format!("{b:02x}"))
             .collect();
-        let path = std::env::temp_dir().join(format!("sc-training-fake-smart-commit-{id}"));
+        let path = std::env::temp_dir().join(format!("pionus-training-fake-pionus-{id}"));
         if !path.exists() {
             // Written aside and renamed in: nobody ever sees it half written.
             let aside = path.with_extension(format!("{}", std::process::id()));
@@ -147,7 +147,7 @@ fn a_model_can_be_read_with_its_own_scopes() {
 fn each_model_gets_its_scopes_and_the_others_the_runs() {
     let dir = tempfile::TempDir::new().unwrap();
     let set = write_set(dir.path());
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let mut options = options(dir.path(), &set, &binary);
     options.candidates[0].scopes = Some("map".into());
     compare(&options).unwrap();
@@ -201,7 +201,7 @@ fn habits_show_a_model_that_stopped_writing_scopes_or_took_to_one_type() {
 #[test]
 fn traces_are_made_once_by_the_model_asked_for_with_a_clean_absolute_path() {
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let options = options(dir.path(), &set, &binary);
     let out = dir.path().join("out/val/sft.jsonl");
@@ -229,9 +229,9 @@ fn traces_are_made_once_by_the_model_asked_for_with_a_clean_absolute_path() {
 }
 
 #[test]
-fn a_model_that_cannot_run_leaves_no_trace_and_says_what_smart_commit_said() {
+fn a_model_that_cannot_run_leaves_no_trace_and_says_what_pionus_said() {
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let options = options(dir.path(), &set, &binary);
     let out = dir.path().join("out/val/broken.jsonl");
@@ -259,7 +259,7 @@ fn a_model_that_cannot_run_leaves_no_trace_and_says_what_smart_commit_said() {
 #[test]
 fn a_candidate_is_compared_with_the_baseline_case_by_case() {
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let options = options(dir.path(), &set, &binary);
     let (text, summary) = compare(&options).unwrap();
@@ -348,7 +348,7 @@ fn the_cases_to_read_are_half_of_each_set_and_the_same_whatever_the_models() {
 #[test]
 fn the_cases_to_read_come_with_the_real_subject_and_every_model() {
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let options = Options {
         read: 3,
@@ -375,7 +375,7 @@ fn the_cases_to_read_come_with_the_real_subject_and_every_model() {
 #[test]
 fn traces_of_another_model_or_other_settings_under_the_same_name_are_made_again() {
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let options = options(dir.path(), &set, &binary);
     let (inputs, out) = (set.join("inputs.jsonl"), dir.path().join("out/val/m.jsonl"));
@@ -431,7 +431,7 @@ fn a_model_name_cannot_leave_its_directory_nor_repeat_nor_be_real() {
     assert!(Model::parse("b01-lr2.v2_x=m.gguf").is_ok());
     // Two models with one name would overwrite each other's results.
     let dir = tempfile::TempDir::new().unwrap();
-    let binary = fake_smart_commit();
+    let binary = fake_pionus();
     let set = write_set(dir.path());
     let mut options = options(dir.path(), &set, &binary);
     options.candidates = vec![Model {

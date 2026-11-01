@@ -1,15 +1,15 @@
-//! `smart-commit` without a subcommand: write the message for what is
+//! `pionus` without a subcommand: write the message for what is
 //! staged, and optionally commit it.
 
 use std::time::Instant;
 
 use anyhow::Result;
-use smart_commit::generate::{Source, TypeAsk};
-use smart_commit::git::Repo;
-use smart_commit::message::{CommitMessage, SanitizeError};
-use smart_commit::tui::review::{self, Review};
-use smart_commit::tui::type_choice::{Outcome, TypeChoiceView};
-use smart_commit::tui::{self, Screen};
+use pionus::generate::{Source, TypeAsk};
+use pionus::git::Repo;
+use pionus::message::{CommitMessage, SanitizeError};
+use pionus::tui::review::{self, Review};
+use pionus::tui::type_choice::{Outcome, TypeChoiceView};
+use pionus::tui::{self, Screen};
 
 use super::args::{BackendArgs, GenerateArgs};
 use super::session::Session;

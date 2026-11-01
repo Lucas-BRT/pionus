@@ -1,4 +1,4 @@
-"""Checks `mine_pairs` against a stand-in smart-commit and llama-server.
+"""Checks `mine_pairs` against a stand-in pionus and llama-server.
 
     python -I test_mine_pairs.py
 """
@@ -24,10 +24,10 @@ def write_set(d: Path, repos: list[str]) -> None:
     )
 
 
-def fake_smart_commit(d: Path) -> str:
+def fake_pionus(d: Path) -> str:
     """Answers `prompt --inputs F ...` with a prompt per line of F, whose
     user message is `u` and the line's number from 0."""
-    fake = d / "smart-commit"
+    fake = d / "pionus"
     fake.write_text(
         '#!/bin/sh\nn=0\nwhile read -r line; do echo "{\\"system\\": \\"S\\", \\"user\\": \\"u$n\\"}"; '
         'n=$((n+1)); done < "$3"\n'
@@ -81,7 +81,7 @@ def test_replies_are_sampled_with_fixed_seeds_in_the_order_of_the_inputs() -> No
         d = Path(tmp)
         write_set(d / "src", ["a/x", "b/y", "c/z"])
         select(d / "src", d / "out", set(), 0)
-        binary = fake_smart_commit(d)
+        binary = fake_pionus(d)
         Llama.seeds = []
         assert mine(d / "out", binary, url, "full", "plain", 2, 0.7, 0.95, 7, workers=2) == 3
         rows = [json.loads(line) for line in (d / "out/candidates.jsonl").read_text().splitlines()]
@@ -100,7 +100,7 @@ def test_a_stopped_run_resumes_after_the_inputs_it_finished() -> None:
         d = Path(tmp)
         write_set(d / "src", ["a/x", "b/y", "c/z"])
         select(d / "src", d / "out", set(), 0)
-        binary = fake_smart_commit(d)
+        binary = fake_pionus(d)
         mine(d / "out", binary, url, "full", "plain", 1, 0.7, 0.95, 0, workers=1)
         complete = (d / "out/candidates.jsonl").read_text()
         # Cut after the first input: only the other two are sampled again.
@@ -121,7 +121,7 @@ def test_prompts_built_beforehand_replace_the_binary() -> None:
         d = Path(tmp)
         write_set(d / "src", ["a/x", "b/y"])
         select(d / "src", d / "out", set(), 0)
-        assert write_prompts(d / "out", fake_smart_commit(d), "full", "plain") == 2
+        assert write_prompts(d / "out", fake_pionus(d), "full", "plain") == 2
         written = (d / "out/prompts.jsonl").read_text().splitlines()
         assert [json.loads(line)["user"] for line in written] == ["u0", "u1"]
         # Somewhere else, with no binary: the same prompts, the same candidates.

@@ -22,8 +22,8 @@ where a model is not kept loaded.
     python -I cascade_bench.py run SET_DIR TRACES.jsonl SMALL.gguf BIG.gguf OUT.json [--device vulkan|cpu] [--limit N]
     python -I cascade_bench.py report OUT.json [--tau 0.5]
 
-`TRACES.jsonl` are `smart-commit eval` traces of SET_DIR (their first prompt of each Conventional commit is the one
-timed). Standard library only; `$LLAMA_SERVER` or the server smart-commit downloaded.
+`TRACES.jsonl` are `pionus eval` traces of SET_DIR (their first prompt of each Conventional commit is the one
+timed). Standard library only; `$LLAMA_SERVER` or the server pionus downloaded.
 """
 
 import json

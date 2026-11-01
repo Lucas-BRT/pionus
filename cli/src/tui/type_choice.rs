@@ -1,4 +1,4 @@
-//! `smart-commit --commit` in a terminal, when the model is unsure of the
+//! `pionus --commit` in a terminal, when the model is unsure of the
 //! type: the types it finds likeliest, to choose one, or to leave the choice
 //! to the model.
 

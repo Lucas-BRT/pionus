@@ -1,4 +1,4 @@
-//! `smart-commit model`: list the recommended models and switch between
+//! `pionus model`: list the recommended models and switch between
 //! them, or to a model file on disk, remembered for next time.
 
 use std::io::{IsTerminal, Write};
@@ -8,11 +8,11 @@ use std::time::Duration;
 
 use anyhow::{Context as _, Result, bail};
 use clap::Subcommand;
-use smart_commit::config::{self, Origin, Resolved};
-use smart_commit::models::{self, Local, Model};
-use smart_commit::paths;
-use smart_commit::tui::models::{Action, Entry, LocalEntry, Picker};
-use smart_commit::tui::{self, Screen};
+use pionus::config::{self, Origin, Resolved};
+use pionus::models::{self, Local, Model};
+use pionus::paths;
+use pionus::tui::models::{Action, Entry, LocalEntry, Picker};
+use pionus::tui::{self, Screen};
 
 use super::settings::{env, resolve, stop_kept_after};
 use super::ui::note;
@@ -25,7 +25,7 @@ pub(super) enum ModelCommand {
     /// Download a recommended model from Hugging Face and use it, or use a
     /// GGUF file (or an OpenVINO model directory) from disk.
     Use {
-        /// A model id from `smart-commit model list`, or a path.
+        /// A model id from `pionus model list`, or a path.
         model: String,
     },
 }
@@ -127,20 +127,20 @@ fn list() -> Result<()> {
     }
     println!(
         "Models come from Hugging Face, pinned and checked: their publishers' files,\n\
-         or smart-commit's own fine-tunes (smart-commit-*).\n\
-         To change: smart-commit model use <id>, or a GGUF file: smart-commit model use FILE\n\
+         or pionus's own fine-tunes (pionus-*).\n\
+         To change: pionus model use <id>, or a GGUF file: pionus model use FILE\n\
          (remembered, and listed here while it exists)"
     );
     Ok(())
 }
 
-/// `$XDG_DATA_HOME/smart-commit/local-models`.
+/// `$XDG_DATA_HOME/pionus/local-models`.
 fn local_file() -> Result<PathBuf> {
     paths::default_local_models_file(env).context("HOME is not set")
 }
 
 /// The models from disk used before, and those model.gguf and model.dir
-/// point at if not recorded (set with `config set`, or before smart-commit
+/// point at if not recorded (set with `config set`, or before pionus
 /// recorded them), each saying whether it is in use.
 fn local_entries(resolved: &Resolved) -> Vec<LocalEntry> {
     let in_use: Vec<PathBuf> = ["model.gguf", "model.dir"]
@@ -296,7 +296,7 @@ struct Download {
 /// Where models are downloaded from: Hugging Face, unless a test serves
 /// them.
 fn hugging_face() -> String {
-    env("SMART_COMMIT_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned())
+    env("PIONUS_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned())
 }
 
 fn use_recommended(model: &'static Model) -> Result<()> {
@@ -332,7 +332,7 @@ fn use_recommended(model: &'static Model) -> Result<()> {
         ),
         Some(name) if !dir.join(name).join("openvino_model.xml").is_file() => println!(
             "note: its OpenVINO version (npu, intel-gpu, openvino-cpu) is not installed; \
-             `smart-commit setup` exports it on machines with OpenVINO."
+             `pionus setup` exports it on machines with OpenVINO."
         ),
         Some(_) => {}
     }
@@ -404,15 +404,15 @@ fn select_file(path: &Path, key: &str) -> Result<Vec<String>> {
     let mut lines = vec![
         format!("{key} = {text}  ({origin})"),
         format!(
-            "{devices} now run this file, unverified: smart-commit did not choose it and \
-             cannot check it. `smart-commit model use <id>` goes back to a recommended model."
+            "{devices} now run this file, unverified: pionus did not choose it and \
+             cannot check it. `pionus model use <id>` goes back to a recommended model."
         ),
     ];
     lines.extend(stopped);
     // Remembering is a convenience: the model is in use either way.
     if let Err(err) = local_file().and_then(|file| Ok(models::remember_local(&file, path)?)) {
         lines.push(format!(
-            "note: cannot remember {text} for `smart-commit model`: {err}"
+            "note: cannot remember {text} for `pionus model`: {err}"
         ));
     }
     Ok(lines)
@@ -447,7 +447,7 @@ fn warn_overridden(resolved: &Resolved, keys: &[&str]) {
 
 fn suggest_bench() {
     if super::benchmark::last_report().is_some() {
-        println!("The last benchmark measured the previous model: run `smart-commit bench` again.");
+        println!("The last benchmark measured the previous model: run `pionus bench` again.");
     }
 }
 

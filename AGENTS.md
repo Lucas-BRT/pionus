@@ -3,11 +3,11 @@
 Rules for anyone changing this repo. A directory's `AGENTS.md` adds to this
 file, never overrides it.
 
-smart-commit: Rust CLI that writes commit messages in a repo's style with a
+pionus: Rust CLI that writes commit messages in a repo's style with a
 small local language model (Intel NPU, Intel GPU via OpenVINO, AMD/NVIDIA via
 llama.cpp + Vulkan, or CPU). Virtual Cargo workspace: `cli/` (the binary, only
 default member), `website/` (read [website/AGENTS.md](website/AGENTS.md)),
-`tools/` (`sc-tools`), `training/tools/` (`sc-training`; the rest of
+`tools/` (`pionus-tools`), `training/tools/` (`pionus-training`; the rest of
 `training/` is Python). Shared deps go in the root `Cargo.toml`.
 
 ## Hard rules
@@ -26,7 +26,7 @@ default member), `website/` (read [website/AGENTS.md](website/AGENTS.md)),
 ## Workflow
 
 - **Checks:** `scripts/check.sh` before any commit; it says what it skipped.
-- **Before each commit**, run `smart-commit --trace /tmp/trace.json` on the
+- **Before each commit**, run `pionus --trace /tmp/trace.json` on the
   staged change. A wrong message becomes a trace fixture, in its own commit.
 - **Read first:** tests, commits and releases: [docs/contributing.md](docs/contributing.md).
   Pinning, export, traces, build image: [docs/reproducibility.md](docs/reproducibility.md).

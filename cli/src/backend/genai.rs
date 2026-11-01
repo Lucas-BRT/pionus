@@ -1,7 +1,7 @@
 //! The real backend: an OpenVINO GenAI `LLMPipeline` on the NPU (or GPU or
 //! CPU).
 //!
-//! The OpenVINO GenAI library is loaded at run time, so smart-commit builds
+//! The OpenVINO GenAI library is loaded at run time, so pionus builds
 //! and runs without it and reports how to install it when it is missing.
 //! The binding's errors carry no message, so everything the user can fix
 //! (missing model, missing library) is checked here first.
@@ -35,7 +35,7 @@ impl Device {
         }
     }
 
-    /// The smart-commit device this is.
+    /// The pionus device this is.
     pub fn target(self) -> crate::backend::device::Target {
         use crate::backend::device::Target;
         match self {
@@ -54,7 +54,7 @@ impl fmt::Display for Device {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GenaiOptions {
-    /// The OpenVINO model (`smart-commit setup` downloads it).
+    /// The OpenVINO model (`pionus setup` downloads it).
     pub model_dir: PathBuf,
     pub device: Device,
     /// Where OpenVINO keeps compiled models; without it every load on the
@@ -93,11 +93,9 @@ impl Default for NpuTuning {
 /// Who needs OpenVINO GenAI (only Intel's devices) and how to get it.
 pub fn missing_openvino(device: Device) -> &'static str {
     match device {
-        Device::Npu => {
-            "the Intel NPU needs it; `smart-commit setup` installs it on machines with one"
-        }
+        Device::Npu => "the Intel NPU needs it; `pionus setup` installs it on machines with one",
         Device::Gpu => {
-            "Intel GPUs need it; `smart-commit setup` installs it on machines with one \
+            "Intel GPUs need it; `pionus setup` installs it on machines with one \
              (other GPUs use the vulkan device)"
         }
         Device::Cpu => {
@@ -119,7 +117,7 @@ impl GenaiBackend {
         let model_xml = options.model_dir.join("openvino_model.xml");
         if !model_xml.is_file() {
             return Err(BackendError::NotInstalled(format!(
-                "no model in {}; `smart-commit setup` downloads it",
+                "no model in {}; `pionus setup` downloads it",
                 options.model_dir.display()
             )));
         }
@@ -146,7 +144,7 @@ impl GenaiBackend {
                 .map_err(|err| {
                 BackendError::Unavailable(format!(
                     "cannot load the model on the {} ({err:?}); \
-                         `smart-commit setup` installs and checks the drivers",
+                         `pionus setup` installs and checks the drivers",
                     options.device
                 ))
             })?;
@@ -312,7 +310,7 @@ mod tests {
         GenaiOptions {
             model_dir: model_dir.to_path_buf(),
             device,
-            cache_dir: PathBuf::from("/cache/smart-commit/openvino"),
+            cache_dir: PathBuf::from("/cache/pionus/openvino"),
             max_prompt_tokens: 1024,
             max_new_tokens: 128,
             npu: NpuTuning::default(),
@@ -351,7 +349,7 @@ mod tests {
         assert_eq!(
             npu,
             [
-                ("CACHE_DIR", "/cache/smart-commit/openvino".to_owned()),
+                ("CACHE_DIR", "/cache/pionus/openvino".to_owned()),
                 ("MAX_PROMPT_LEN", "1024".to_owned()),
                 ("MIN_RESPONSE_LEN", "128".to_owned()),
                 ("NPUW_LLM_PREFILL_CHUNK_SIZE", "512".to_owned()),
@@ -367,10 +365,7 @@ mod tests {
         );
         for device in [Device::Cpu, Device::Gpu] {
             let props = pipeline_properties(&options(Path::new("/m"), device));
-            assert_eq!(
-                props,
-                [("CACHE_DIR", "/cache/smart-commit/openvino".to_owned())]
-            );
+            assert_eq!(props, [("CACHE_DIR", "/cache/pionus/openvino".to_owned())]);
         }
     }
 
@@ -417,7 +412,7 @@ mod tests {
         assert_eq!(
             err,
             BackendError::NotInstalled(format!(
-                "no model in {}; `smart-commit setup` downloads it",
+                "no model in {}; `pionus setup` downloads it",
                 dir.path().display()
             ))
         );

@@ -28,12 +28,12 @@ pub const KEPT: &[Kept] = &[
         kept: "2.0s",
     },
     Kept {
-        label: "`smart-commit-0.5b-v0.1`, `vulkan`",
+        label: "`pionus-0.5b-v0.1`, `vulkan`",
         cold: "1.4s",
         kept: "0.14s",
     },
     Kept {
-        label: "`smart-commit-0.5b-v0.1`, `cpu`",
+        label: "`pionus-0.5b-v0.1`, `cpu`",
         cold: "1.3s",
         kept: "0.8s",
     },
@@ -62,13 +62,13 @@ pub struct Resident {
 
 pub const RESIDENT: &[Resident] = &[
     Resident {
-        model: "`smart-commit-0.5b-v0.1`",
+        model: "`pionus-0.5b-v0.1`",
         file: "380 MB",
         with_fast_load: "564 MB",
         without_fast_load: "593 MB",
     },
     Resident {
-        model: "`smart-commit-1.5b-v0.1`",
+        model: "`pionus-1.5b-v0.1`",
         file: "941 MB",
         with_fast_load: "1,169 MB",
         without_fast_load: "1,773 MB",
@@ -109,7 +109,7 @@ pub fn by_device(name: &str) -> &'static str {
         .map_or("", |row| row.time)
 }
 
-/// Per message on the Ryzen 5 5500, from `smart-commit bench`.
+/// Per message on the Ryzen 5 5500, from `pionus bench`.
 pub struct Bench {
     pub device: &'static str,
     pub total: &'static str,
@@ -155,12 +155,12 @@ pub const BY_MODEL: &[ModelTime] = &[
         vulkan: "1.5s",
     },
     ModelTime {
-        model: "`smart-commit-1.5b-v0.1`",
+        model: "`pionus-1.5b-v0.1`",
         cpu: "3.8s",
         vulkan: "2.3s",
     },
     ModelTime {
-        model: "`smart-commit-0.5b-v0.1`",
+        model: "`pionus-0.5b-v0.1`",
         cpu: "1.9s",
         vulkan: "1.2s",
     },

@@ -1,12 +1,12 @@
-//! `smart-commit config`: read and change settings.
+//! `pionus config`: read and change settings.
 
 use std::path::PathBuf;
 
 use anyhow::{Context as _, Result, anyhow, bail};
 use clap::{Args, Subcommand};
-use smart_commit::config::{self, Origin, Resolved, Sources};
-use smart_commit::git::Repo;
-use smart_commit::paths;
+use pionus::config::{self, Origin, Resolved, Sources};
+use pionus::git::Repo;
+use pionus::paths;
 
 use super::settings::{env, resolve, stop_kept_after};
 use super::ui::note;
@@ -58,7 +58,7 @@ pub(super) enum ConfigCommand {
     },
 }
 
-/// The repository whose `.smart-commit.toml` applies, if any.
+/// The repository whose `.pionus.toml` applies, if any.
 #[derive(Debug, Args)]
 pub(super) struct At {
     #[arg(short = 'C', long = "path", default_value = ".")]
@@ -68,7 +68,7 @@ pub(super) struct At {
 /// Which config file to change.
 #[derive(Debug, Args)]
 pub(super) struct Target {
-    /// The repository's .smart-commit.toml (shared through git) instead of
+    /// The repository's .pionus.toml (shared through git) instead of
     /// the global config; only style.* settings are allowed there.
     #[arg(long)]
     repo: bool,

@@ -7,7 +7,7 @@
 use std::fs;
 use std::path::Path;
 
-use smart_commit::trace::Trace;
+use pionus::trace::Trace;
 
 #[test]
 fn every_fixture_is_reproduced() {

@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 
-/// `smart-commit-website --health`: GET / on the local port, for the container healthcheck.
+/// `pionus-website --health`: GET / on the local port, for the container healthcheck.
 /// The runtime image is `scratch`, so it has no curl.
 fn healthy() -> bool {
     let port = env::var("PORT").unwrap_or_else(|_| "3000".into());
@@ -31,8 +31,6 @@ async fn main() -> ExitCode {
             ExitCode::FAILURE
         };
     }
-    topcoat::start(smart_commit_website::router())
-        .await
-        .unwrap();
+    topcoat::start(pionus_website::router()).await.unwrap();
     ExitCode::SUCCESS
 }

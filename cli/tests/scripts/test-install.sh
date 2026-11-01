@@ -9,7 +9,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-ASSET=smart-commit-x86_64-unknown-linux-gnu.tar.gz
+ASSET=pionus-x86_64-unknown-linux-gnu.tar.gz
 VERSION=$(sed -n 's/^version = "\(.*\)"$/\1/p' "$ROOT/cli/Cargo.toml" | head -1)
 
 "$ROOT/scripts/package.sh" "$work/dist1" >/dev/null
@@ -30,34 +30,34 @@ for dir in latest/download "download/v$VERSION"; do
 done
 
 install() {
-    SMART_COMMIT_RELEASE_BASE=file://$work/releases bash "$ROOT/install.sh" --prefix "$work/prefix" "$@" \
+    PIONUS_RELEASE_BASE=file://$work/releases bash "$ROOT/install.sh" --prefix "$work/prefix" "$@" \
         >"$work/out" 2>&1
 }
 
 install --no-setup
-"$work/prefix/bin/smart-commit" --version | grep -qx "smart-commit $VERSION"
-for file in share/smart-commit/scripts/setup-gpu.sh share/smart-commit/scripts/setup-npu.sh \
-    share/smart-commit/scripts/check-npu.sh share/smart-commit/scripts/setup-llamacpp.sh \
-    share/smart-commit/scripts/export-model.sh share/smart-commit/scripts/install.sh \
-    share/smart-commit/scripts/export/MANIFEST.sha256 \
-    share/smart-commit/scripts/export/requirements.lock share/smart-commit/scripts/export/normalize_ir.py \
-    share/doc/smart-commit/LICENSE share/doc/smart-commit/usage.md; do
+"$work/prefix/bin/pionus" --version | grep -qx "pionus $VERSION"
+for file in share/pionus/scripts/setup-gpu.sh share/pionus/scripts/setup-npu.sh \
+    share/pionus/scripts/check-npu.sh share/pionus/scripts/setup-llamacpp.sh \
+    share/pionus/scripts/export-model.sh share/pionus/scripts/install.sh \
+    share/pionus/scripts/export/MANIFEST.sha256 \
+    share/pionus/scripts/export/requirements.lock share/pionus/scripts/export/normalize_ir.py \
+    share/doc/pionus/LICENSE share/doc/pionus/usage.md; do
     test -f "$work/prefix/$file"
 done
-test ! -e "$work/prefix/share/smart-commit/scripts/fetch-model.sh"
-grep -q "smart-commit setup" "$work/out"
+test ! -e "$work/prefix/share/pionus/scripts/fetch-model.sh"
+grep -q "pionus setup" "$work/out"
 echo "ok    installs the latest release"
-# install.sh only replaces and removes these, since share/smart-commit is
+# install.sh only replaces and removes these, since share/pionus is
 # also the data directory.
-release_files=$(tar -tzf "$work/dist1/$ASSET" | sed -n 's|^[^/]*/share/smart-commit/\([^/][^/]*\).*|\1|p' | LC_ALL=C sort -u | tr '\n' ' ')
+release_files=$(tar -tzf "$work/dist1/$ASSET" | sed -n 's|^[^/]*/share/pionus/\([^/][^/]*\).*|\1|p' | LC_ALL=C sort -u | tr '\n' ' ')
 [ "$release_files" = "VERSION scripts " ] || {
-    echo "FAIL  share/smart-commit has $release_files; update RELEASE_FILES in install.sh"
+    echo "FAIL  share/pionus has $release_files; update RELEASE_FILES in install.sh"
     exit 1
 }
-echo "ok    the release's share/smart-commit is what install.sh manages"
+echo "ok    the release's share/pionus is what install.sh manages"
 
 install --no-setup --version "v$VERSION"
-grep -q "installed smart-commit $VERSION" "$work/out"
+grep -q "installed pionus $VERSION" "$work/out"
 echo "ok    installs a given version"
 
 printf 'x' >>"$work/releases/latest/download/$ASSET"
@@ -69,6 +69,6 @@ grep -q "does not match the release's SHA256SUMS" "$work/out"
 echo "ok    refuses a download that does not match SHA256SUMS"
 
 install --uninstall
-test ! -e "$work/prefix/bin/smart-commit"
-test ! -e "$work/prefix/share/smart-commit"
+test ! -e "$work/prefix/bin/pionus"
+test ! -e "$work/prefix/share/pionus"
 echo "ok    uninstalls"

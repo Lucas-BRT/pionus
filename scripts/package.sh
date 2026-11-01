@@ -9,12 +9,12 @@
 #   scripts/package.sh --check-env   (does this machine build the same bytes?)
 #
 # Needs Docker. The image is the one in scripts/build/IMAGE (pulled, by
-# digest), or SMART_COMMIT_BUILD_IMAGE, or built from scripts/build/Dockerfile
-# when neither is set. SMART_COMMIT_PACKAGE_HOST=1 builds on the host instead:
+# digest), or PIONUS_BUILD_IMAGE, or built from scripts/build/Dockerfile
+# when neither is set. PIONUS_PACKAGE_HOST=1 builds on the host instead:
 # the result is then only reproducible on a machine whose C toolchain
 # `--check-env` finds the same as the image's.
 #
-# Writes OUT_DIR/smart-commit-x86_64-unknown-linux-gnu.tar.gz, a copy of
+# Writes OUT_DIR/pionus-x86_64-unknown-linux-gnu.tar.gz, a copy of
 # install.sh (the installer of this very commit, a release asset of its own),
 # OUT_DIR/BUILDINFO (what it was built with) and OUT_DIR/SHA256SUMS, which
 # lists all three.
@@ -26,7 +26,7 @@ if [ "${1:-}" = --check-env ]; then
 fi
 OUT=$(realpath -m "${1:-$ROOT/dist}")
 TARGET=x86_64-unknown-linux-gnu
-NAME=smart-commit-$TARGET
+NAME=pionus-$TARGET
 cd "$ROOT"
 
 VERSION=$(sed -n 's/^version = "\(.*\)"$/\1/p' cli/Cargo.toml | head -1)
@@ -34,25 +34,25 @@ SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
 export SOURCE_DATE_EPOCH
 
 binary=$(mktemp -d)
-if [ "${SMART_COMMIT_PACKAGE_HOST:-0}" = 1 ]; then
+if [ "${PIONUS_PACKAGE_HOST:-0}" = 1 ]; then
     RUSTFLAGS="--remap-path-prefix=$ROOT=. --remap-path-prefix=${CARGO_HOME:-$HOME/.cargo}=/cargo" \
         cargo build --release --locked --target "$TARGET" --quiet
-    cp "target/$TARGET/release/smart-commit" "$binary/"
+    cp "target/$TARGET/release/pionus" "$binary/"
 else
     # shellcheck source=scripts/build/image.sh
     . "$ROOT/scripts/build/image.sh"
     resolve_image
     # The sources are mounted read-only at /src; the toolchain and the crates
-    # go in volumes, reused between runs. With SMART_COMMIT_BUILD_CACHE=DIR
+    # go in volumes, reused between runs. With PIONUS_BUILD_CACHE=DIR
     # they are in DIR instead, which CI keeps between runs. The build itself
     # (the target directory) is an anonymous volume, gone with the container:
     # every packaging compiles from scratch, so the tarball's hash is that of a
     # build from scratch, and packaging twice really checks the bytes.
-    rustup=smart-commit-rustup cargo=smart-commit-cargo
-    if [ -n "${SMART_COMMIT_BUILD_CACHE:-}" ]; then
-        mkdir -p "$SMART_COMMIT_BUILD_CACHE/rustup" "$SMART_COMMIT_BUILD_CACHE/cargo"
-        rustup=$(realpath "$SMART_COMMIT_BUILD_CACHE/rustup")
-        cargo=$(realpath "$SMART_COMMIT_BUILD_CACHE/cargo")
+    rustup=pionus-rustup cargo=pionus-cargo
+    if [ -n "${PIONUS_BUILD_CACHE:-}" ]; then
+        mkdir -p "$PIONUS_BUILD_CACHE/rustup" "$PIONUS_BUILD_CACHE/cargo"
+        rustup=$(realpath "$PIONUS_BUILD_CACHE/rustup")
+        cargo=$(realpath "$PIONUS_BUILD_CACHE/cargo")
     fi
     build_volumes=(
         --volume "$ROOT:/src:ro"
@@ -72,25 +72,25 @@ else
         --env RUSTFLAGS="--remap-path-prefix=/src=. --remap-path-prefix=/root/.cargo=/cargo" \
         --env HOST_UID="$(id -u)" --env HOST_GID="$(id -g)" \
         "$IMAGE" sh -c "cargo build --release --locked --offline --target $TARGET --quiet \
-            && cp /target/$TARGET/release/smart-commit /out/ \
-            && chown \$HOST_UID:\$HOST_GID /out/smart-commit"
+            && cp /target/$TARGET/release/pionus /out/ \
+            && chown \$HOST_UID:\$HOST_GID /out/pionus"
 fi
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 stage=$work/$NAME
-mkdir -p "$stage/bin" "$stage/share/smart-commit/scripts/export" "$stage/share/doc/smart-commit"
-install -m 755 "$binary/smart-commit" "$stage/bin/"
+mkdir -p "$stage/bin" "$stage/share/pionus/scripts/export" "$stage/share/doc/pionus"
+install -m 755 "$binary/pionus" "$stage/bin/"
 rm -rf "$binary"
 for script in setup-npu.sh setup-gpu.sh setup-llamacpp.sh check-npu.sh export-model.sh; do
-    install -m 755 "scripts/$script" "$stage/share/smart-commit/scripts/"
+    install -m 755 "scripts/$script" "$stage/share/pionus/scripts/"
 done
-# `smart-commit update` and `uninstall` run the installer they came with.
-install -m 755 install.sh "$stage/share/smart-commit/scripts/"
+# `pionus update` and `uninstall` run the installer they came with.
+install -m 755 install.sh "$stage/share/pionus/scripts/"
 install -m 644 scripts/export/requirements.in scripts/export/requirements.lock \
-    scripts/export/MANIFEST.sha256 scripts/export/normalize_ir.py "$stage/share/smart-commit/scripts/export/"
-install -m 644 LICENSE README.md docs/usage.md "$stage/share/doc/smart-commit/"
-echo "$VERSION" >"$stage/share/smart-commit/VERSION"
+    scripts/export/MANIFEST.sha256 scripts/export/normalize_ir.py "$stage/share/pionus/scripts/export/"
+install -m 644 LICENSE README.md docs/usage.md "$stage/share/doc/pionus/"
+echo "$VERSION" >"$stage/share/pionus/VERSION"
 
 mkdir -p "$OUT"
 # Modes are normalised too: the umask of whoever packages must not matter.
@@ -100,7 +100,7 @@ PACK='tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeri
     --mode=u+rwX,go+rX,go-w \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
     -C "$1" -cf - "$3" | gzip -9n >"$2/$3.tar.gz"'
-if [ "${SMART_COMMIT_PACKAGE_HOST:-0}" = 1 ]; then
+if [ "${PIONUS_PACKAGE_HOST:-0}" = 1 ]; then
     sh -c "$PACK" pack "$work" "$OUT" "$NAME"
 else
     # tar's and gzip's versions change the bytes too, so they come from the
@@ -119,8 +119,8 @@ install -m 755 install.sh "$OUT/install.sh"
 # What it was built with, so that anyone can see whether their machine does the
 # same (`scripts/package.sh --check-env`) and where a difference would come from.
 {
-    echo "smart-commit $VERSION, commit $(git rev-parse HEAD)"
-    if [ "${SMART_COMMIT_PACKAGE_HOST:-0}" = 1 ]; then
+    echo "pionus $VERSION, commit $(git rev-parse HEAD)"
+    if [ "${PIONUS_PACKAGE_HOST:-0}" = 1 ]; then
         echo "built on the host"
         sh scripts/build/env-report.sh
     else
@@ -130,5 +130,5 @@ install -m 755 install.sh "$OUT/install.sh"
     sed -n 's/^channel = "\(.*\)"$/rust \1/p' rust-toolchain.toml
 } >"$OUT/BUILDINFO"
 (cd "$OUT" && sha256sum "$NAME.tar.gz" install.sh BUILDINFO >SHA256SUMS)
-echo "smart-commit $VERSION: $OUT/$NAME.tar.gz"
+echo "pionus $VERSION: $OUT/$NAME.tar.gz"
 cat "$OUT/SHA256SUMS"

@@ -18,13 +18,13 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "hook",
                 label: "Install the git hook",
-                "smart-commit hook install\n"
+                "pionus hook install\n"
                 note("the editor opens with the message written")
                 "git commit"
             )
             <p>
                 "Edit the message as usual. "
-                <code>"smart-commit hook uninstall"</code>
+                <code>"pionus hook uninstall"</code>
                 " removes the hook."
             </p>
         )

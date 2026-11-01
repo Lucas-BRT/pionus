@@ -2,7 +2,7 @@
 
 `model.ask_type` asks the person when the probability of the type a reply starts with is low. This reads the same
 probabilities, from the first token of the reply (llama-server, `top_logprobs`, the prompts of the traces
-`sc-training compare` left), and reports how far they can be trusted:
+`pionus-training compare` left), and reports how far they can be trusted:
 
 - `top1`, `top2`, `top3`: the real type is the likeliest, among the two, among the three likeliest;
 - `ece`: expected calibration error, over CALIBRATION_BINS equal-width bins of the confidence in the likeliest type;
@@ -27,7 +27,7 @@ real type when it is offered.
 the real type on CALIBRATION, so a share `1 - alpha` of the commits has the real type in the set; TEST shows the
 coverage, the share asked and the lines the sets really have.
 
-`collect` starts the llama-server of the project (`$LLAMA_SERVER`, or the one smart-commit downloaded) on the GPU
+`collect` starts the llama-server of the project (`$LLAMA_SERVER`, or the one pionus downloaded) on the GPU
 and asks for one token of each Conventional commit's first prompt. Standard library only.
 """
 
@@ -250,7 +250,7 @@ def sets(calibration: list[dict], test: list[dict], alpha: float) -> dict:
 def server_binary() -> str:
     if os.environ.get("LLAMA_SERVER"):
         return os.environ["LLAMA_SERVER"]
-    found = sorted(Path.home().glob(".local/share/smart-commit/llama.cpp/llama-*/llama-server"))
+    found = sorted(Path.home().glob(".local/share/pionus/llama.cpp/llama-*/llama-server"))
     if not found:
         sys.exit("no llama-server: set LLAMA_SERVER")
     return str(found[-1])

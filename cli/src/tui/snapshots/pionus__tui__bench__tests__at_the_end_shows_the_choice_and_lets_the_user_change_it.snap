@@ -11,5 +11,5 @@ expression: "draw(80, 12, |f| view.render(f))"
  fast load turned on for vulkan (--no-repack --fit off): 3.5 s -> 2.3 s per mess
  fast load turned on for cpu (--no-repack --fit off): 2.9 s -> 1.9 s per message
 
- smart-commit uses cpu: the fastest, model.device = auto.
+ pionus uses cpu: the fastest, model.device = auto.
 [Up/Down] choose  [Enter] use this device  [a] auto: the fastest  [q] done

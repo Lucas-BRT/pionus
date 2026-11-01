@@ -32,7 +32,7 @@ pub async fn site_header(cx: &Cx) -> Result<impl View> {
                 attrs: attributes! { class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4" },
                 <a class="flex items-center gap-2.5 font-display text-xl font-bold tracking-tight text-foreground no-underline" href=(href!(crate::app::page))>
                     <img src="/logo.svg" alt="" class="size-8">
-                    "smart-commit"
+                    "pionus"
                 </a>
                 <nav aria-label="Main">
                     <ul class="m-0 flex list-none items-center gap-1 p-0">

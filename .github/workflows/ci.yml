@@ -60,4 +60,4 @@ jobs:
           restore-keys: package-
       - run: cli/tests/scripts/test-install.sh
         env:
-          SMART_COMMIT_BUILD_CACHE: ${{ runner.temp }}/build-cache
+          PIONUS_BUILD_CACHE: ${{ runner.temp }}/build-cache

@@ -18,7 +18,7 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "preview",
                 label: "Print the suggested message",
-                cmd("smart-commit")
+                cmd("pionus")
                 message("feat(retry): add a retry loop")
             )
             <p>"This only prints a suggestion; nothing is committed."</p>

@@ -29,7 +29,7 @@ pub struct Prompt {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PromptRules {
-    /// Every rule, for models that were not trained on smart-commit's task.
+    /// Every rule, for models that were not trained on pionus's task.
     #[default]
     Full,
     /// Only what varies by repository (types, scopes, examples) and what

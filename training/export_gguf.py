@@ -1,5 +1,5 @@
 """Adapter (or nothing) + base model -> merged GGUF, quantized like the
-upstream file smart-commit pins (Q4_K_M), with llama.cpp b11381.
+upstream file pionus pins (Q4_K_M), with llama.cpp b11381.
 
     python -I export_gguf.py BASE_DIR OUT.gguf --llama-src DIR --llama-bin DIR
                              [--adapter DIR ... [--merged DIR]] [--quant Q4_K_M]

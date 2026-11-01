@@ -1,13 +1,13 @@
 """The paired difference in `word_f1` between two runs of the same cases, with a bootstrap interval (H14).
 
-`sc-training score --against` pairs the yes/no metrics (McNemar), but `word_f1` is a number per case: this takes
+`pionus-training score --against` pairs the yes/no metrics (McNemar), but `word_f1` is a number per case: this takes
 the difference of the two runs case by case, for all the cases and for each set (Conventional, free), and
 resamples the cases BOOTSTRAPS times (seeded) for the 95% interval of the mean difference.
 
     python -I paired_f1.py SET_DIR ARM.jsonl CONTROL.jsonl
 
-`ARM.jsonl` and `CONTROL.jsonl` are `smart-commit eval` traces, one per line, in the order of `SET_DIR/meta.jsonl`.
-The words are the lowercase runs of letters and digits, as `sc-training score` counts them. Standard library only.
+`ARM.jsonl` and `CONTROL.jsonl` are `pionus eval` traces, one per line, in the order of `SET_DIR/meta.jsonl`.
+The words are the lowercase runs of letters and digits, as `pionus-training score` counts them. Standard library only.
 """
 
 import collections

@@ -61,7 +61,7 @@ pub async fn section() -> Result<impl View> {
             )
             <ul class="mt-6">
                 <li>
-                    "One thread per core halves the prefill, so smart-commit sets "
+                    "One thread per core halves the prefill, so pionus sets "
                     <code>"model.threads_batch"</code>
                     "."
                 </li>

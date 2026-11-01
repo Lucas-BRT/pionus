@@ -1,4 +1,4 @@
-/* smart-commit website: the font, and the defaults of plain elements (text,
+/* pionus website: the font, and the defaults of plain elements (text,
    lists, inline code). Everything else is a Tailwind utility in a component.
    System fonts apart from the display face, no external requests. */
 
@@ -31,6 +31,6 @@ ul { list-style: disc; }
 ol { list-style: decimal; }
 li { margin-bottom: 0.75rem; }
 code {
-  font: 0.88em var(--font-mono); background: #1b1824; border: 0.0625rem solid var(--border); color: var(--foreground);
+  font: 0.88em var(--font-mono); background: #171d2a; border: 0.0625rem solid var(--border); color: var(--foreground);
   padding: 0.1em 0.4em; border-radius: 0.3rem; overflow-wrap: anywhere;
 }

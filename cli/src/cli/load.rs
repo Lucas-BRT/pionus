@@ -1,14 +1,14 @@
 //! Loading the model on a device, or on the first that works.
 
 use anyhow::Result;
-use smart_commit::backend::device::{self, Target};
-use smart_commit::backend::genai::{Device, GenaiBackend};
-use smart_commit::backend::llamacpp::{self, LlamaCppBackend, LlamaCppOptions};
-use smart_commit::backend::server::{self, ConnectError};
-use smart_commit::backend::{Backend, BackendError};
-use smart_commit::config::{DeviceSetting, Settings};
-use smart_commit::hardware::Hardware;
-use smart_commit::paths;
+use pionus::backend::device::{self, Target};
+use pionus::backend::genai::{Device, GenaiBackend};
+use pionus::backend::llamacpp::{self, LlamaCppBackend, LlamaCppOptions};
+use pionus::backend::server::{self, ConnectError};
+use pionus::backend::{Backend, BackendError};
+use pionus::config::{DeviceSetting, Settings};
+use pionus::hardware::Hardware;
+use pionus::paths;
 
 use super::benchmark;
 use super::settings::{env, hardware_sources, meminfo_path};
@@ -25,7 +25,7 @@ pub(super) fn load_model(settings: &Settings) -> Result<(Box<dyn Backend>, Targe
     if settings.device == DeviceSetting::Auto && !selection.skipped.is_empty() {
         let skipped: Vec<&str> = selection.skipped.iter().map(|(t, _)| t.name()).collect();
         note!(
-            "running on {}; {} unavailable (`smart-commit device` shows why)",
+            "running on {}; {} unavailable (`pionus device` shows why)",
             selection.target,
             skipped.join(", ")
         );
@@ -137,7 +137,7 @@ fn keep_loaded(settings: &Settings, options: &LlamaCppOptions) -> Option<LlamaCp
 fn with_kept_model_hint(err: BackendError) -> BackendError {
     let kept = paths::runtime_dir(env).is_some_and(|runtime| !server::status(&runtime).is_empty());
     let hint = |text: String| {
-        format!("{text}; a model kept loaded holds memory too: `smart-commit server stop` frees it")
+        format!("{text}; a model kept loaded holds memory too: `pionus server stop` frees it")
     };
     match err {
         BackendError::Unavailable(text) if kept => BackendError::Unavailable(hint(text)),
