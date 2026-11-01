@@ -1,4 +1,4 @@
-//! Installing llama.cpp: the Vulkan build `smart-commit setup` pins, which
+//! Installing llama.cpp: the Vulkan build `pionus setup` pins, which
 //! runs the `cpu` device on any x86_64 machine and the `vulkan` device on
 //! any GPU with a Vulkan driver. Nothing here needs sudo.
 
@@ -22,7 +22,7 @@ pub fn archive_url() -> String {
     )
 }
 
-/// The server of the build in `dir` (`.../smart-commit/llama.cpp`).
+/// The server of the build in `dir` (`.../pionus/llama.cpp`).
 pub fn server_in(dir: &Path) -> PathBuf {
     dir.join(format!("llama-{LLAMA_CPP_BUILD}/llama-server"))
 }

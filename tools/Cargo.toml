@@ -1,19 +1,19 @@
 [package]
-name = "smart-commit-tools"
+name = "pionus-tools"
 version = "0.0.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Tools for working on smart-commit; not part of the release"
+description = "Tools for working on pionus; not part of the release"
 publish = false
 
 [[bin]]
-name = "sc-tools"
+name = "pionus-tools"
 path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true
 clap.workspace = true
-smart-commit = { path = "../cli" }
+pionus = { path = "../cli" }
 
 [dev-dependencies]
 tempfile.workspace = true

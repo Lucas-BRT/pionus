@@ -150,7 +150,7 @@ fn connects_to_a_running_server_without_starting_one() {
         &options,
         Duration::from_secs(60),
         &roomy(runtime.path()),
-        Path::new("/nonexistent/smart-commit"),
+        Path::new("/nonexistent/pionus"),
     )
     .unwrap();
     assert!(backend.is_running());
@@ -278,7 +278,7 @@ fn a_model_too_large_a_share_of_the_ram_is_not_kept_and_nothing_is_started() {
         &options,
         Duration::from_secs(60),
         &share,
-        Path::new("/nonexistent/smart-commit"),
+        Path::new("/nonexistent/pionus"),
     )
     .unwrap_err();
     assert!(
@@ -330,7 +330,7 @@ fn a_busy_machine_does_not_start_a_server_to_keep() {
             max_percent: 100,
             ..share
         },
-        Path::new("/nonexistent/smart-commit"),
+        Path::new("/nonexistent/pionus"),
     )
     .unwrap_err();
     assert!(
@@ -358,7 +358,7 @@ fn a_server_already_running_is_used_even_when_the_machine_is_short() {
             &options,
             Duration::from_secs(60),
             &share,
-            Path::new("/nonexistent/smart-commit"),
+            Path::new("/nonexistent/pionus"),
         )
         .is_ok()
     );

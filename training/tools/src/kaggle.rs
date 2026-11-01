@@ -65,8 +65,7 @@ pub fn training_root() -> PathBuf {
 }
 
 fn sha256_file(path: &Path) -> Result<String> {
-    smart_commit::models::sha256_file(path)
-        .with_context(|| format!("cannot read {}", path.display()))
+    pionus::models::sha256_file(path).with_context(|| format!("cannot read {}", path.display()))
 }
 
 fn copy(from: &Path, to: &Path) -> Result<()> {
@@ -132,8 +131,8 @@ fn start(out: &Path, scripts: &[&str], requirements: bool) -> Result<()> {
     write_json(
         &out.join("dataset-metadata.json"),
         &json!({
-            "title": format!("smart-commit-training-{name}"),
-            "id": format!("{USER}/smart-commit-training-{name}"),
+            "title": format!("pionus-training-{name}"),
+            "id": format!("{USER}/pionus-training-{name}"),
             "licenses": [{"name": "other"}],
         }),
     )
@@ -200,8 +199,8 @@ pub fn train(out: &Path, val: Option<&Path>, specs: &[String]) -> Result<Vec<Str
 
 /// The fine-tune of `MODEL_VERSION` for a size, as the registry pins it.
 fn pinned_model(size: &str) -> Result<Value> {
-    let id = format!("smart-commit-{size}-{MODEL_VERSION}");
-    let model = smart_commit::models::find(&id).with_context(|| {
+    let id = format!("pionus-{size}-{MODEL_VERSION}");
+    let model = pionus::models::find(&id).with_context(|| {
         let known: Vec<&str> = BASES.iter().map(|(key, ..)| *key).collect();
         format!("{id} is not in the registry (sizes {known:?})")
     })?;

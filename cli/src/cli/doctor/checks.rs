@@ -1,4 +1,4 @@
-//! The checks of `smart-commit doctor`. Each one is a function of what it
+//! The checks of `pionus doctor`. Each one is a function of what it
 //! is given (paths, text, the hardware inventory, a benchmark), so tests
 //! build the installation they want in a temporary directory; `super` only
 //! gathers the real inputs.
@@ -6,16 +6,16 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use smart_commit::backend::device::{self, Target};
-use smart_commit::backend::llamacpp::LLAMA_CPP_BUILD;
-use smart_commit::bench::Report;
-use smart_commit::config::{
+use pionus::backend::device::{self, Target};
+use pionus::backend::llamacpp::LLAMA_CPP_BUILD;
+use pionus::bench::Report;
+use pionus::config::{
     BackendKind, ConfigError, DeviceSetting, Origin, RETIRED, Resolved, Settings, Sources,
     parse_file,
 };
-use smart_commit::hardware::Hardware;
-use smart_commit::hook;
-use smart_commit::models::{self, Gguf};
+use pionus::hardware::Hardware;
+use pionus::hook;
+use pionus::models::{self, Gguf};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Level {
@@ -101,7 +101,7 @@ pub(super) fn binary_on_path(exe_dir: Option<&Path>, path_dirs: &[PathBuf]) -> F
     )
 }
 
-/// The oldest git that smart-commit is used with.
+/// The oldest git that pionus is used with.
 const GIT_MINIMUM: (u32, u32) = (2, 20);
 
 /// `output` is what `git --version` printed, or `None` if git did not run.
@@ -288,12 +288,12 @@ pub(super) fn device_lines(
         Err(problem) => lines.push(Finding::fail(
             "device",
             problem,
-            "`smart-commit config set backend auto`",
+            "`pionus config set backend auto`",
         )),
         Ok(target) if !target.is_present(hardware) => lines.push(Finding::fail(
             "device",
             format!("{target} is not available on this machine"),
-            "`smart-commit hardware` lists what is; `smart-commit device use auto` picks one",
+            "`pionus hardware` lists what is; `pionus device use auto` picks one",
         )),
         Ok(target) => {
             let why = match (settings.device, bench) {
@@ -308,7 +308,7 @@ pub(super) fn device_lines(
         None => lines.push(Finding::warn(
             "device",
             "no benchmark yet",
-            "run `smart-commit bench`",
+            "run `pionus bench`",
         )),
         Some(report) => {
             let failed = chosen
@@ -320,7 +320,7 @@ pub(super) fn device_lines(
                 Some(error) => Finding::warn(
                     "device",
                     format!("the last benchmark could not run it: {error}"),
-                    "`smart-commit device` shows why",
+                    "`pionus device` shows why",
                 ),
                 None => Finding::ok(
                     "device",
@@ -368,7 +368,7 @@ fn gguf(path: Option<&Path>, thorough: bool) -> Finding {
         return Finding::fail(
             "model",
             format!("no GGUF model at {}", path.display()),
-            "`smart-commit setup` downloads it",
+            "`pionus setup` downloads it",
         );
     }
     let Some(known) = models::REGISTRY.iter().find(|m| m.gguf.file == name) else {
@@ -380,7 +380,7 @@ fn gguf(path: Option<&Path>, thorough: bool) -> Finding {
                     path.display()
                 ),
             ),
-            Err(err) => Finding::fail("model", err.to_string(), "`smart-commit model use <id>`"),
+            Err(err) => Finding::fail("model", err.to_string(), "`pionus model use <id>`"),
         };
     };
     verify(path, known.id, &known.gguf, thorough)
@@ -390,7 +390,7 @@ fn gguf(path: Option<&Path>, thorough: bool) -> Finding {
 /// hash.
 pub(super) fn verify(path: &Path, id: &str, pinned: &Gguf, thorough: bool) -> Finding {
     let name = path.file_name().unwrap_or_default().to_string_lossy();
-    let again = format!("`smart-commit model use {id}` downloads it again");
+    let again = format!("`pionus model use {id}` downloads it again");
     let size = std::fs::metadata(path).map_or(0, |m| m.len());
     if size != pinned.size {
         return Finding::fail(
@@ -434,7 +434,7 @@ pub(super) fn verify(path: &Path, id: &str, pinned: &Gguf, thorough: bool) -> Fi
 
 fn openvino_model(settings: &Settings) -> Finding {
     let Some(dir) = settings.model_dir.as_deref() else {
-        let fix = format!("`smart-commit model use {}` has one", models::DEFAULT);
+        let fix = format!("`pionus model use {}` has one", models::DEFAULT);
         return Finding::fail(
             "model",
             format!("{} has no OpenVINO version", settings.model.id),
@@ -447,7 +447,7 @@ fn openvino_model(settings: &Settings) -> Finding {
     Finding::fail(
         "model",
         format!("no OpenVINO model in {}", dir.display()),
-        "`smart-commit setup` exports it",
+        "`pionus setup` exports it",
     )
 }
 
@@ -472,7 +472,7 @@ pub(super) fn llama_cpp(settings: &Settings, hardware: &Hardware) -> Finding {
         return Finding::warn(
             "llama.cpp",
             format!("no llama-server at {}", server.display()),
-            "`smart-commit setup` installs it",
+            "`pionus setup` installs it",
         );
     }
     let pinned = format!("llama-{LLAMA_CPP_BUILD}");
@@ -487,7 +487,7 @@ pub(super) fn llama_cpp(settings: &Settings, hardware: &Hardware) -> Finding {
                 "{} is not the build this release pins ({LLAMA_CPP_BUILD})",
                 server.display()
             ),
-            "`smart-commit setup` installs it",
+            "`pionus setup` installs it",
         ),
         _ => Finding::ok("llama.cpp", format!("{}", server.display())),
     }
@@ -532,7 +532,7 @@ pub(super) fn server(input: &ServerInput) -> Vec<Finding> {
         Finding::warn(
             "server",
             format!("{} holds a server that does not answer", dir.display()),
-            "`smart-commit server stop` clears it",
+            "`pionus server stop` clears it",
         )
     }));
     if lines.is_empty() {
@@ -542,7 +542,7 @@ pub(super) fn server(input: &ServerInput) -> Vec<Finding> {
             Finding::warn(
                 "server",
                 "$XDG_RUNTIME_DIR is not set, so no model is kept loaded",
-                "log in with a session that sets it, or `smart-commit config set model.keep_loaded 0`",
+                "log in with a session that sets it, or `pionus config set model.keep_loaded 0`",
             )
         } else {
             Finding::ok("server", "none running: the next commit starts one")
@@ -572,7 +572,7 @@ pub(super) struct HookInput {
 
 pub(super) fn hook(input: &HookInput) -> Finding {
     let ours = |h: &HookFile| hook::is_ours(&h.text);
-    let install = "`smart-commit hook install`";
+    let install = "`pionus hook install`";
     let Some(found) = input.hook.as_ref() else {
         return match (&input.hooks_path, &input.default_hook) {
             (Some(path), Some(other)) if ours(other) => Finding::warn(
@@ -591,7 +591,7 @@ pub(super) fn hook(input: &HookInput) -> Finding {
         return Finding::warn(
             "hook",
             format!("{} is another hook", path.display()),
-            "`smart-commit hook install --force` keeps it as a backup",
+            "`pionus hook install --force` keeps it as a backup",
         );
     }
     if !found.executable {

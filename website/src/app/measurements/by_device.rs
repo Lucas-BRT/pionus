@@ -76,7 +76,7 @@ pub async fn section() -> Result<impl View> {
                 "On a "
                 (RYZEN)
                 ", "
-                <code>"smart-commit bench"</code>
+                <code>"pionus bench"</code>
                 " on four prompts sized like real ones:"
             </p>
             chart(

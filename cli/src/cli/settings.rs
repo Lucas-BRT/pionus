@@ -3,11 +3,11 @@
 
 use std::path::PathBuf;
 
-use smart_commit::backend::server;
-use smart_commit::config::{self, Resolved, Sources};
-use smart_commit::git::Repo;
-use smart_commit::hardware;
-use smart_commit::paths;
+use pionus::backend::server;
+use pionus::config::{self, Resolved, Sources};
+use pionus::git::Repo;
+use pionus::hardware;
+use pionus::paths;
 
 pub(super) fn env(name: &str) -> Option<String> {
     std::env::var(name).ok()
@@ -46,20 +46,19 @@ pub(super) fn stop_kept_after(key: &str) -> Option<String> {
 }
 
 /// Where the RAM is read from: `/proc/meminfo`, or the file tests point
-/// `SMART_COMMIT_MEMINFO` at.
+/// `PIONUS_MEMINFO` at.
 pub(super) fn meminfo_path() -> PathBuf {
-    std::env::var_os("SMART_COMMIT_MEMINFO")
-        .map_or_else(|| PathBuf::from("/proc/meminfo"), PathBuf::from)
+    std::env::var_os("PIONUS_MEMINFO").map_or_else(|| PathBuf::from("/proc/meminfo"), PathBuf::from)
 }
 
-/// The real machine, or the fake one tests point at (`SMART_COMMIT_SYSFS`
+/// The real machine, or the fake one tests point at (`PIONUS_SYSFS`
 /// is read by `scripts/setup-gpu.sh` too).
 pub(super) fn hardware_sources() -> hardware::Sources {
     let real = hardware::Sources::real();
     let var = |name: &str| std::env::var_os(name).map(PathBuf::from);
     hardware::Sources {
-        sysfs: var("SMART_COMMIT_SYSFS").unwrap_or(real.sysfs),
-        cpuinfo: var("SMART_COMMIT_CPUINFO").unwrap_or(real.cpuinfo),
-        openvino_dir: var("SMART_COMMIT_OPENVINO_DIR").unwrap_or(real.openvino_dir),
+        sysfs: var("PIONUS_SYSFS").unwrap_or(real.sysfs),
+        cpuinfo: var("PIONUS_CPUINFO").unwrap_or(real.cpuinfo),
+        openvino_dir: var("PIONUS_OPENVINO_DIR").unwrap_or(real.openvino_dir),
     }
 }

@@ -10,17 +10,17 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-ASSET=smart-commit-x86_64-unknown-linux-gnu.tar.gz
+ASSET=pionus-x86_64-unknown-linux-gnu.tar.gz
 failures=0
 
-stage=$work/stage/smart-commit-x86_64-unknown-linux-gnu
-mkdir -p "$stage/bin" "$stage/share/smart-commit/scripts" "$stage/share/doc/smart-commit"
-printf '#!/bin/sh\necho "smart-commit 1.0.0"\n' >"$stage/bin/smart-commit"
-chmod +x "$stage/bin/smart-commit"
-echo 1.0.0 >"$stage/share/smart-commit/VERSION"
-echo licence >"$stage/share/doc/smart-commit/LICENSE"
+stage=$work/stage/pionus-x86_64-unknown-linux-gnu
+mkdir -p "$stage/bin" "$stage/share/pionus/scripts" "$stage/share/doc/pionus"
+printf '#!/bin/sh\necho "pionus 1.0.0"\n' >"$stage/bin/pionus"
+chmod +x "$stage/bin/pionus"
+echo 1.0.0 >"$stage/share/pionus/VERSION"
+echo licence >"$stage/share/doc/pionus/LICENSE"
 mkdir -p "$work/releases/latest/download"
-tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" smart-commit-x86_64-unknown-linux-gnu
+tar -C "$work/stage" -czf "$work/releases/latest/download/$ASSET" pionus-x86_64-unknown-linux-gnu
 (cd "$work/releases/latest/download" && sha256sum "$ASSET" >SHA256SUMS)
 
 home=$work/home
@@ -32,7 +32,7 @@ run() {
     shift 2
     rm -rf "$home"
     mkdir -p "$home"
-    env -i HOME="$home" PATH="$path" SHELL="$shell" SMART_COMMIT_RELEASE_BASE=file://"$work"/releases \
+    env -i HOME="$home" PATH="$path" SHELL="$shell" PIONUS_RELEASE_BASE=file://"$work"/releases \
         bash "$ROOT/install.sh" --no-setup "$@" </dev/null >"$work/out" 2>&1
 }
 
@@ -86,7 +86,7 @@ report "prefix on PATH: no note" "$ok"
 
 run /bin/bash "$base"
 ok=1
-grep -q "installed smart-commit 1.0.0" "$work/out" || ok=0
+grep -q "installed pionus 1.0.0" "$work/out" || ok=0
 report "the install still happens" "$ok"
 
 [ "$failures" = 0 ] || exit 1

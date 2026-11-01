@@ -9,7 +9,7 @@ use std::process::Output;
 use tempfile::TempDir;
 
 mod common;
-use common::smart_commit;
+use common::pionus;
 
 const NEWER: &str = r#"{"tag_name": "v99.0.0"}"#;
 
@@ -42,7 +42,7 @@ impl FakeCurl {
         fs::read_to_string(self.dir.path().join("calls")).unwrap_or_default()
     }
 
-    /// `smart-commit` with the fake curl first in PATH. `setting` is the
+    /// `pionus` with the fake curl first in PATH. `setting` is the
     /// `update.check` environment variable, if any.
     fn run(&self, args: &[&str], setting: Option<&str>, terminal: bool) -> Output {
         let path = format!(
@@ -55,12 +55,12 @@ impl FakeCurl {
             ("XDG_CACHE_HOME", self.cache.path().to_str().unwrap()),
         ];
         if let Some(setting) = setting {
-            env.push(("SMART_COMMIT_UPDATE_CHECK", setting));
+            env.push(("PIONUS_UPDATE_CHECK", setting));
         }
         if terminal {
-            env.push(("SMART_COMMIT_NOTICE_TTY", "1"));
+            env.push(("PIONUS_NOTICE_TTY", "1"));
         }
-        smart_commit(args, Path::new("."), &env)
+        pionus(args, Path::new("."), &env)
     }
 }
 
@@ -85,7 +85,7 @@ fn the_note_is_printed_once_a_day() {
     let first = curl.run(&["model"], Some("true"), true);
     assert!(first.status.success(), "{}", stderr(&first));
     let note = format!(
-        "note: smart-commit 99.0.0 is available (you have {}); run smart-commit update\n",
+        "note: pionus 99.0.0 is available (you have {}); run pionus update\n",
         env!("CARGO_PKG_VERSION")
     );
     assert_eq!(
@@ -96,8 +96,8 @@ fn the_note_is_printed_once_a_day() {
     );
     let calls = curl.calls();
     assert!(calls.contains("--max-time 2"), "{calls}");
-    assert!(calls.contains(&format!("smart-commit/{}", env!("CARGO_PKG_VERSION"))));
-    assert!(calls.contains("https://api.github.com/repos/Lucas-BRT/smart-commit/releases/latest"));
+    assert!(calls.contains(&format!("pionus/{}", env!("CARGO_PKG_VERSION"))));
+    assert!(calls.contains("https://api.github.com/repos/Lucas-BRT/pionus/releases/latest"));
 
     let second = curl.run(&["model"], Some("true"), true);
     assert!(

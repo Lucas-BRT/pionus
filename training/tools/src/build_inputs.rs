@@ -1,9 +1,9 @@
-//! CommitChronicle parquet shards -> smart-commit trace `Inputs` + targets.
+//! CommitChronicle parquet shards -> pionus trace `Inputs` + targets.
 //!
 //! Writes two aligned JSON Lines files: `inputs.jsonl` (one `trace::Inputs`
-//! per line, for `smart-commit prompt --inputs`) and `meta.jsonl`
+//! per line, for `pionus prompt --inputs`) and `meta.jsonl`
 //! (repository, hash, target subject and its Conventional Commits type). The
-//! prompt itself is built by smart-commit, never here.
+//! prompt itself is built by pionus, never here.
 //!
 //! Deterministic: the same shards give byte-identical outputs.
 //!
@@ -29,7 +29,7 @@ use crate::pytext;
 pub const HISTORY_DEPTH: usize = 30; // style.history_depth
 pub const SUBJECT_MIN: usize = 8;
 pub const SUBJECT_MAX: usize = 72;
-const CONTEXT: usize = 1; // smart-commit runs `git diff -U1`
+const CONTEXT: usize = 1; // pionus runs `git diff -U1`
 const MAX_FILES: usize = 64;
 const MAX_DIFF_BYTES: usize = 64 * 1024; // per file; the prompt keeps far less
 const HISTORY_FILES: usize = 20; // paths kept per history commit, like git::Repo::recent_commits

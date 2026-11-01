@@ -5,7 +5,7 @@ use sha2::{Digest, Sha256};
 
 use super::*;
 
-/// The `smart-commit` of the tests, written once per process (the tests run in
+/// The `pionus` of the tests, written once per process (the tests run in
 /// threads) and under a name made from its content (a script written and run at
 /// once can fail with "text file busy" when another thread forks): it answers a prompt per input line whose
 /// system message is its own arguments and what its environment holds.
@@ -25,7 +25,7 @@ done
             .take(6)
             .map(|b| format!("{b:02x}"))
             .collect();
-        let path = std::env::temp_dir().join(format!("sc-training-fake-prompt-{id}"));
+        let path = std::env::temp_dir().join(format!("pionus-training-fake-prompt-{id}"));
         if !path.exists() {
             // Written aside and renamed in: nobody ever sees it half written.
             let aside = path.with_extension(format!("{}", std::process::id()));
@@ -141,7 +141,7 @@ fn a_prompt_for_every_case_or_an_error() {
     assert!(err.contains("2 prompts for 1 cases"), "{err}");
     let err = make_examples(
         dir.path(),
-        Path::new("/no/such/smart-commit"),
+        Path::new("/no/such/pionus"),
         "full",
         "plain",
         "list",
@@ -219,7 +219,7 @@ fn each_size_holds_every_example_of_the_smaller_ones_whatever_the_order_of_the_f
 fn the_ranking_is_by_the_salted_hash_not_the_plain_one_and_a_size_too_big_is_refused() {
     let dir = tempfile::TempDir::new().unwrap();
     // Find two hashes whose order the salt reverses: the point of the salt.
-    let hex = |text: String| smart_commit::models::sha256_hex(text.as_bytes());
+    let hex = |text: String| pionus::models::sha256_hex(text.as_bytes());
     let (mut a, mut b) = (String::new(), String::new());
     for n in 0..200 {
         let (x, y) = (format!("c{n}"), format!("c{}", n + 1));

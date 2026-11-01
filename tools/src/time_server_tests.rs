@@ -1,8 +1,8 @@
 use std::sync::Mutex;
 
 use super::{ServerTiming, parse_prompt_file, read_prompts, time_prompts};
-use smart_commit::backend::{Backend, BackendError, GenerationConfig, Metrics};
-use smart_commit::prompt::Prompt;
+use pionus::backend::{Backend, BackendError, GenerationConfig, Metrics};
+use pionus::prompt::Prompt;
 
 const PRINTED: &str = "===== system =====\nRules.\n\n===== user =====\nfile | +1 -0\n\n--- file\n+x\n===== ~12 of 1024 tokens =====\n";
 
@@ -104,7 +104,7 @@ fn prefill_and_decode_are_told_apart() {
 
 #[test]
 fn a_backend_without_timings_is_an_error() {
-    let backend = smart_commit::backend::MockBackend::new(["feat: x"]);
+    let backend = pionus::backend::MockBackend::new(["feat: x"]);
     let prompts = [("a.txt".to_owned(), prompt())];
     assert!(time_prompts(&backend, &prompts, &GenerationConfig::default()).is_err());
 }

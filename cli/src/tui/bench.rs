@@ -1,4 +1,4 @@
-//! `smart-commit bench` and `smart-commit device` in a terminal: each device
+//! `pionus bench` and `pionus device` in a terminal: each device
 //! as it is measured (or as the last benchmark left it), what fast load
 //! did, and choosing the device to use.
 
@@ -114,10 +114,11 @@ impl BenchView {
                 } else {
                     "set in model.device"
                 };
-                format!("smart-commit uses {target}: {why}.")
+                format!("pionus uses {target}: {why}.")
             }
-            None => "No device could run the model: `smart-commit setup` installs what they need."
-                .to_owned(),
+            None => {
+                "No device could run the model: `pionus setup` installs what they need.".to_owned()
+            }
         });
     }
 

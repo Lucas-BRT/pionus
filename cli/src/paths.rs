@@ -1,4 +1,4 @@
-//! Where smart-commit keeps models and caches, following the XDG base
+//! Where pionus keeps models and caches, following the XDG base
 //! directory spec.
 //!
 //! Functions take the environment as a lookup so they can be tested
@@ -6,25 +6,25 @@
 
 use std::path::PathBuf;
 
-/// `$XDG_DATA_HOME/smart-commit`: the models, llama.cpp and the benchmark
+/// `$XDG_DATA_HOME/pionus`: the models, llama.cpp and the benchmark
 /// (and, with install.sh's default prefix, the release's own files).
 pub fn data_dir(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("smart-commit"))
+    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("pionus"))
 }
 
-/// `$XDG_CACHE_HOME/smart-commit`, every cache of smart-commit.
+/// `$XDG_CACHE_HOME/pionus`, every cache of pionus.
 pub fn cache_root(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_CACHE_HOME", ".cache")?.join("smart-commit"))
+    Some(xdg(&env, "XDG_CACHE_HOME", ".cache")?.join("pionus"))
 }
 
-/// `$XDG_CONFIG_HOME/smart-commit`, the global configuration's directory.
+/// `$XDG_CONFIG_HOME/pionus`, the global configuration's directory.
 pub fn config_dir(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_CONFIG_HOME", ".config")?.join("smart-commit"))
+    Some(xdg(&env, "XDG_CONFIG_HOME", ".config")?.join("pionus"))
 }
 
-/// `$XDG_DATA_HOME/smart-commit/models`, where models are installed.
+/// `$XDG_DATA_HOME/pionus/models`, where models are installed.
 pub fn default_models_dir(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("smart-commit/models"))
+    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("pionus/models"))
 }
 
 fn default_model() -> &'static crate::models::Model {
@@ -41,12 +41,12 @@ pub fn default_gguf_file(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf
     Some(default_models_dir(env)?.join(default_model().gguf.file))
 }
 
-/// `$XDG_DATA_HOME/smart-commit/llama.cpp/llama-<build>/llama-server`, as
-/// `smart-commit setup` installs it.
+/// `$XDG_DATA_HOME/pionus/llama.cpp/llama-<build>/llama-server`, as
+/// `pionus setup` installs it.
 pub fn default_llama_server(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
     Some(
         xdg(&env, "XDG_DATA_HOME", ".local/share")?
-            .join("smart-commit/llama.cpp")
+            .join("pionus/llama.cpp")
             .join(format!(
                 "llama-{}",
                 crate::backend::llamacpp::LLAMA_CPP_BUILD
@@ -55,33 +55,33 @@ pub fn default_llama_server(env: impl Fn(&str) -> Option<String>) -> Option<Path
     )
 }
 
-/// `$XDG_DATA_HOME/smart-commit/bench.json`, the last `smart-commit bench`.
+/// `$XDG_DATA_HOME/pionus/bench.json`, the last `pionus bench`.
 pub fn default_bench_file(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("smart-commit/bench.json"))
+    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("pionus/bench.json"))
 }
 
-/// `$XDG_DATA_HOME/smart-commit/local-models`, the models from disk used
+/// `$XDG_DATA_HOME/pionus/local-models`, the models from disk used
 /// before, one path per line.
 pub fn default_local_models_file(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("smart-commit/local-models"))
+    Some(xdg(&env, "XDG_DATA_HOME", ".local/share")?.join("pionus/local-models"))
 }
 
-/// `$XDG_CACHE_HOME/smart-commit/openvino`, where compiled NPU blobs go.
+/// `$XDG_CACHE_HOME/pionus/openvino`, where compiled NPU blobs go.
 pub fn default_cache_dir(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_CACHE_HOME", ".cache")?.join("smart-commit/openvino"))
+    Some(xdg(&env, "XDG_CACHE_HOME", ".cache")?.join("pionus/openvino"))
 }
 
-/// `$XDG_CONFIG_HOME/smart-commit/config.toml`, the global config.
+/// `$XDG_CONFIG_HOME/pionus/config.toml`, the global config.
 pub fn default_config_file(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
-    Some(xdg(&env, "XDG_CONFIG_HOME", ".config")?.join("smart-commit/config.toml"))
+    Some(xdg(&env, "XDG_CONFIG_HOME", ".config")?.join("pionus/config.toml"))
 }
 
-/// `$XDG_RUNTIME_DIR/smart-commit`, where models kept loaded listen
+/// `$XDG_RUNTIME_DIR/pionus`, where models kept loaded listen
 /// (`model.keep_loaded`): private to the user and emptied at logout. No
 /// fallback: without it, models are not kept loaded.
 pub fn runtime_dir(env: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
     let dir = env("XDG_RUNTIME_DIR").map(PathBuf::from)?;
-    dir.is_absolute().then(|| dir.join("smart-commit"))
+    dir.is_absolute().then(|| dir.join("pionus"))
 }
 
 /// The XDG variable if set to an absolute path (relative ones are invalid
@@ -110,7 +110,7 @@ mod tests {
     fn runtime_dir_needs_xdg_runtime_dir() {
         assert_eq!(
             runtime_dir(env(&[("XDG_RUNTIME_DIR", "/run/user/1000")])).unwrap(),
-            PathBuf::from("/run/user/1000/smart-commit")
+            PathBuf::from("/run/user/1000/pionus")
         );
         assert_eq!(runtime_dir(env(&[("HOME", "/home/me")])), None);
         assert_eq!(runtime_dir(env(&[("XDG_RUNTIME_DIR", "run")])), None);
@@ -122,34 +122,34 @@ mod tests {
         assert_eq!(
             default_model_dir(env(&vars)).unwrap(),
             PathBuf::from(
-                "/home/me/.local/share/smart-commit/models/qwen2.5-coder-1.5b-instruct-int4-sym-g128"
+                "/home/me/.local/share/pionus/models/qwen2.5-coder-1.5b-instruct-int4-sym-g128"
             )
         );
         assert_eq!(
             default_cache_dir(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.cache/smart-commit/openvino")
+            PathBuf::from("/home/me/.cache/pionus/openvino")
         );
         assert_eq!(
             default_config_file(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.config/smart-commit/config.toml")
+            PathBuf::from("/home/me/.config/pionus/config.toml")
         );
         assert_eq!(
             default_gguf_file(env(&vars)).unwrap(),
             PathBuf::from(
-                "/home/me/.local/share/smart-commit/models/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
+                "/home/me/.local/share/pionus/models/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
             )
         );
         assert_eq!(
             default_bench_file(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.local/share/smart-commit/bench.json")
+            PathBuf::from("/home/me/.local/share/pionus/bench.json")
         );
         assert_eq!(
             default_local_models_file(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.local/share/smart-commit/local-models")
+            PathBuf::from("/home/me/.local/share/pionus/local-models")
         );
         assert_eq!(
             default_llama_server(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.local/share/smart-commit/llama.cpp/llama-b11381/llama-server")
+            PathBuf::from("/home/me/.local/share/pionus/llama.cpp/llama-b11381/llama-server")
         );
     }
 
@@ -163,15 +163,15 @@ mod tests {
         ];
         assert_eq!(
             default_config_file(env(&vars)).unwrap(),
-            PathBuf::from("/config/smart-commit/config.toml")
+            PathBuf::from("/config/pionus/config.toml")
         );
         assert_eq!(
             default_models_dir(env(&vars)).unwrap(),
-            PathBuf::from("/data/smart-commit/models")
+            PathBuf::from("/data/pionus/models")
         );
         assert_eq!(
             default_cache_dir(env(&vars)).unwrap(),
-            PathBuf::from("/cache/smart-commit/openvino")
+            PathBuf::from("/cache/pionus/openvino")
         );
     }
 
@@ -180,7 +180,7 @@ mod tests {
         let vars = [("HOME", "/home/me"), ("XDG_CACHE_HOME", "cache")];
         assert_eq!(
             default_cache_dir(env(&vars)).unwrap(),
-            PathBuf::from("/home/me/.cache/smart-commit/openvino")
+            PathBuf::from("/home/me/.cache/pionus/openvino")
         );
     }
 

@@ -68,12 +68,12 @@ const MODELS: &[Model] = &[
     },
     Model::gguf("qwen2.5-coder-0.5b", "491 MB"),
     Model::gguf("qwen2.5-coder-7b", "4.7 GB"),
-    Model::gguf("smart-commit-1.5b-v0.1", "986 MB"),
-    Model::gguf("smart-commit-0.5b-v0.1", "397 MB"),
-    Model::gguf("smart-commit-0.5b-v0.2", "397 MB"),
-    Model::gguf("smart-commit-1.5b-v0.2", "986 MB"),
-    Model::gguf("smart-commit-0.5b-v0.3", "397 MB"),
-    Model::gguf("smart-commit-1.5b-v0.3", "986 MB"),
+    Model::gguf("pionus-1.5b-v0.1", "986 MB"),
+    Model::gguf("pionus-0.5b-v0.1", "397 MB"),
+    Model::gguf("pionus-0.5b-v0.2", "397 MB"),
+    Model::gguf("pionus-1.5b-v0.2", "986 MB"),
+    Model::gguf("pionus-0.5b-v0.3", "397 MB"),
+    Model::gguf("pionus-1.5b-v0.3", "986 MB"),
 ];
 
 #[component]
@@ -83,7 +83,7 @@ pub async fn section() -> Result<impl View> {
             id: "models",
             title: "Models",
             <p>
-                "smart-commit ships no model. "
+                "pionus ships no model. "
                 <code>"model use"</code>
                 " downloads one from Hugging Face and checks it against a SHA-256. The project's own fine-tunes are on its "
                 <a href="https://huggingface.co/LucasBRT">"Hugging Face account"</a>
@@ -92,13 +92,13 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "models",
                 label: "Commands to choose a model",
-                "smart-commit model\n"
+                "pionus model\n"
                 note("a picker, in a terminal")
-                "smart-commit model list\n"
+                "pionus model list\n"
                 note("the recommended models and those from disk, and which is in use")
-                "smart-commit model use qwen2.5-coder-7b\n"
+                "pionus model use qwen2.5-coder-7b\n"
                 note("download it from Hugging Face and use it")
-                "smart-commit model use ~/models/my.gguf\n"
+                "pionus model use ~/models/my.gguf\n"
                 note("a GGUF file from disk, unverified, remembered")
             )
             data_table(
@@ -119,12 +119,12 @@ pub async fn section() -> Result<impl View> {
                 </li>
                 <li>"Experimental models are not fully tested."</li>
                 <li>
-                    <code>"smart-commit-*"</code>
+                    <code>"pionus-*"</code>
                     " models are fine-tuned for this prompt."
                 </li>
                 <li>
                     "After switching, run "
-                    <code>"smart-commit bench"</code>
+                    <code>"pionus bench"</code>
                     " again."
                 </li>
             </ul>

@@ -1,4 +1,4 @@
-//! Tools for working on smart-commit. They are a crate of their own so that
+//! Tools for working on pionus. They are a crate of their own so that
 //! what they need never reaches the binary users install.
 
 mod release_notes;
@@ -8,12 +8,12 @@ use std::path::PathBuf;
 
 use anyhow::{Result, anyhow, bail};
 use clap::{Parser, Subcommand};
-use smart_commit::backend::device::Target;
-use smart_commit::config::{DeviceSetting, Resolved, Sources};
-use smart_commit::paths;
+use pionus::backend::device::Target;
+use pionus::config::{DeviceSetting, Resolved, Sources};
+use pionus::paths;
 
 #[derive(Debug, Parser)]
-#[command(name = "sc-tools", about = "Tools for working on smart-commit")]
+#[command(name = "pionus-tools", about = "Tools for working on pionus")]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -28,9 +28,9 @@ enum Command {
         #[arg(default_value = "HEAD")]
         rev: String,
     },
-    /// Time llama-server on the `smart-commit prompt` outputs in DIR
+    /// Time llama-server on the `pionus prompt` outputs in DIR
     /// (`*.txt`), with the llama-server flags after `--`, to see what a flag
-    /// costs. The model, server and budgets come from smart-commit's settings.
+    /// costs. The model, server and budgets come from pionus's settings.
     TimeServer {
         dir: PathBuf,
         /// `vulkan` or `cpu` [default: model.device].
@@ -39,7 +39,7 @@ enum Command {
         /// The name printed on the result line.
         #[arg(long, default_value = "llama-server")]
         label: String,
-        /// More llama-server flags, after smart-commit's own.
+        /// More llama-server flags, after pionus's own.
         #[arg(last = true)]
         server_args: Vec<String>,
     },

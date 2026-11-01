@@ -1,4 +1,4 @@
-//! `smart-commit setup` in a terminal: the hardware, the plan with each step
+//! `pionus setup` in a terminal: the hardware, the plan with each step
 //! on or off, then each step's progress and output.
 
 use std::collections::VecDeque;
@@ -210,10 +210,9 @@ impl SetupView {
             .map(|l| Line::raw(l.clone()))
             .collect();
         frame.render_widget(
-            Paragraph::new(inventory).block(Block::bordered().title(Line::styled(
-                " smart-commit setup: hardware ",
-                theme::title(),
-            ))),
+            Paragraph::new(inventory).block(
+                Block::bordered().title(Line::styled(" pionus setup: hardware ", theme::title())),
+            ),
             hardware,
         );
 

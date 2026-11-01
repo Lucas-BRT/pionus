@@ -31,7 +31,7 @@ use serde_json::{Value, json};
 use crate::backend::{Backend, BackendError, GenerationConfig, Metrics, TypeChoice, choices};
 use crate::prompt::Prompt;
 
-/// The llama.cpp release `smart-commit setup` installs.
+/// The llama.cpp release `pionus setup` installs.
 pub const LLAMA_CPP_BUILD: &str = "b11381";
 
 /// UNIX socket paths are limited to 108 bytes on Linux.
@@ -72,7 +72,7 @@ pub struct LlamaCppOptions {
     /// Skips what llama-server does at every start that a small model with a
     /// fixed context rarely needs: repacking the weights for the CPU's vector
     /// instructions (a copy of most of the model) and fitting the model to the
-    /// GPUs' free memory. `smart-commit bench` measures whether it pays off.
+    /// GPUs' free memory. `pionus bench` measures whether it pays off.
     pub fast_load: bool,
 }
 
@@ -102,13 +102,13 @@ pub fn missing_file(options: &LlamaCppOptions) -> Option<BackendError> {
     let unavailable = BackendError::NotInstalled;
     if !options.model.is_file() {
         return Some(unavailable(format!(
-            "no GGUF model at {}; `smart-commit setup` downloads it",
+            "no GGUF model at {}; `pionus setup` downloads it",
             options.model.display()
         )));
     }
     if !options.server.is_file() {
         return Some(unavailable(format!(
-            "no llama-server at {}; `smart-commit setup` installs it",
+            "no llama-server at {}; `pionus setup` installs it",
             options.server.display()
         )));
     }
@@ -146,7 +146,7 @@ impl LlamaCppBackend {
     }
 
     /// Like [`Self::start_in`], with `extra` llama-server flags after
-    /// smart-commit's own, to try others than it passes (`bench --prompts`).
+    /// pionus's own, to try others than it passes (`bench --prompts`).
     pub fn start_with(
         options: &LlamaCppOptions,
         dir: Option<&Path>,
@@ -520,7 +520,7 @@ fn private_dir() -> std::io::Result<PathBuf> {
         base = PathBuf::from("/tmp");
     }
     let name = format!(
-        "smart-commit-{}-{}",
+        "pionus-{}-{}",
         std::process::id(),
         COUNTER.fetch_add(1, Ordering::Relaxed)
     );

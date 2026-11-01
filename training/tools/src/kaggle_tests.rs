@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use smart_commit::models::sha256_hex;
+use pionus::models::sha256_hex;
 
 use super::*;
 
@@ -34,10 +34,7 @@ fn is_hex(text: &Value, len: usize) -> bool {
 
 #[test]
 fn the_mining_models_are_those_of_the_registry() {
-    for (size, id) in [
-        ("0.5b", "smart-commit-0.5b-v0.1"),
-        ("1.5b", "smart-commit-1.5b-v0.1"),
-    ] {
+    for (size, id) in [("0.5b", "pionus-0.5b-v0.1"), ("1.5b", "pionus-1.5b-v0.1")] {
         let model = pinned_model(size).unwrap();
         assert_eq!(model["repo"], format!("LucasBRT/{id}"));
         assert_eq!(model["file"], format!("{id}-q4_k_m.gguf"));
@@ -126,7 +123,7 @@ fn the_longest_mining_jobs_come_first_and_everything_is_pinned() {
     assert!(!out.join("requirements.txt").exists());
     assert_eq!(
         read_json(&out.join("dataset-metadata.json"))["id"],
-        "lucasbrt/smart-commit-training-bundle"
+        "lucasbrt/pionus-training-bundle"
     );
     // One model only; one the registry does not have is refused.
     let one = dir.path().join("one");

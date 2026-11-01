@@ -1,4 +1,4 @@
-//! `smart-commit model` in a terminal: the recommended models with what is
+//! `pionus model` in a terminal: the recommended models with what is
 //! installed and in use, the models from disk used before, the chosen one's
 //! details, its download's progress, and a path prompt for a model on disk.
 
@@ -317,7 +317,7 @@ impl Picker {
             Mode::Path(text) => {
                 let lines = vec![
                     Line::raw("A GGUF file runs on vulkan and cpu; an OpenVINO model directory on"),
-                    Line::raw("npu, intel-gpu and openvino-cpu. smart-commit cannot check them."),
+                    Line::raw("npu, intel-gpu and openvino-cpu. pionus cannot check them."),
                     Line::raw(""),
                     Line::from(vec![
                         Span::styled("Path: ", theme::title()),
@@ -380,7 +380,7 @@ impl Picker {
                     Span::styled(format!("{:<9}", "devices"), theme::dim()),
                     Span::raw(format!("{} ({})", l.local.devices(), l.local.key())),
                 ]),
-                Line::raw("smart-commit did not choose it and cannot check it."),
+                Line::raw("pionus did not choose it and cannot check it."),
             ])
             .wrap(Wrap { trim: false })
             .block(Block::bordered().title(format!(" {} ", l.local.name())));
@@ -499,26 +499,26 @@ mod tests {
         let mut picker = picker();
         let index = models::REGISTRY
             .iter()
-            .position(|m| m.id == "smart-commit-0.5b-v0.1")
+            .position(|m| m.id == "pionus-0.5b-v0.1")
             .unwrap();
         for _ in 0..index {
             picker.on_key(key(KeyCode::Down));
         }
         let screen = draw(90, 23, |f| picker.render(f));
-        assert!(screen.contains("> smart-commit-0.5b-v0.1"), "{screen}");
-        assert!(screen.contains("smart-commit 0.5B v0.1"), "{screen}");
+        assert!(screen.contains("> pionus-0.5b-v0.1"), "{screen}");
+        assert!(screen.contains("pionus 0.5B v0.1"), "{screen}");
         assert!(
-            screen.contains("huggingface.co/LucasBRT/smart-commit-0.5b-v0.1"),
+            screen.contains("huggingface.co/LucasBRT/pionus-0.5b-v0.1"),
             "{screen}"
         );
-        assert!(screen.contains("commit 829633003d09"), "{screen}");
+        assert!(screen.contains("commit db86742adc4d"), "{screen}");
         assert!(screen.contains("licence  Apache-2.0"), "{screen}");
     }
 
     #[test]
     fn models_from_disk_used_before_are_listed_and_chosen_again() {
         let dir = tempfile::TempDir::new().unwrap();
-        let used = dir.path().join("smart-commit-0.5b-v0.2-q4_k_m.gguf");
+        let used = dir.path().join("pionus-0.5b-v0.2-q4_k_m.gguf");
         let other = dir.path().join("other.gguf");
         std::fs::write(&used, "GGUF").unwrap();
         std::fs::write(&other, "GGUF").unwrap();
@@ -536,7 +536,7 @@ mod tests {
         ]);
         let screen = draw(90, 24, |f| picker.render(f));
         assert!(
-            screen.contains("> smart-commit-0.5b-v0.2-q4_k_m 0 MB    unverified   gguf"),
+            screen.contains("> pionus-0.5b-v0.2-q4_k_m 0 MB    unverified   gguf"),
             "the one in use is selected: {screen}"
         );
         assert!(screen.contains("  other   "), "{screen}");

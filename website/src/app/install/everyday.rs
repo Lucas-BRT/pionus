@@ -19,9 +19,9 @@ pub async fn section() -> Result<impl View> {
                 label: "Everyday commands",
                 "git add -p\n"
                 note("print the message")
-                "smart-commit\n"
+                "pionus\n"
                 note("review it, then commit")
-                "smart-commit --commit"
+                "pionus --commit"
             )
             <p>"The message follows the style of your history."</p>
         )
@@ -31,7 +31,7 @@ pub async fn section() -> Result<impl View> {
             terminal(
                 title: "hook",
                 label: "Install the git hook",
-                "smart-commit hook install\n"
+                "pionus hook install\n"
                 note("the editor opens with the message written")
                 "git commit"
             )

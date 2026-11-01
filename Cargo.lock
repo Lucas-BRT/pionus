@@ -1819,6 +1819,63 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
+name = "pionus"
+version = "0.14.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "insta",
+ "openvino-genai",
+ "ratatui",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror",
+ "toml 0.9.12+spec-1.1.0",
+ "toml_edit 0.23.10+spec-1.0.0",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "pionus-tools"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "pionus",
+ "tempfile",
+]
+
+[[package]]
+name = "pionus-training"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "fancy-regex",
+ "glob",
+ "parquet",
+ "pionus",
+ "regex",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "toml 0.9.12+spec-1.1.0",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "pionus-website"
+version = "0.1.0"
+dependencies = [
+ "http",
+ "tokio",
+ "topcoat",
+]
+
+[[package]]
 name = "pkg-config"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2392,63 +2449,6 @@ name = "smallvec"
 version = "1.16.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b3dc8af474f516a851ff4bd12db780f948b9250ad37211e4eec0bccea54e01b"
-
-[[package]]
-name = "smart-commit"
-version = "0.14.0"
-dependencies = [
- "anyhow",
- "clap",
- "insta",
- "openvino-genai",
- "ratatui",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror",
- "toml 0.9.12+spec-1.1.0",
- "toml_edit 0.23.10+spec-1.0.0",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "smart-commit-tools"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "clap",
- "smart-commit",
- "tempfile",
-]
-
-[[package]]
-name = "smart-commit-training"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "clap",
- "fancy-regex",
- "glob",
- "parquet",
- "regex",
- "serde_json",
- "sha2 0.10.9",
- "smart-commit",
- "tempfile",
- "toml 0.9.12+spec-1.1.0",
- "unicode-normalization",
-]
-
-[[package]]
-name = "smart-commit-website"
-version = "0.1.0"
-dependencies = [
- "http",
- "tokio",
- "topcoat",
-]
 
 [[package]]
 name = "snap"

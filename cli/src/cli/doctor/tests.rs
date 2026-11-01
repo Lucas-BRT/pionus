@@ -2,12 +2,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use smart_commit::backend::device::Target;
-use smart_commit::bench::{self, Entry, Machine, Measurement, Report};
-use smart_commit::config::{Resolved, Settings, Sources};
-use smart_commit::hardware::{CpuVendor, Gpu, Hardware, Npu};
-use smart_commit::hook;
-use smart_commit::models;
+use pionus::backend::device::Target;
+use pionus::bench::{self, Entry, Machine, Measurement, Report};
+use pionus::config::{Resolved, Settings, Sources};
+use pionus::hardware::{CpuVendor, Gpu, Hardware, Npu};
+use pionus::hook;
+use pionus::models;
 use tempfile::TempDir;
 
 use super::checks::*;
@@ -252,7 +252,7 @@ fn config_warns_about_retired_keys_and_old_names() {
 #[test]
 fn config_fails_on_a_bad_environment() {
     let home = TempDir::new().unwrap();
-    let env = |name: &str| (name == "SMART_COMMIT_DEVICE").then(|| "tpu".to_owned());
+    let env = |name: &str| (name == "PIONUS_DEVICE").then(|| "tpu".to_owned());
     let (findings, settings) = config(&config_input(&home, &env));
     assert!(
         findings.iter().any(|f| f.level == Level::Fail),
@@ -305,7 +305,7 @@ fn device_lines_say_where_it_runs_and_whether_it_was_measured() {
         lines[0].detail.contains("vulkan (auto: no benchmark"),
         "{lines:?}"
     );
-    assert!(lines[1].detail.contains("smart-commit bench"), "{lines:?}");
+    assert!(lines[1].detail.contains("pionus bench"), "{lines:?}");
 
     let measured = report(vec![(Target::Vulkan, 500.0, None)]);
     let lines = device_lines(&auto, &Ok(Target::Vulkan), &machine, Some(&measured));
@@ -367,7 +367,7 @@ fn model_missing_fails_with_the_fix() {
     let missing = settings(&home, "");
     let finding = model_of(&missing, false);
     one(finding.clone(), Level::Fail, "no GGUF model at");
-    assert!(finding.detail.contains("smart-commit setup"));
+    assert!(finding.detail.contains("pionus setup"));
 }
 
 #[test]
@@ -390,7 +390,7 @@ fn model_with_the_wrong_size_or_record_fails() {
     assert!(
         finding
             .detail
-            .contains("smart-commit model use qwen2.5-coder-1.5b")
+            .contains("pionus model use qwen2.5-coder-1.5b")
     );
     let other = install_gguf(&home, pinned().size, Some("0000 file"));
     one(model_of(&other, false), Level::Fail, "not the pinned one");
@@ -466,7 +466,7 @@ fn model_for_openvino_needs_its_export() {
     fs::write(exported.join("openvino_model.xml"), "").unwrap();
     one(check(&dir), Level::Ok, "export");
     // A model without an export has no directory at all.
-    let without = settings(&home, "[model]\nname = \"smart-commit-1.5b-v0.1\"\n");
+    let without = settings(&home, "[model]\nname = \"pionus-1.5b-v0.1\"\n");
     one(check(&without), Level::Fail, "has no OpenVINO version");
 }
 
@@ -491,7 +491,7 @@ fn model_is_not_checked_without_a_device() {
 fn llama_server_present_missing_and_other_build() {
     let home = TempDir::new().unwrap();
     let machine = hardware(Npu::None, Vec::new());
-    let build = smart_commit::backend::llamacpp::LLAMA_CPP_BUILD;
+    let build = pionus::backend::llamacpp::LLAMA_CPP_BUILD;
     let at = |path: &Path| {
         settings(
             &home,
@@ -552,7 +552,7 @@ fn server_lines() {
     input.keep_loaded = Duration::from_secs(600);
     input.runtime_dir_set = true;
     input.kept = vec![kept(42)];
-    input.stale = vec![dir("/run/user/1/smart-commit/abc")];
+    input.stale = vec![dir("/run/user/1/pionus/abc")];
     let lines = server(&input);
     assert_eq!(level_of(&lines), [Level::Ok, Level::Warn]);
     assert!(
@@ -586,7 +586,7 @@ fn binary(home: &TempDir, name: &str) -> PathBuf {
 #[test]
 fn hook_installed_for_this_binary_is_ok() {
     let home = TempDir::new().unwrap();
-    let exe = binary(&home, "smart-commit");
+    let exe = binary(&home, "pionus");
     let input = hook_input(&home, Some(&hook::script(&exe)), &exe);
     one(hook(&input), Level::Ok, "runs this binary");
     // A path with a quote in it is read back.
@@ -601,9 +601,9 @@ fn hook_installed_for_this_binary_is_ok() {
 #[test]
 fn hook_missing_or_foreign_warns() {
     let home = TempDir::new().unwrap();
-    let exe = binary(&home, "smart-commit");
+    let exe = binary(&home, "pionus");
     let missing = hook(&hook_input(&home, None, &exe));
-    one(missing, Level::Warn, "smart-commit hook install");
+    one(missing, Level::Warn, "pionus hook install");
     let foreign = hook(&hook_input(&home, Some("#!/bin/sh\nlint\n"), &exe));
     one(foreign, Level::Warn, "another hook");
     assert!(foreign_fix(&home, &exe).contains("--force"));
@@ -616,7 +616,7 @@ fn foreign_fix(home: &TempDir, exe: &Path) -> String {
 #[test]
 fn hook_pointing_elsewhere_or_not_executable_warns() {
     let home = TempDir::new().unwrap();
-    let exe = binary(&home, "smart-commit");
+    let exe = binary(&home, "pionus");
     let other = binary(&home, "other");
     one(
         hook(&hook_input(&home, Some(&hook::script(&other)), &exe)),
@@ -640,7 +640,7 @@ fn hook_pointing_elsewhere_or_not_executable_warns() {
 #[test]
 fn hook_ignored_because_of_core_hooks_path_warns() {
     let home = TempDir::new().unwrap();
-    let exe = binary(&home, "smart-commit");
+    let exe = binary(&home, "pionus");
     let mut input = hook_input(&home, None, &exe);
     input.hooks_path = Some(".githooks".to_owned());
     input.default_hook = Some(HookFile {

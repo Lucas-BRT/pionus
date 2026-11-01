@@ -1,6 +1,6 @@
-"""LoRA / QLoRA fine-tune on `examples.jsonl` (from `sc-training make-examples`).
+"""LoRA / QLoRA fine-tune on `examples.jsonl` (from `pionus-training make-examples`).
 
-Each example is the model's own chat template over smart-commit's system
+Each example is the model's own chat template over pionus's system
 and user messages, then the target subject and the end-of-turn token; the
 loss covers the reply only. Writes the adapter and `run.json` (everything
 needed to repeat the run) to OUT_DIR.

@@ -90,8 +90,8 @@ pub enum DeviceError {
     /// Every device failed for want of a file nothing has installed yet:
     /// said once, without the list (`-v` logs each device's reason).
     #[error(
-        "smart-commit is not set up yet: no model or llama.cpp found.\n\
-         Run `smart-commit setup` to download them and pick the fastest device."
+        "pionus is not set up yet: no model or llama.cpp found.\n\
+         Run `pionus setup` to download them and pick the fastest device."
     )]
     NotSetUp,
 }
@@ -454,8 +454,8 @@ mod tests {
         assert_eq!(err, DeviceError::NotSetUp);
         assert_eq!(
             err.to_string(),
-            "smart-commit is not set up yet: no model or llama.cpp found.\n\
-             Run `smart-commit setup` to download them and pick the fastest device."
+            "pionus is not set up yet: no model or llama.cpp found.\n\
+             Run `pionus setup` to download them and pick the fastest device."
         );
         // One candidate: its own error, naming the file.
         let err = load_first(&[Target::Cpu], missing).err().unwrap();

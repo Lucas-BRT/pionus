@@ -25,7 +25,7 @@ pub async fn section() -> Result<impl View> {
                     (INSTALL_CMD)
                     " -s -- --no-setup"
                 )
-                cmd("smart-commit setup --dry-run")
+                cmd("pionus setup --dry-run")
             )
             <p>"It lists every step and changes nothing."</p>
         )

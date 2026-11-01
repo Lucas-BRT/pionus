@@ -1,9 +1,9 @@
 # Hypotheses and measurements
 
-Every number comes from `sc-training score` on `data/eval-v1` (500 commits from 70
+Every number comes from `pionus-training score` on `data/eval-v1` (500 commits from 70
 repositories of CommitChronicle's test split: 250 Conventional from 7
 mostly-Conventional repositories, 250 from 63 others), generated with
-`smart-commit eval --device vulkan` on the RTX 3050. With n = 250, a rate
+`pionus eval --device vulkan` on the RTX 3050. With n = 250, a rate
 near 0.5 has a standard error of about 0.03: differences under ~0.06 are
 noise.
 
@@ -74,7 +74,7 @@ model would be.
 - Where: the first local run (bf16 base on the 3050: 0.69 s/example and
   4.8 GiB peak, against 0.85 s/example and 4.1 GiB for QLoRA) stalled when
   the machine suspended, so H1 runs on Kaggle (`kaggle_train.ipynb`, bundle
-  `lucasbrt/smart-commit-training-b1`, T4 without bf16): QLoRA, 4-bit NF4
+  `lucasbrt/pionus-training-b1`, T4 without bf16): QLoRA, 4-bit NF4
   base with fp16 compute.
 - Expectation: type_match well above the control's 0.416, copied down,
   word_f1 up; first_try must not drop.
@@ -111,17 +111,17 @@ shorter prompt read and replies of 42 characters instead of 78. Kaggle T4,
 
 ### H3. More data keeps helping, and cleaner labels help more — partly true
 
-Bundle b2 (`lucasbrt/smart-commit-training-b2`, uploaded before the scope
+Bundle b2 (`lucasbrt/pionus-training-b2`, uploaded before the scope
 map of H4, so trained on the prompt without it): a learning curve on the
-0.5B with nested subsets (`nest.py`, now `sc-training nest`) of 2.5k, 5k, 20k and 40k examples,
+0.5B with nested subsets (`nest.py`, now `pionus-training nest`) of 2.5k, 5k, 20k and 40k examples,
 the 40k set on the 1.5B, and h3a, the 0.5B on 9,278 examples: H1's set
 with the unsupported and version-only targets dropped and nothing chosen
-in their place, `sc-training filter-supported data/h1 data/h3a` (first made with an
+in their place, `pionus-training filter-supported data/h1 data/h3a` (first made with an
 unrecorded inline script; the versioned one rebuilds `inputs.jsonl`,
 `meta.jsonl` and the bundle's `examples.jsonl`, sha256 `27747f54…`, byte for
 byte). Same recipe as H1/H2 otherwise.
 
-Scored with smart-commit at `db389c2` (Vulkan, Intel Arc iGPU), merged
+Scored with pionus at `db389c2` (Vulkan, Intel Arc iGPU), merged
 and re-quantized with `export_gguf.py`, against the controls of H0
 re-run with the same binary. That binary has the copy guard of H5, which
 rejects a first reply repeating a history subject: first_try is lower and
@@ -222,7 +222,7 @@ even rewards that: `training` is a known scope, just the wrong one.
   traces stay): with no model trained on it, it only cost tokens. It comes
   back with H4b, switched on for the model trained with it, like H6's
   switch.
-- **Measured with v0.1, map against none** (`smart-commit eval --device
+- **Measured with v0.1, map against none** (`pionus eval --device
   vulkan`, the binaries of `04e3713` and of the revert, on the 138 inputs
   of eval-v1h whose prompt the map changes, 136 Conventional; the other
   362 get the same prompt, hence the same reply). The map adds ~725
@@ -248,7 +248,7 @@ hello world program`) and a one-line change adding a `println!` with a sum.
 Every model tried, base and fine-tuned, 0.5B and 1.5B, answered with the
 history subject verbatim; H1 came closest (`... with a print statement`).
 
-Cause in our data: `sc-training select` requires `--min-history 10`, for training
+Cause in our data: `pionus-training select` requires `--min-history 10`, for training
 and for eval-v1, so neither has ever seen a young repository. With one
 example and "follow their style", repeating it is the easy answer.
 
@@ -257,7 +257,7 @@ example and "follow their style", repeating it is the easy answer.
   retried with a note naming it; repeated again, it falls back to the file
   list. Nothing copied reaches the user, but the fallback is generic.
 - **eval-short**: young repositories, 1–5 history subjects, from test
-  shards 2–5 (`sc-training select --min-history 1 --max-history 5 --per-repo 5`):
+  shards 2–5 (`pionus-training select --min-history 1 --max-history 5 --per-repo 5`):
   47 Conventional commits from 13 repositories, 150 others from 132.
   Too few Conventional commits for type_match; it measures copying.
 
@@ -314,7 +314,7 @@ for moves into the weights; the prompt shrinks.
   candidate before it is in the registry. Omitted keeps what varies by
   repository (types, scopes, examples) and what the training data lacks
   (tickets, Portuguese, gitmoji).
-- **Training.** The same pipeline, with `make_examples.py` (now `sc-training make-examples`) building prompts
+- **Training.** The same pipeline, with `make_examples.py` (now `pionus-training make-examples`) building prompts
   with `--rules omitted`. Best trained together with H5 (young repositories) in
   one bundle, on about 20k examples, where H3's curve flattens.
 - **Metrics.** eval-v1 and eval-short with the switch on against H2/H1 with
@@ -327,7 +327,7 @@ for moves into the weights; the prompt shrinks.
 
 ### H7. The lists in the prompt are read as closed because the data rarely leaves them — release bumps in v0.2's data; the rest planned
 
-Found in real use with v0.1 (smart-commit 0.5.0, Vulkan), each with a
+Found in real use with v0.1 (pionus 0.5.0, Vulkan), each with a
 trace fixture:
 
 - `mise.toml` added at the root of this repository, whose recent subjects
@@ -336,7 +336,7 @@ trace fixture:
   (`conventional-en-closed-types`); 1.5B: `docs(mise): add rust to tools`
   (`conventional-en-file-scope`). The base 0.5B answered `chore: add
   mise.toml`.
-- The 0.5.0 version bump: `feat(model): update smart-commit to 0.5b-v0.1`
+- The 0.5.0 version bump: `feat(model): update pionus to 0.5b-v0.1`
   (`conventional-en-release`), with `chore` in the list: the version is
   taken from the last subject's model name.
 - Fixtures added one after the other: the 0.5B repeated the previous
@@ -357,18 +357,18 @@ v0.1 set), on the 25,652 targets matching `type(scope)!: `:
   With no listed scope fitting `mise.toml`, the 0.5B takes the most
   frequent one, the 1.5B makes one from the file name.
 
-- **Release bumps.** `sc-training build-inputs` drops every release bump
+- **Release bumps.** `pionus-training build-inputs` drops every release bump
   (`chore: release …`, version-only descriptions), so the models never saw
   one. Keep those whose version is in the diff (a `version = ` line), where
   the target is predictable; keep dropping version-only ones without it.
-  Built: `sc-training build-inputs --releases` keeps only those (the filters stay
+  Built: `pionus-training build-inputs --releases` keeps only those (the filters stay
   as they are, so earlier sets rebuild the same): 7,639 of the train
   split's 7.66M commits, from 988 repositories, 1,125 Conventional (1,023
   `chore`). Selected: `data/h7`, 219 Conventional and 200 free, at most 5
-  per repository (`sc-training select --releases`), about 2% of a 20k bundle.
+  per repository (`pionus-training select --releases`), about 2% of a 20k bundle.
 - **Data.** Raise the share of targets whose type is outside the list and
   of unscoped targets under a fully scoped history, by selection in
-  `sc-training select`, not by editing targets. Train with the scope map of H4
+  `pionus-training select`, not by editing targets. Train with the scope map of H4
   (H4b) so "no scope fits" is visible in the prompt.
 - **Prompt, if data is not enough.** List the standard Conventional types
   after the ones used here, so `chore` and `build` are always offered.
@@ -416,12 +416,12 @@ grouped by path rules: docs, tests, CI, build files, else code):
   errors (`fix→feat` alone 30) and 25 of the 1.5B's 89; then `fix→chore`
   (10, 11) and `refactor→feat`.
 - The 0.5B finds 51% of the `fix` commits and 79% of the `feat` ones. The
-  selection caps each type at 30% (`sc-training select --max-type-share 0.3`). Less
+  selection caps each type at 30% (`pionus-training select --max-type-share 0.3`). Less
   than it seemed: without the cap, `fix` is 34.9% of the same selection
   (a cap of 0.45 does not bind and gives the same commits), and the 41% of
   eval-v1 is its own: 20% to 70% across its 7 Conventional repositories.
   The cap moves `fix` by 5 points, not 11.
-- `sc-training score` now reports each type's precision, recall and F1 and their
+- `pionus-training score` now reports each type's precision, recall and F1 and their
   mean, `type_macro_f1`: base 1.5B 0.172, v0.1 0.5B 0.537, v0.1 1.5B
   0.548 (type_match 0.480, 0.588, 0.648 on the same traces). Spellings of
   one type are folded (`tests` is `test`) in selection and scoring; the
@@ -550,8 +550,8 @@ counted once): 0.5B 1.150 → 0.976 s per message, 1.5B 2.532 → 2.156 s.
   0.448). Twenty thousand examples without the rules may not be enough for
   the 1.5B to take them in; v0.1 1.5B had forty thousand. To try in v0.4.
 - Both are public on Hugging Face and registered as experimental:
-  `LucasBRT/smart-commit-0.5b-v0.2` (revision `bdb93a5`) and
-  `LucasBRT/smart-commit-1.5b-v0.2` (`4bca5dc`); v0.1 stays the better
+  `LucasBRT/pionus-0.5b-v0.2` (revision `bdb93a5`) and
+  `LucasBRT/pionus-1.5b-v0.2` (`4bca5dc`); v0.1 stays the better
   1.5B on the type.
 - Building b3 found a bug in the prompt budget's token estimate: see
   `docs/architecture.md`, Fitting the diff.
@@ -586,7 +586,7 @@ works: it changes the reply format and the Rust side.
   reuses this prompt and model, and each message sees its whole diff
   instead of sharing the 1024 tokens.
 - **Product.** The hook never blocks: it writes the message for the whole
-  change plus comment lines git drops (`# smart-commit: looks like 2
+  change plus comment lines git drops (`# pionus: looks like 2
   commits: src/diff.rs src/git.rs | docs/usage.md`). The interactive review
   gets a "split" action that unstages, stages and commits each group. Split
   by file first; hunks within one file (partial patches) later.
@@ -605,12 +605,12 @@ deleted, renamed, only reformatted or only commented. `--diff annotated`
 says so (src/annotate.rs). eval-v1, Vulkan, greedy, each model with its
 best rules (0.5B v0.2 `--rules omitted`, the others `--rules full`), with
 the near-copy and language retries and the typed fallback of the same
-branch, paired with `sc-training score --against` against the plain list:
+branch, paired with `pionus-training score --against` against the plain list:
 
 | Model | type_match plain → annotated | Paired | type_macro_f1 |
 |---|---|---|---|
-| smart-commit-0.5b-v0.2 | 0.636 → 0.664 | +7/−0, p = 0.016 | 0.547 → 0.562 |
-| smart-commit-1.5b-v0.2 | 0.664 → 0.668 | +3/−2 | 0.550 → 0.551 |
+| pionus-0.5b-v0.2 | 0.636 → 0.664 | +7/−0, p = 0.016 | 0.547 → 0.562 |
+| pionus-1.5b-v0.2 | 0.664 → 0.668 | +3/−2 | 0.550 → 0.551 |
 | qwen2.5-coder-0.5b | 0.268 → 0.276 | +5/−3 | 0.167 → 0.166 |
 | qwen2.5-coder-1.5b | 0.508 → 0.516 | +4/−2 | 0.228 → 0.235 |
 
@@ -627,7 +627,7 @@ SFT shows what to write, never what not to. DPO trains on pairs: a reply the
 model sampled that a check rejects (a history subject copied, a detail found
 nowhere in the diff, a vague description), against one that passes
 (`train_dpo.py`: a LoRA on the SFT model merged, which is also the
-reference; `mine_pairs.py` and `sc-training pairs` make the pairs).
+reference; `mine_pairs.py` and `pionus-training pairs` make the pairs).
 
 **First run** (v0.1 0.5B, `--rules full --diff plain`). 3,551 inputs of
 `data/test2to5h` outside the evaluation sets' repositories, four samples each
@@ -652,7 +652,7 @@ RTX 3050. One binary, Vulkan, greedy, eval-v1 (250 + 250) and eval-short
   same on eval-short. The messages do not turn generic: they are a little
   longer (39 columns against 37; the real ones 41) and the share of their
   content words that are in none of the history, the paths and the diff
-  (`novel` of `sc-training compare`) does not grow, it falls (0.147 → 0.126
+  (`novel` of `pionus-training compare`) does not grow, it falls (0.147 → 0.126
   Conventional, 0.118 → 0.105 free; the real subjects 0.327 Conventional).
 - What it did not teach, it lost: `scope_known` +0/−12 (p < 0.001; eval-short
   0.681 → 0.617) and `type_match` +9/−13 (p = 0.52; eval-short 0.617 → 0.702).
@@ -672,7 +672,7 @@ evaluation and validation repositories: 4,500 from 680 repositories (at most
 mined on Kaggle's T4s; a judge that also rejects a scope the history never
 used and a type other than the real commit's, and prefers a sample of the
 model itself; pairs balanced by repository, type and bucket, a tenth of the
-repositories apart for validation (`sc-training balance`). A sweep of β,
+repositories apart for validation (`pionus-training balance`). A sweep of β,
 learning rate, epochs and `--sft-weight` on the 0.5B chosen on `data/val1`,
 never on eval-v1, which is read once, for the chosen configuration; then the
 1.5B.
@@ -720,7 +720,7 @@ likely, the rejected one more so:
 - All six use far fewer words that are in nothing the model was given
   (`novel`: 0.134 for the SFT model, 0.04–0.08 for them, the real subjects
   0.316): they say what the diff says and not what the change means. Side
-  by side (`sc-training compare --read`), for a change the real commit calls
+  by side (`pionus-training compare --read`), for a change the real commit calls
   `feat: export getElementInfo function` the run without `--sft-weight`
   writes `chore: move matrix utils to utils`. It is not the invention the
   criterion guards against but a habit to count.
@@ -728,7 +728,7 @@ likely, the rejected one more so:
   rise). The mean subject of the SFT model on val1 is 35.3 columns, below the
   36–42 the criteria assumed from eval-v1.
 - Next: pairs whose chosen and rejected replies have the same distribution of
-  type and of scope (`sc-training balance --match-marginals`), so that only
+  type and of scope (`pionus-training balance --match-marginals`), so that only
   what depends on the diff can lower the loss, and a larger `--sft-weight`.
 
 **Second run, second sweep: the collapse is gone.** Six runs of the 0.5B on the pairs with matched
@@ -780,12 +780,12 @@ Read once on the evaluation sets, paired against the SFT model:
   commits. Taken together: the DPO now removes what the first run removed, at no cost to the type and the
   scope, and does **not** improve the type significantly, which was the aim of the second run. One seed
   per configuration, so differences of a few cases between runs are noise.
-- The six runs are in a private repository, `LucasBRT/smart-commit-0.5b-dpo-runs` (adapters, logs,
+- The six runs are in a private repository, `LucasBRT/pionus-0.5b-dpo-runs` (adapters, logs,
   `run.json`, Q4_K_M GGUF and the results), as experiments and not as a version of the model.
 - Next, by decision of the author and not because the criteria were met: the same configuration on the
   1.5B (below).
 
-**Second run on the 1.5B.** The same recipe on `smart-commit-1.5b-v0.1`: 3,091 pairs (885 of
+**Second run on the 1.5B.** The same recipe on `pionus-1.5b-v0.1`: 3,091 pairs (885 of
 free-style commits, 795 repositories) with matched marginals, 500 for validation, β 0.1, lr 2e-5, one epoch
 (193 steps), two runs of `--sft-weight` 0.2 and 0.5, one on each T4 of the same Kaggle session (82 minutes
 each, 4.4 GiB; about 1.5 h of the session). Validation accuracy 0.754 and 0.740.
@@ -804,7 +804,7 @@ significant gains and the highest `word_f1`) points to either, and the choice wa
 was read. A reading of the cases side by side shows replies close to the SFT model's (a complement dropped, a
 verb or a scope changed) and no new habit.
 
-Read once on the evaluation sets (smart-commit 0.9.0 plus `main` up to `236d51f`, as for the 0.5B), paired
+Read once on the evaluation sets (pionus 0.9.0 plus `main` up to `236d51f`, as for the 0.5B), paired
 against the SFT model, the base model as a control:
 
 | | SFT → m15-b01-lr2-s05, plain list | annotated list | paired (plain) |
@@ -827,7 +827,7 @@ against the SFT model, the base model as a control:
   one gains 1 and 0.065; `scope_known` rises with both. Not the fall of the 0.5B. Taken together: at 1.5B the
   DPO removes the same failures and the type rises a little, without significance (p = 0.057 with the list the
   model was trained on). One seed per configuration; differences of a few cases are noise.
-- The GGUF of the model is `smart-commit-1.5b-v0.3` on Hugging Face, public like the 0.5B's.
+- The GGUF of the model is `pionus-1.5b-v0.3` on Hugging Face, public like the 0.5B's.
 
 ### H13. The type is limited by what the model is trained on, not by the failures DPO removes — planned for v0.4
 
@@ -893,7 +893,7 @@ before; Kaggle's quota does not go further on S and D.
 one T4, and S0 and S1 run together, one on each of the session's two T4s.
 Their validation loss is logged on one set (S1's, annotated) and is not
 compared between the two: the arms are compared on `data/val1` with
-`sc-training compare`. The time of each arm is written here when it ends.
+`pionus-training compare`. The time of each arm is written here when it ends.
 
 **S0 and S1 (first result).** The same 40k commits of v0.1, `--rules full`, QLoRA as v0.1, one seed,
 one on each T4 of a session (2.48 h and 2.39 h, 2.0 h of the session; the quota 6.98 → 8.99 of 30 h).
@@ -1475,7 +1475,7 @@ before this judge.
 ## Ideas not tried yet
 
 - An LLM judge for faithfulness, validated against a sample rated by
-  hand; `unsupported` and `ungrounded` in `sc-training score` are the cheap checks.
+  hand; `unsupported` and `ungrounded` in `pionus-training score` are the cheap checks.
 - A body in the target when the real commit has one.
 - A second epoch instead of more data (H3's curve flattens at about 20k).
 - Portuguese and gitmoji targets: v0.1 is English, and eval-v1 has neither.

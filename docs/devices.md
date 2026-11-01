@@ -1,6 +1,6 @@
 # Devices
 
-smart-commit runs the model on the NPU, a GPU or the CPU, through two
+pionus runs the model on the NPU, a GPU or the CPU, through two
 backends:
 
 | Device | Backend | Hardware | Model |
@@ -33,7 +33,7 @@ that have OpenVINO anyway, so `bench` can compare both CPU backends.
 On a Ryzen 5 5500 with an RTX 3050 (no Intel device, so no OpenVINO):
 
 ```console
-$ smart-commit bench
+$ pionus bench
 Benchmark on AMD Ryzen 5 5500: 4 prompts, after one warm-up load.
 
   device       per message     load  generate     CPU
@@ -43,14 +43,14 @@ Benchmark on AMD Ryzen 5 5500: 4 prompts, after one warm-up load.
 fast load turned on for vulkan (--no-repack --fit off): 2.7 s -> 2.4 s per message
 fast load turned on for cpu (--no-repack --fit off): 5.1 s -> 4.0 s per message
 
-smart-commit will use vulkan on this machine (~2.4 s per message): the fastest, model.device = auto.
-To use another device: smart-commit device use <npu|intel-gpu|vulkan|cpu|openvino-cpu>, or `auto` for the fastest.
+pionus will use vulkan on this machine (~2.4 s per message): the fastest, model.device = auto.
+To use another device: pionus device use <npu|intel-gpu|vulkan|cpu|openvino-cpu>, or `auto` for the fastest.
 
-$ smart-commit device use cpu
-model.device = cpu  (global /home/me/.config/smart-commit/config.toml)
+$ pionus device use cpu
+model.device = cpu  (global /home/me/.config/pionus/config.toml)
 ~4.0 s per message on this machine, in the last benchmark.
 
-$ smart-commit device          # the last benchmark and the current choice
+$ pionus device          # the last benchmark and the current choice
 ```
 
 - **`model.device = auto`** (the default) tries the devices in the order of
@@ -61,7 +61,7 @@ $ smart-commit device          # the last benchmark and the current choice
   with a note naming the ones skipped. When none works, the error lists the
   reason for each. A device set by hand in `model.device` is tried even when
   it is not there, and the error says why it failed.
-- **`smart-commit bench`** measures the devices the machine has (up to five) on four prompts
+- **`pionus bench`** measures the devices the machine has (up to five) on four prompts
   embedded in the binary (`cli/tests/fixtures/traces/bench-*.json`), so every
   machine is measured on the same inputs. They are sized like real prompts,
   about 300 to 900 tokens (the quartiles and 90th percentile of eval-v1's),
@@ -69,26 +69,26 @@ $ smart-commit device          # the last benchmark and the current choice
   prompts of earlier versions the CPU looked twice as fast as it is. Each device is loaded once to warm the caches, then loaded
   again and timed. *Per message* is what a commit costs: one load and one
   generation. *CPU* is the mean number of busy cores. The report is saved to
-  `$XDG_DATA_HOME/smart-commit/bench.json`, with the CPU model, the kernel,
+  `$XDG_DATA_HOME/pionus/bench.json`, with the CPU model, the kernel,
   the version and each backend's description.
 - **Fast load.** `vulkan` and `cpu` are measured twice, with and without
   [fast load](#fast-load), and keep the faster mode; the lines under the
   table say what was turned on.
-- **In a terminal**, `smart-commit bench` shows each device while it is
+- **In a terminal**, `pionus bench` shows each device while it is
   measured (and which load mode), then the results, with the device in use
   selected: Up/Down and Enter use another device, `a` goes back to `auto`.
   Ctrl+C stops after the device being measured, so no server is left
   running, and saves nothing. The summary is printed when the screen
-  closes. `smart-commit device` opens the same screen on the last
+  closes. `pionus device` opens the same screen on the last
   benchmark. `--json`, pipes and scripts get the text output.
-- **`smart-commit device use <device>`** writes `model.device` to the global
+- **`pionus device use <device>`** writes `model.device` to the global
   config and shows the estimate for that device, or a note if it failed in
   the last benchmark.
 - The device that actually ran is part of the backend's description, which
   every trace records.
 
-Run `smart-commit bench` again after installing drivers or changing the
-model; `smart-commit setup` runs it at the end.
+Run `pionus bench` again after installing drivers or changing the
+model; `pionus setup` runs it at the end.
 
 ## Fast load
 
@@ -103,9 +103,9 @@ with a fixed context:
 - **Fitting** (CPU and Vulkan): every GPU is asked for its free memory, and
   the layers and context adjusted to fit, even with `--device none`.
   `--fit off` skips it; a GPU short of memory then fails to load instead of
-  loading fewer layers, so smart-commit loads it again normally.
+  loading fewer layers, so pionus loads it again normally.
 
-Since the gain depends on the processor, `smart-commit bench` measures
+Since the gain depends on the processor, `pionus bench` measures
 each llama.cpp device in both modes, and fast load is used where it saved
 at least 5% per message (more than the noise between runs).
 `model.fast_load = on` or `off` overrides that. The backend's description,
@@ -122,7 +122,7 @@ What it saves, per model and device, is in
 [measurements](measurements.md#keeping-the-model-loaded).
 
 One model is kept at a time: a commit with another model or device stops
-the one kept, and so do `smart-commit bench` before measuring and any
+the one kept, and so do `pionus bench` before measuring and any
 change of a `model.*` setting, since it holds memory the GPU may need (two
 7B models do not fit in 8 GB). A hardware test checks that a kept model
 gives the same replies as a fresh one.
@@ -139,14 +139,14 @@ on one with 4 GiB. The figures per model are in
 Only `vulkan` and `cpu` can tell how likely each type is and start a reply
 with a chosen one, so `model.ask_type` ([configuration](configuration.md))
 does nothing on `npu`, `intel-gpu` and `openvino-cpu`: the C API of OpenVINO
-GenAI that smart-commit uses shows no log probabilities. What it gains is in
+GenAI that pionus uses shows no log probabilities. What it gains is in
 [measurements](measurements.md#asking-for-the-type).
 
 ## Threads on the CPU
 
 Reading the prompt (prefill) is most of the time per message on the CPU,
 and it scales with the threads doing it. llama.cpp picks that count itself,
-and the pick depends on the processor, so smart-commit passes
+and the pick depends on the processor, so pionus passes
 `--threads-batch` explicitly: one thread per physical core
 (`model.threads_batch` overrides it). The backend's description, which
 traces record, says `threads-batch=N` on the CPU. Decoding keeps llama.cpp's
@@ -155,8 +155,8 @@ are in [measurements](measurements.md#threads-on-the-cpu).
 
 ## Setting up the hardware
 
-`smart-commit hardware` prints the hardware list below without changing
-anything. `smart-commit setup` first lists the hardware (the CPU, each GPU with its
+`pionus hardware` prints the hardware list below without changing
+anything. `pionus setup` first lists the hardware (the CPU, each GPU with its
 vendor, kernel driver and the devices it gives, and the NPU), then prints a
 plan of what that hardware needs, and only that, then asks before each step
 that needs `sudo` (in a terminal, as a full-screen checklist where each
@@ -188,14 +188,14 @@ with an RTX 3050:
 | AMD NPU (Ryzen AI) | nothing: listed as not supported |
 
 OpenVINO, the NPU driver and Intel's GPU runtime are never installed on a
-machine without an Intel NPU or GPU. `smart-commit setup` installs llama.cpp
+machine without an Intel NPU or GPU. `pionus setup` installs llama.cpp
 and the model itself; the steps that need the system are scripts, which can
-also run on their own, from `~/.local/share/smart-commit/scripts/` (or
+also run on their own, from `~/.local/share/pionus/scripts/` (or
 `scripts/` in a checkout):
 
 | Script | Does | sudo |
 |---|---|---|
-| `setup-llamacpp.sh` | only runs `smart-commit setup --llamacpp-only`: the installer of 0.7.0 and 0.8.0 calls it after an update | no |
+| `setup-llamacpp.sh` | only runs `pionus setup --llamacpp-only`: the installer of 0.7.0 and 0.8.0 calls it after an update | no |
 | `setup-gpu.sh [--dry-run] [--yes]` | the system drivers each GPU needs (below) | only for system packages |
 | `setup-npu.sh` | NPU driver 1.38.0, Level Zero 1.32.0 and OpenVINO GenAI 2026.3.1, the combination Intel validated; adds you to the `render` group | yes |
 | `setup-npu.sh --openvino-only` | only OpenVINO, for an Intel GPU without an NPU, or to compare `openvino-cpu` with `cpu` | yes |
@@ -233,7 +233,7 @@ prompt fails, and the token estimate can be short, so the NPU is given a
 fifth less than that as the prompt budget.
 
 - **Cache.** The first load compiles the graph; later loads read it from
-  `$XDG_CACHE_HOME/smart-commit/openvino`.
+  `$XDG_CACHE_HOME/pionus/openvino`.
 - **Chunked prefill.** The NPU processes the prompt in chunks of
   `NPUW_LLM_PREFILL_CHUNK_SIZE`, but only when `MAX_PROMPT_LEN` is larger
   than a chunk. With the library's default chunk (the same as our prompt
@@ -258,5 +258,5 @@ prompt, every time (a hardware test checks it). Across devices:
 - **`vulkan` and `cpu`** run a different quantisation (Q4_K_M) and differ
   too.
 
-A trace records the device that ran, and `smart-commit replay --with-model`
+A trace records the device that ran, and `pionus replay --with-model`
 notes when the current device is not the recorded one.

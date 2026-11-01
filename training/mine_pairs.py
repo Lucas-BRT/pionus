@@ -1,8 +1,8 @@
 """Selected inputs -> the replies a model samples for them, to mine
-preference pairs (`sc-training pairs` judges them).
+preference pairs (`pionus-training pairs` judges them).
 
-Builds the prompts with `smart-commit prompt --inputs` (empty
-XDG_CONFIG_HOME, as `sc-training make-examples`), or reads them from `--prompts`,
+Builds the prompts with `pionus prompt --inputs` (empty
+XDG_CONFIG_HOME, as `pionus-training make-examples`), or reads them from `--prompts`,
 the `prompts.jsonl` that `--prompts-only` wrote: a machine without the
 binary (Kaggle) samples from the prompts of another. Drops the commits of the
 repositories of the evaluation sets, and samples SAMPLES replies per input
@@ -11,9 +11,9 @@ give the same candidates. Writes to OUT `inputs.jsonl` and `meta.jsonl` (what
 is left of SRC) and `candidates.jsonl`: `{"system", "user", "replies"}` per
 line, in the same order. Stopped, it resumes where it was.
 
-    python -I mine_pairs.py SRC OUT GGUF --binary SMART_COMMIT --server LLAMA_SERVER [options]
-    python -I mine_pairs.py SRC OUT GGUF --binary SMART_COMMIT --url http://127.0.0.1:8080
-    python -I mine_pairs.py SRC OUT --binary SMART_COMMIT --prompts-only [options]
+    python -I mine_pairs.py SRC OUT GGUF --binary PIONUS --server LLAMA_SERVER [options]
+    python -I mine_pairs.py SRC OUT GGUF --binary PIONUS --url http://127.0.0.1:8080
+    python -I mine_pairs.py SRC OUT --binary PIONUS --prompts-only [options]
     python -I mine_pairs.py SRC OUT GGUF --prompts SRC/prompts.jsonl --server LLAMA_SERVER
 
 `--rules` and `--diff` are those the model was trained on: `full` and
@@ -210,7 +210,7 @@ def main() -> None:
     parser.add_argument("src", type=Path)
     parser.add_argument("out", type=Path)
     parser.add_argument("gguf", nargs="?", help="the model to sample from")
-    parser.add_argument("--binary", help="smart-commit, to build the prompts")
+    parser.add_argument("--binary", help="pionus, to build the prompts")
     parser.add_argument("--prompts", type=Path, help="the prompts.jsonl of --prompts-only")
     parser.add_argument("--prompts-only", action="store_true",
                         help="write OUT/prompts.jsonl and stop, without a model")

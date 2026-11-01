@@ -2,7 +2,7 @@
 //!
 //! Loading the model is most of a commit on a GPU (2.1 of 2.4 s on an RTX
 //! 3050). With `model.keep_loaded`, the first commit starts a supervisor, a
-//! detached `smart-commit keep-server DIR`, that owns the llama-server and
+//! detached `pionus keep-server DIR`, that owns the llama-server and
 //! stops it after that many minutes without a request; later commits
 //! connect to its socket. There is one server per configuration: its
 //! directory is named after a hash of everything that shapes the server,

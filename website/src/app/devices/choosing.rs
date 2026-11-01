@@ -26,8 +26,8 @@ pub async fn section() -> Result<impl View> {
                 ":"
             </p>
             terminal(
-                title: "smart-commit bench (abridged)",
-                label: "Example output of smart-commit bench",
+                title: "pionus bench (abridged)",
+                label: "Example output of pionus bench",
                 aligned: true,
                 "  device   per message\n"
                 for line in BENCH {
@@ -42,9 +42,9 @@ pub async fn section() -> Result<impl View> {
             )
             <p>
                 "Run "
-                <code>"smart-commit bench"</code>
+                <code>"pionus bench"</code>
                 " again after changing drivers. Force a device with "
-                <code>"smart-commit device use npu"</code>
+                <code>"pionus device use npu"</code>
                 "."
             </p>
             <p>

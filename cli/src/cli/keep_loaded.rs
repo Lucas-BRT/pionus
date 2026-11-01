@@ -1,9 +1,9 @@
-//! `smart-commit server`: the models kept loaded between commits.
+//! `pionus server`: the models kept loaded between commits.
 
 use anyhow::Result;
 use clap::Subcommand;
-use smart_commit::backend::server;
-use smart_commit::paths;
+use pionus::backend::server;
+use pionus::paths;
 
 use super::settings::env;
 

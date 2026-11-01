@@ -1,10 +1,10 @@
-//! Scores `smart-commit eval` traces against the real subjects.
+//! Scores `pionus eval` traces against the real subjects.
 //!
 //! Per set (conventional, free) and overall:
 //! - first_try: the first reply passed the sanitizer
 //! - fallback: every attempt failed; the message came from the file list
 //! - copied: the subject is one of the history subjects verbatim
-//! - first_copied: the first reply repeated a history subject (smart-commit
+//! - first_copied: the first reply repeated a history subject (pionus
 //!   rejects that and retries, so copied alone hides it)
 //! - type_match: same Conventional type as the real subject (conventional
 //!   set), with spellings of one type folded (`tests` is `test`)

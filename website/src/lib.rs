@@ -1,4 +1,4 @@
-//! The smart-commit website, served by Topcoat.
+//! The pionus website, served by Topcoat.
 
 mod app;
 mod assets;

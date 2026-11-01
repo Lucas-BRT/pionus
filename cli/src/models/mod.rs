@@ -1,4 +1,4 @@
-//! The models smart-commit recommends, and installing them.
+//! The models pionus recommends, and installing them.
 //!
 //! Each model is downloaded from Hugging Face, pinned to a revision and
 //! checked against the SHA-256 of the file at that revision: other

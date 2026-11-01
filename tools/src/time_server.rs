@@ -1,19 +1,19 @@
-//! `sc-tools time-server`: times llama-server on prompts printed by
-//! `smart-commit prompt`, with llama-server flags of the caller's choice, to
+//! `pionus-tools time-server`: times llama-server on prompts printed by
+//! `pionus prompt`, with llama-server flags of the caller's choice, to
 //! see what a setting costs before it is turned into one.
 
 use std::path::Path;
 use std::time::Instant;
 
-use smart_commit::backend::llamacpp::{LlamaCppBackend, LlamaCppOptions};
-use smart_commit::backend::{Backend, BackendError, GenerationConfig};
-use smart_commit::prompt::Prompt;
+use pionus::backend::llamacpp::{LlamaCppBackend, LlamaCppOptions};
+use pionus::backend::{Backend, BackendError, GenerationConfig};
+use pionus::prompt::Prompt;
 
 const SYSTEM_MARK: &str = "===== system =====\n";
 const USER_MARK: &str = "===== user =====\n";
 const END_MARK: &str = "\n===== ~";
 
-/// A prompt as `smart-commit prompt` prints it: the system message, the user
+/// A prompt as `pionus prompt` prints it: the system message, the user
 /// message, and a closing line with the token estimate.
 pub fn parse_prompt_file(text: &str) -> Option<Prompt> {
     let after_system = text.split_once(SYSTEM_MARK)?.1;
@@ -39,12 +39,8 @@ pub fn read_prompts(dir: &Path) -> Result<Vec<(String, Prompt)>, String> {
         let name = path.file_name().unwrap_or_default().to_string_lossy();
         let text =
             std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-        let prompt = parse_prompt_file(&text).ok_or_else(|| {
-            format!(
-                "{} is not the output of `smart-commit prompt`",
-                path.display()
-            )
-        })?;
+        let prompt = parse_prompt_file(&text)
+            .ok_or_else(|| format!("{} is not the output of `pionus prompt`", path.display()))?;
         prompts.push((name.into_owned(), prompt));
     }
     if prompts.is_empty() {

@@ -12,7 +12,7 @@
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
-reference=${SMART_COMMIT_ENV_FILE:-$here/ENV}
+reference=${PIONUS_ENV_FILE:-$here/ENV}
 mine=$(mktemp)
 trap 'rm -f "$mine"' EXIT
 sh "$here/env-report.sh" >"$mine"

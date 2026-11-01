@@ -1,17 +1,17 @@
-//! `smart-commit hook`: the `prepare-commit-msg` git hook.
+//! `pionus hook`: the `prepare-commit-msg` git hook.
 
 use std::path::{Path, PathBuf};
 
 use anyhow::{Result, anyhow, bail};
 use clap::Subcommand;
-use smart_commit::git::Repo;
-use smart_commit::hook;
+use pionus::git::Repo;
+use pionus::hook;
 
 use super::args::BackendArgs;
 use super::suggest::generate_message;
 
 const HOOK_NAME: &str = "prepare-commit-msg";
-const HOOK_BACKUP: &str = "prepare-commit-msg.smart-commit-backup";
+const HOOK_BACKUP: &str = "prepare-commit-msg.pionus-backup";
 
 #[derive(Debug, Subcommand)]
 pub(super) enum HookCommand {
@@ -19,7 +19,7 @@ pub(super) enum HookCommand {
     Install {
         #[arg(short = 'C', long = "path", default_value = ".")]
         path: PathBuf,
-        /// Replace a hook that was not installed by smart-commit; it is kept
+        /// Replace a hook that was not installed by pionus; it is kept
         /// as a backup and restored by `uninstall`.
         #[arg(long)]
         force: bool,
@@ -67,7 +67,7 @@ fn install(path: &Path, force: bool) -> Result<()> {
     {
         if !force {
             bail!(
-                "{} already exists and was not installed by smart-commit; \
+                "{} already exists and was not installed by pionus; \
                  use --force to replace it (it will be kept as a backup)",
                 hook.display()
             );
@@ -97,7 +97,7 @@ fn uninstall(path: &Path) -> Result<()> {
         .map_err(|_| anyhow!("no {HOOK_NAME} hook in {}", dir.display()))?;
     if !hook::is_ours(&existing) {
         bail!(
-            "{} was not installed by smart-commit; leaving it alone",
+            "{} was not installed by pionus; leaving it alone",
             hook.display()
         );
     }
@@ -129,7 +129,7 @@ fn fill(message_file: &Path, source: Option<&str>, backend: &BackendArgs) {
         return;
     }
     if let Err(err) = fill_message_file(message_file, backend) {
-        eprintln!("smart-commit: {err:#}; the commit message was left as is");
+        eprintln!("pionus: {err:#}; the commit message was left as is");
     }
 }
 

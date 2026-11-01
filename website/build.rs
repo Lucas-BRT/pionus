@@ -191,7 +191,7 @@ fn devices_table(devices: &str) -> Vec<[String; 3]> {
     rows
 }
 
-/// The machine of the guide's `smart-commit bench` example ("Ryzen 5 5500
+/// The machine of the guide's `pionus bench` example ("Ryzen 5 5500
 /// with an RTX 3050") and its rows: device, time per message and whether it
 /// was selected.
 fn bench_example(devices: &str) -> (String, Vec<(String, String, bool)>) {

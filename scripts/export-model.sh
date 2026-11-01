@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Exports the default model, downloaded from its publisher on Hugging Face,
 # in the format the OpenVINO devices need (INT4 symmetric weights, which the
-# NPU requires), on this machine: smart-commit does not host models. It is
+# NPU requires), on this machine: pionus does not host models. It is
 # reproducible: the source model is pinned to a revision, uv and Python to
 # exact versions, and every Python package to a hash (or, for the two git
 # dependencies, a commit) in scripts/export/requirements.lock. The result
@@ -16,9 +16,9 @@
 #
 # Needs about 10 GB of disk while it runs (the source model, the Python
 # environment and the export) and leaves the 0.9 GB model. Only this step
-# uses Python; smart-commit itself does not. uv is downloaded, pinned, if
-# this version is not in the cache. SMART_COMMIT_UV names a uv binary to use
-# instead and SMART_COMMIT_UV_URL replaces its download URL, for tests.
+# uses Python; pionus itself does not. uv is downloaded, pinned, if
+# this version is not in the cache. PIONUS_UV names a uv binary to use
+# instead and PIONUS_UV_URL replaces its download URL, for tests.
 #
 # Exporting twice gives identical files; scripts/export/MANIFEST.sha256 holds
 # the expected result, and the script fails if the export differs from it.
@@ -36,7 +36,7 @@ MODEL_REVISION=2e1fd397ee46e1388853d2af2c993145b0f1098a
 NAME=qwen2.5-coder-1.5b-instruct-int4-sym-g128
 PYTHON_VERSION=3.11.17
 UV_VERSION=0.13.1
-UV_URL=${SMART_COMMIT_UV_URL:-https://github.com/astral-sh/uv/releases/download/$UV_VERSION/uv-x86_64-unknown-linux-gnu.tar.gz}
+UV_URL=${PIONUS_UV_URL:-https://github.com/astral-sh/uv/releases/download/$UV_VERSION/uv-x86_64-unknown-linux-gnu.tar.gz}
 UV_SHA256=eadd9d27c134ab5ac1ffd4473b97a741407f3ea238288f03121fc4deddf90220
 # The NPU needs symmetric INT4 weights for every layer (ratio 1.0); a group
 # size of 128 keeps the precision of models up to about 4B parameters.
@@ -65,11 +65,11 @@ for arg in "$@"; do
         *) OUT=$arg ;;
     esac
 done
-OUT=$(realpath -m "${OUT:-${XDG_DATA_HOME:-$HOME/.local/share}/smart-commit/models/$NAME}")
-CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/smart-commit
-VENV=${SMART_COMMIT_EXPORT_VENV:-$CACHE/export-venv}
+OUT=$(realpath -m "${OUT:-${XDG_DATA_HOME:-$HOME/.local/share}/pionus/models/$NAME}")
+CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/pionus
+VENV=${PIONUS_EXPORT_VENV:-$CACHE/export-venv}
 SOURCE=$CACHE/sources/$MODEL_ID@$MODEL_REVISION
-UV=${SMART_COMMIT_UV:-$CACHE/uv-$UV_VERSION/uv}
+UV=${PIONUS_UV:-$CACHE/uv-$UV_VERSION/uv}
 
 # intact DIR: the export in DIR is the expected one, every file checked.
 intact() {
@@ -126,7 +126,7 @@ rm -rf "${staging:?}"
 "$VENV/bin/python" -I "$HERE/export/normalize_ir.py" "$staging"/openvino_*.xml
 
 lock_sha256=$(sha256sum "$LOCK" | cut -d' ' -f1)
-cat >"$staging/smart-commit-export.json" <<JSON
+cat >"$staging/pionus-export.json" <<JSON
 {
   "model": "$MODEL_ID",
   "revision": "$MODEL_REVISION",
@@ -151,8 +151,8 @@ mv "$staging" "$OUT"
 if [ "$KEEP" = 0 ]; then
     rm -rf "${SOURCE:?}"
     rmdir "$(dirname "$SOURCE")" "$CACHE/sources" 2>/dev/null || true
-    # A Python environment given by SMART_COMMIT_EXPORT_VENV is not ours.
-    [ -n "${SMART_COMMIT_EXPORT_VENV:-}" ] || rm -rf "${VENV:?}"
+    # A Python environment given by PIONUS_EXPORT_VENV is not ours.
+    [ -n "${PIONUS_EXPORT_VENV:-}" ] || rm -rf "${VENV:?}"
 fi
 echo
 echo "Exported to $OUT"

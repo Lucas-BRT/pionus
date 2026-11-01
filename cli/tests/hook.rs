@@ -4,15 +4,15 @@ use std::fs;
 use std::path::PathBuf;
 use std::process::Output;
 
-use smart_commit::trace::Trace;
+use pionus::trace::Trace;
 
 mod common;
-use common::{FakeMachine, TestRepo, smart_commit};
+use common::{FakeMachine, TestRepo, pionus};
 
-const MOCK: (&str, &str) = ("SMART_COMMIT_BACKEND", "mock");
+const MOCK: (&str, &str) = ("PIONUS_BACKEND", "mock");
 
 fn reply(text: &str) -> (&str, &str) {
-    ("SMART_COMMIT_MOCK_RESPONSE", text)
+    ("PIONUS_MOCK_RESPONSE", text)
 }
 
 /// Accepts whatever message the editor was given.
@@ -39,7 +39,7 @@ fn repo_with_hook() -> TestRepo {
 }
 
 fn install(repo: &TestRepo) -> Output {
-    let output = smart_commit(&["hook", "install"], repo.path(), &[]);
+    let output = pionus(&["hook", "install"], repo.path(), &[]);
     assert!(output.status.success(), "{}", stderr(&output));
     output
 }
@@ -58,8 +58,8 @@ fn install_writes_an_executable_hook_calling_this_binary() {
     assert!(String::from_utf8_lossy(&output.stdout).starts_with("installed "));
 
     let script = fs::read_to_string(hook_path(&repo)).unwrap();
-    assert!(smart_commit::hook::is_ours(&script));
-    let binary = PathBuf::from(env!("CARGO_BIN_EXE_smart-commit"))
+    assert!(pionus::hook::is_ours(&script));
+    let binary = PathBuf::from(env!("CARGO_BIN_EXE_pionus"))
         .canonicalize()
         .unwrap();
     assert!(script.contains(&format!("'{}' hook run", binary.display())));
@@ -161,7 +161,7 @@ fn failures_warn_but_never_block_the_commit() {
     let output = repo.git_with(&["commit", "--quiet"], &env);
     assert!(output.status.success(), "{}", stderr(&output));
     assert!(
-        stderr(&output).contains("smart-commit: smart-commit is not set up yet"),
+        stderr(&output).contains("pionus: pionus is not set up yet"),
         "{}",
         stderr(&output)
     );
@@ -173,10 +173,10 @@ fn a_missing_binary_never_blocks_the_commit() {
     let repo = repo_with_hook();
     // The binary was uninstalled or moved: the hook points at nothing.
     let script = fs::read_to_string(hook_path(&repo)).unwrap();
-    let binary = PathBuf::from(env!("CARGO_BIN_EXE_smart-commit"))
+    let binary = PathBuf::from(env!("CARGO_BIN_EXE_pionus"))
         .canonicalize()
         .unwrap();
-    let gone = script.replace(&binary.display().to_string(), "/nonexistent/smart-commit");
+    let gone = script.replace(&binary.display().to_string(), "/nonexistent/pionus");
     assert_ne!(gone, script);
     fs::write(hook_path(&repo), gone).unwrap();
 
@@ -204,7 +204,7 @@ fn hook_can_record_a_trace_that_replays() {
         &[
             MOCK,
             reply("Add the entry point"),
-            ("SMART_COMMIT_TRACE", trace.to_str().unwrap()),
+            ("PIONUS_TRACE", trace.to_str().unwrap()),
             ACCEPT,
         ],
     );
@@ -221,21 +221,21 @@ fn existing_hooks_are_protected() {
     fs::create_dir_all(hook_path(&repo).parent().unwrap()).unwrap();
     fs::write(hook_path(&repo), foreign).unwrap();
 
-    let output = smart_commit(&["hook", "install"], repo.path(), &[]);
+    let output = pionus(&["hook", "install"], repo.path(), &[]);
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("use --force"));
-    let output = smart_commit(&["hook", "uninstall"], repo.path(), &[]);
+    let output = pionus(&["hook", "uninstall"], repo.path(), &[]);
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("leaving it alone"));
     assert_eq!(fs::read_to_string(hook_path(&repo)).unwrap(), foreign);
 
     // --force keeps the original as a backup, and uninstall restores it.
-    let output = smart_commit(&["hook", "install", "--force"], repo.path(), &[]);
+    let output = pionus(&["hook", "install", "--force"], repo.path(), &[]);
     assert!(output.status.success(), "{}", stderr(&output));
-    assert!(smart_commit::hook::is_ours(
+    assert!(pionus::hook::is_ours(
         &fs::read_to_string(hook_path(&repo)).unwrap()
     ));
-    let output = smart_commit(&["hook", "uninstall"], repo.path(), &[]);
+    let output = pionus(&["hook", "uninstall"], repo.path(), &[]);
     assert!(output.status.success(), "{}", stderr(&output));
     assert_eq!(fs::read_to_string(hook_path(&repo)).unwrap(), foreign);
 }
@@ -246,16 +246,12 @@ fn force_never_overwrites_an_earlier_backup() {
     let hooks = hook_path(&repo).parent().unwrap().to_path_buf();
     fs::create_dir_all(&hooks).unwrap();
     fs::write(hook_path(&repo), "#!/bin/sh\necho first\n").unwrap();
-    fs::write(
-        hooks.join("prepare-commit-msg.smart-commit-backup"),
-        "older",
-    )
-    .unwrap();
+    fs::write(hooks.join("prepare-commit-msg.pionus-backup"), "older").unwrap();
 
-    let output = smart_commit(&["hook", "install", "--force"], repo.path(), &[]);
+    let output = pionus(&["hook", "install", "--force"], repo.path(), &[]);
     assert_eq!(output.status.code(), Some(1));
     assert_eq!(
-        fs::read_to_string(hooks.join("prepare-commit-msg.smart-commit-backup")).unwrap(),
+        fs::read_to_string(hooks.join("prepare-commit-msg.pionus-backup")).unwrap(),
         "older"
     );
 }
@@ -263,7 +259,7 @@ fn force_never_overwrites_an_earlier_backup() {
 #[test]
 fn uninstall_without_a_hook_fails() {
     let repo = TestRepo::new();
-    let output = smart_commit(&["hook", "uninstall"], repo.path(), &[]);
+    let output = pionus(&["hook", "uninstall"], repo.path(), &[]);
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("no prepare-commit-msg hook"));
 }
@@ -274,14 +270,14 @@ fn install_honours_core_hooks_path() {
     repo.git(&["config", "core.hooksPath", "tools/hooks"]);
     install(&repo);
     let script = fs::read_to_string(repo.path().join("tools/hooks/prepare-commit-msg")).unwrap();
-    assert!(smart_commit::hook::is_ours(&script));
+    assert!(pionus::hook::is_ours(&script));
     assert!(!hook_path(&repo).exists());
 }
 
 #[test]
 fn broken_config_warns_but_never_blocks_the_commit() {
     let repo = repo_with_hook();
-    repo.write(".smart-commit.toml", "[style]\nconvention = \"klingon\"\n");
+    repo.write(".pionus.toml", "[style]\nconvention = \"klingon\"\n");
     let output = repo.git_with(
         &["commit", "--quiet"],
         &[

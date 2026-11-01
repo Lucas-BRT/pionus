@@ -26,7 +26,7 @@ pub async fn section() -> Result<impl View> {
                 "Two steps of starting "
                 <code>"llama-server"</code>
                 " are rarely needed for a 1 GB model: repacking the weights and fitting them to GPU memory. "
-                <code>"smart-commit bench"</code>
+                <code>"pionus bench"</code>
                 " keeps whichever is faster."
             </p>
             chart(

@@ -1,7 +1,7 @@
 """Scores the commit type of the models against more than the repository's own label (H13).
 
 `type_match` takes the real commit's type as the only right answer, but the same change can be a `fix` or a
-`feat`, a `chore` or a `build`. This reads the traces `sc-training compare` leaves for a set, and the Conventional
+`feat`, a `chore` or a `build`. This reads the traces `pionus-training compare` leaves for a set, and the Conventional
 commits among its meta lines, and reports, for each model:
 
 - `strict`: the type equals the label (the `type_match` of the scores);

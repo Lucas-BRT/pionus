@@ -32,7 +32,7 @@ pub async fn section() -> Result<impl View> {
                 terminal(
                     title: "~/projects/api",
                     label: "Committing with the hook installed",
-                    cmd("smart-commit hook install")
+                    cmd("pionus hook install")
                     cmd("git add .")
                     cmd("git commit")
                     note("the editor opens with the generated message")

@@ -29,7 +29,7 @@ RUN mkdir -p cli/src tools/src training/tools/src website/src \
         echo 'fn main() {}' >"$main"; \
     done \
     && : >cli/src/lib.rs && : >website/src/lib.rs \
-    && cargo build --profile website --locked -p smart-commit-website
+    && cargo build --profile website --locked -p pionus-website
 
 # The sources. Their modification times can be older than the stubs above, so
 # they are touched, or Cargo would keep the stubs' build.
@@ -44,8 +44,8 @@ COPY website/src website/src
 COPY website/assets website/assets
 COPY website/icons website/icons
 RUN find cli/src tools/src training/tools/src website/src website/build.rs -name '*.rs' -exec touch {} + \
-    && cargo build --profile website --locked -p smart-commit-website \
-    && cp target/website/smart-commit-website /server
+    && cargo build --profile website --locked -p pionus-website \
+    && cp target/website/pionus-website /server
 
 FROM scratch
 COPY --from=build /server /server

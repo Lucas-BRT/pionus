@@ -22,7 +22,7 @@ use crate::build_inputs::{conventional_type, fold_type};
 use crate::pytext::read_lines;
 use crate::score::{SCOPE, description, evidence, f1, ungrounded, unsupported};
 
-/// The longest subject, in columns, as in smart-commit.
+/// The longest subject, in columns, as in pionus.
 const SUBJECT_MAX: usize = 72;
 
 /// A history subject is repeated nearly when every word of the description,

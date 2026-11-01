@@ -1,6 +1,6 @@
-# smart-commit website
+# pionus website
 
-Marketing and documentation site for [smart-commit](https://github.com/Lucas-BRT/smart-commit),
+Marketing and documentation site for [pionus](https://github.com/Lucas-BRT/pionus),
 written in Rust with [Topcoat](https://github.com/tokio-rs/topcoat) (pinned to
 `=0.11.0`). Server-rendered HTML, one stylesheet, no JavaScript, no external
 fonts, CDNs or trackers. The site is dark only.
@@ -8,8 +8,8 @@ fonts, CDNs or trackers. The site is dark only.
 ## Run
 
 ```bash
-cargo run -p smart-commit-website                  # http://127.0.0.1:3000 (override with HOST and PORT)
-PORT=8080 cargo run -p smart-commit-website
+cargo run -p pionus-website                  # http://127.0.0.1:3000 (override with HOST and PORT)
+PORT=8080 cargo run -p pionus-website
 ```
 
 Topcoat's own dev server (rebuild and reload on change) is optional:
@@ -41,8 +41,8 @@ reverse proxy in front of it; the app only sets `Cache-Control` on the styleshee
 
 ```bash
 cargo fmt --check
-cargo clippy --all-targets -p smart-commit-website -- -D warnings
-cargo test -p smart-commit-website
+cargo clippy --all-targets -p pionus-website -- -D warnings
+cargo test -p pionus-website
 ```
 
 ## Layout

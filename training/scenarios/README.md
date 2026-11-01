@@ -7,18 +7,18 @@ mode changes or Portuguese, and whose targets were written by whoever made
 the commit.
 
 A case is data: a base repository, a list of operations, a target. Building
-it runs smart-commit's mock backend on the result and keeps the trace's
-inputs, so the cases come out in the format of `sc-training select`:
+it runs pionus's mock backend on the result and keeps the trace's
+inputs, so the cases come out in the format of `pionus-training select`:
 
 ```bash
-SC=../target/release/smart-commit
-SCT=../target/release/sc-training   # cargo build --locked --release -p smart-commit-training
+SC=../target/release/pionus
+SCT=../target/release/pionus-training   # cargo build --locked --release -p pionus-training
 $SCT scenarios list                      # cases per level and split
 $SCT scenarios build data/scenarios-eval $SC --split eval
 $SCT scenarios build data/scenarios-train $SC --split train
 
 # Evaluate, like eval-v1: one section per level besides free/conventional.
-XDG_CONFIG_HOME=$C/empty-config SMART_COMMIT_GGUF=... \
+XDG_CONFIG_HOME=$C/empty-config PIONUS_GGUF=... \
   $SC eval data/scenarios-eval/inputs.jsonl --device vulkan > data/scenarios-eval/h1.jsonl
 $SCT score data/scenarios-eval data/scenarios-eval/h1.jsonl
 
@@ -27,7 +27,7 @@ $SCT make-examples data/scenarios-train $SC
 cat data/h1/examples.jsonl data/scenarios-train/examples.jsonl > data/h1s/examples.jsonl
 ```
 
-`cargo test --locked -p smart-commit-training` checks the cases and the
+`cargo test --locked -p pionus-training` checks the cases and the
 builder; with `-- --ignored` (and `cargo build` first) it also builds everything
 twice, requiring identical files.
 
@@ -64,7 +64,7 @@ so the hashes are the same on every machine.
 | `cafeteria` | Python, Portuguese identifiers | free, Portuguese, informal |
 | `ledger` | TypeScript | Conventional Commits with scopes, English |
 
-`sc-training scenarios show DIR --repo cafeteria` leaves a base repository in
+`pionus-training scenarios show DIR --repo cafeteria` leaves a base repository in
 DIR, and `show DIR --case ID` a case applied on it, to look at while
 writing cases.
 
@@ -97,12 +97,12 @@ tags = ["rename"]
 The top of a case file can set `level`, `repo` and `split` for all its
 cases. Other fields: `stage` (`all`, the default, runs `git add -A` after
 the operations; `none` leaves staging to them), `history = false` (the
-files with no commit, for a first commit), `outcome = "error"` (smart-commit
+files with no commit, for a first commit), `outcome = "error"` (pionus
 must refuse, e.g. nothing staged) and `issue` (a known bug: the build
 reports the case instead of failing).
 
 `expect` patterns are regular expressions matched on the subject in
-lowercase without accents; `sc-training score` reports them as `expected`. `{{name}}`
+lowercase without accents; `pionus-training score` reports them as `expected`. `{{name}}`
 is replaced only in cases with variants, so code keeps its own braces.
 
 ## Operations

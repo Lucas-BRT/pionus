@@ -1,10 +1,10 @@
 //! Builds the commit scenarios of `scenarios/` (see `scenarios.rs`).
 //!
 //! `build` writes DIR/inputs.jsonl and DIR/meta.jsonl, the layout of
-//! `select`'s output: `sc-training make-examples DIR SMART_COMMIT` makes training
-//! examples of them, `smart-commit eval DIR/inputs.jsonl` and `score DIR`
+//! `select`'s output: `pionus-training make-examples DIR PIONUS` makes training
+//! examples of them, `pionus eval DIR/inputs.jsonl` and `score DIR`
 //! evaluate a model on them. A case whose outcome differs from the expected
-//! one (smart-commit refuses to generate, or generates when it should
+//! one (pionus refuses to generate, or generates when it should
 //! refuse) fails the build, unless the case documents it as a known `issue`.
 //!
 //! `show` leaves a base repository, or a case applied on it, in DIR to look

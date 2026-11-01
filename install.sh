@@ -1,39 +1,39 @@
 #!/usr/bin/env bash
-# Installs smart-commit from its GitHub releases, without sudo, then runs the
+# Installs pionus from its GitHub releases, without sudo, then runs the
 # guided setup (drivers, models and the benchmark that picks the device).
 #
-#   curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash
 #
 # Options (after `bash -s --` when piping):
 #   --version X.Y.Z  install that release instead of the latest
 #   --prefix DIR     install in DIR/bin and DIR/share (default: ~/.local)
-#   --no-setup       only install; run `smart-commit setup` later
+#   --no-setup       only install; run `pionus setup` later
 #   --update         install the release only if it is not the version
 #                    installed, without the setup; llama.cpp, if installed,
 #                    follows the build the new release pins (no sudo).
-#                    `smart-commit update` runs this
+#                    `pionus update` runs this
 #   --verify         also verify the build provenance (a GitHub attestation)
 #                    with `gh attestation verify`; needs the GitHub CLI, and
 #                    releases up to 0.14.0 have none
 #   --yes            answer yes to the setup's questions
-#   --uninstall      remove smart-commit (models, caches and config are kept)
+#   --uninstall      remove pionus (models, caches and config are kept)
 #   --purge          --uninstall, and also the models, llama.cpp, the
 #                    benchmark, the caches and the configuration
-#                    (`smart-commit uninstall` runs this)
-#   --system         --uninstall, and also OpenVINO, if smart-commit's setup
+#                    (`pionus uninstall` runs this)
+#   --system         --uninstall, and also OpenVINO, if pionus's setup
 #                    installed it (/opt/intel, /etc/ld.so.conf.d; uses sudo,
 #                    asks first unless --yes). Driver packages are kept.
 #
 # The download is checked against the release's SHA256SUMS.
-# SMART_COMMIT_RELEASE_BASE overrides where releases are downloaded from;
-# SMART_COMMIT_SYSTEM_ROOT (a directory standing for /) and
-# SMART_COMMIT_SUDO (the command instead of sudo), SMART_COMMIT_OS_RELEASE
-# (the os-release file the git hint reads) and SMART_COMMIT_GETCONF (the
+# PIONUS_RELEASE_BASE overrides where releases are downloaded from;
+# PIONUS_SYSTEM_ROOT (a directory standing for /) and
+# PIONUS_SUDO (the command instead of sudo), PIONUS_OS_RELEASE
+# (the os-release file the git hint reads) and PIONUS_GETCONF (the
 # command that reports the C library) are for tests.
 set -euo pipefail
 
-BASE=${SMART_COMMIT_RELEASE_BASE:-https://github.com/Lucas-BRT/smart-commit/releases}
-ASSET=smart-commit-x86_64-unknown-linux-gnu.tar.gz
+BASE=${PIONUS_RELEASE_BASE:-https://github.com/Lucas-BRT/pionus/releases}
+ASSET=pionus-x86_64-unknown-linux-gnu.tar.gz
 PREFIX=$HOME/.local
 VERSION=latest
 SETUP=1
@@ -87,8 +87,8 @@ done
 
 say() { printf '==> %s\n' "$*"; }
 
-# What the release puts in share/smart-commit. With the default prefix that
-# directory is also $XDG_DATA_HOME/smart-commit, where the setup keeps the
+# What the release puts in share/pionus. With the default prefix that
+# directory is also $XDG_DATA_HOME/pionus, where the setup keeps the
 # models, llama.cpp and the benchmark: only these entries are ever replaced
 # or removed.
 RELEASE_FILES=(scripts VERSION)
@@ -96,12 +96,12 @@ RELEASE_FILES=(scripts VERSION)
 # remove_release: the files this script installed, and nothing else.
 remove_release() {
     local entry
-    rm -f "$PREFIX/bin/smart-commit"
+    rm -f "$PREFIX/bin/pionus"
     for entry in "${RELEASE_FILES[@]}"; do
-        rm -rf "${PREFIX:?}/share/smart-commit/$entry"
+        rm -rf "${PREFIX:?}/share/pionus/$entry"
     done
-    rmdir "$PREFIX/share/smart-commit" 2>/dev/null || true
-    rm -rf "${PREFIX:?}/share/doc/smart-commit"
+    rmdir "$PREFIX/share/pionus" 2>/dev/null || true
+    rm -rf "${PREFIX:?}/share/doc/pionus"
 }
 die() {
     echo "error: $*" >&2
@@ -125,12 +125,12 @@ ask() {
 # file marks an install of ours; without it nothing is touched, so an
 # OpenVINO installed some other way stays.
 remove_openvino() {
-    local root=${SMART_COMMIT_SYSTEM_ROOT:-}
-    local sudo=${SMART_COMMIT_SUDO-sudo}
-    local conf=$root/etc/ld.so.conf.d/smart-commit-openvino.conf
+    local root=${PIONUS_SYSTEM_ROOT:-}
+    local sudo=${PIONUS_SUDO-sudo}
+    local conf=$root/etc/ld.so.conf.d/pionus-openvino.conf
     local link=$root/opt/intel/openvino target=
     if [ ! -e "$conf" ]; then
-        say "no OpenVINO installed by smart-commit; nothing to remove"
+        say "no OpenVINO installed by pionus; nothing to remove"
         return
     fi
     if [ -L "$link" ]; then
@@ -140,7 +140,7 @@ remove_openvino() {
             *) target= ;;
         esac
     fi
-    say "OpenVINO installed by smart-commit's setup:"
+    say "OpenVINO installed by pionus's setup:"
     echo "  $conf"
     [ -L "$link" ] && echo "  $link"
     [ -n "$target" ] && echo "  $target"
@@ -156,10 +156,10 @@ remove_openvino() {
 
 if [ "$UNINSTALL" = 1 ]; then
     remove_release
-    say "removed smart-commit from $PREFIX"
-    data=${XDG_DATA_HOME:-$HOME/.local/share}/smart-commit
-    cache=${XDG_CACHE_HOME:-$HOME/.cache}/smart-commit
-    config=${XDG_CONFIG_HOME:-$HOME/.config}/smart-commit
+    say "removed pionus from $PREFIX"
+    data=${XDG_DATA_HOME:-$HOME/.local/share}/pionus
+    cache=${XDG_CACHE_HOME:-$HOME/.cache}/pionus
+    config=${XDG_CONFIG_HOME:-$HOME/.config}/pionus
     if [ "$PURGE" = 1 ]; then
         rm -rf "${data:?}" "${cache:?}" "${config:?}"
         say "removed the models, llama.cpp, the benchmark, the caches and the configuration"
@@ -174,13 +174,13 @@ if [ "$UNINSTALL" = 1 ]; then
     fi
     echo "Kept: driver packages (Intel NPU driver, Level Zero, Intel's compute runtime,"
     echo "Vulkan drivers) and render group membership; other programs may use them."
-    echo "Repositories with the hook keep it; \`smart-commit hook uninstall\` needs the binary,"
+    echo "Repositories with the hook keep it; \`pionus hook uninstall\` needs the binary,"
     echo "so remove .git/hooks/prepare-commit-msg by hand there."
     exit 0
 fi
 
-[ "$(uname -s)" = Linux ] || die "smart-commit runs on Linux only"
-[ "$(uname -m)" = x86_64 ] || die "smart-commit releases are built for x86_64 only"
+[ "$(uname -s)" = Linux ] || die "pionus runs on Linux only"
+[ "$(uname -m)" = x86_64 ] || die "pionus releases are built for x86_64 only"
 for tool in curl tar gzip sha256sum; do
     command -v "$tool" >/dev/null || die "$tool is required"
 done
@@ -188,10 +188,10 @@ done
 # preflight: what the release and the setup need, said before downloading.
 preflight() {
     local id='' id_like='' hint='install git' line libc found free dir
-    local osr=${SMART_COMMIT_OS_RELEASE:-/etc/os-release}
+    local osr=${PIONUS_OS_RELEASE:-/etc/os-release}
     if ! command -v git >/dev/null; then
         if [ "$UPDATE" = 1 ]; then
-            echo "warning: git is not installed; smart-commit needs it to read repositories." >&2
+            echo "warning: git is not installed; pionus needs it to read repositories." >&2
         else
             if [ -r "$osr" ]; then
                 line=$(grep '^ID=' "$osr" || true)
@@ -207,20 +207,20 @@ preflight() {
                 *" arch "*) hint='run: sudo pacman -S git' ;;
                 *suse*) hint='run: sudo zypper install git' ;;
             esac
-            die "git is required (smart-commit reads your repository with it); $hint"
+            die "git is required (pionus reads your repository with it); $hint"
         fi
     fi
 
-    libc=$(${SMART_COMMIT_GETCONF:-getconf} GNU_LIBC_VERSION 2>/dev/null || true)
+    libc=$(${PIONUS_GETCONF:-getconf} GNU_LIBC_VERSION 2>/dev/null || true)
     case $libc in
         "glibc "*)
             found=${libc#glibc }
             if [ "$(printf '%s\n%s\n' "$MIN_GLIBC" "$found" | sort -V | head -n 1)" != "$MIN_GLIBC" ]; then
-                die "smart-commit's release needs glibc $MIN_GLIBC or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+...); this system has glibc $found."
+                die "pionus's release needs glibc $MIN_GLIBC or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+...); this system has glibc $found."
             fi
             ;;
         *)
-            die "smart-commit's release needs glibc $MIN_GLIBC or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+...); this system does not use glibc (musl, Alpine?)."
+            die "pionus's release needs glibc $MIN_GLIBC or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+...); this system does not use glibc (musl, Alpine?)."
             ;;
     esac
 
@@ -252,7 +252,7 @@ curl -fsL --retry 3 -o "$work/SHA256SUMS" "$url/SHA256SUMS"
 if [ "$VERIFY" = 1 ]; then
     command -v gh >/dev/null || die "--verify needs the GitHub CLI: https://cli.github.com"
     say "verifying the build provenance"
-    if ! attestation=$(gh attestation verify "$work/$ASSET" --repo Lucas-BRT/smart-commit 2>&1); then
+    if ! attestation=$(gh attestation verify "$work/$ASSET" --repo Lucas-BRT/pionus 2>&1); then
         printf '%s\n' "$attestation" >&2
         case $attestation in
             *[Nn]o\ attestation*) die "no attestation: releases up to 0.14.0 have none" ;;
@@ -262,27 +262,27 @@ if [ "$VERIFY" = 1 ]; then
 fi
 
 tar -xzf "$work/$ASSET" -C "$work"
-src=$work/smart-commit-x86_64-unknown-linux-gnu
-new=$(cat "$src/share/smart-commit/VERSION")
-old=$(cat "$PREFIX/share/smart-commit/VERSION" 2>/dev/null || true)
+src=$work/pionus-x86_64-unknown-linux-gnu
+new=$(cat "$src/share/pionus/VERSION")
+old=$(cat "$PREFIX/share/pionus/VERSION" 2>/dev/null || true)
 if [ "$UPDATE" = 1 ] && [ "$new" = "$old" ]; then
-    say "smart-commit $old is already the latest release"
+    say "pionus $old is already the latest release"
     exit 0
 fi
 remove_release
-mkdir -p "$PREFIX/bin" "$PREFIX/share/smart-commit" "$PREFIX/share/doc"
-install -m 755 "$src/bin/smart-commit" "$PREFIX/bin/smart-commit"
+mkdir -p "$PREFIX/bin" "$PREFIX/share/pionus" "$PREFIX/share/doc"
+install -m 755 "$src/bin/pionus" "$PREFIX/bin/pionus"
 for entry in "${RELEASE_FILES[@]}"; do
-    cp -R "$src/share/smart-commit/$entry" "$PREFIX/share/smart-commit/$entry"
+    cp -R "$src/share/pionus/$entry" "$PREFIX/share/pionus/$entry"
 done
-cp -R "$src/share/doc/smart-commit" "$PREFIX/share/doc/smart-commit"
-say "installed $("$PREFIX/bin/smart-commit" --version) in $PREFIX"
+cp -R "$src/share/doc/pionus" "$PREFIX/share/doc/pionus"
+say "installed $("$PREFIX/bin/pionus" --version) in $PREFIX"
 if [ "$UPDATE" = 1 ]; then
     [ -n "$old" ] && say "updated from $old"
     # The new binary looks for the llama.cpp build its release pins; it
     # does nothing when that build is already there.
-    if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/smart-commit/llama.cpp" ]; then
-        "$PREFIX/bin/smart-commit" setup --llamacpp-only
+    if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/pionus/llama.cpp" ]; then
+        "$PREFIX/bin/pionus" setup --llamacpp-only
     fi
 fi
 
@@ -308,7 +308,7 @@ path_note() {
     case $file in
         "$HOME"/*) file=\~/${file#"$HOME"/} ;;
     esac
-    echo "note: $PREFIX/bin is not on your PATH, so \`smart-commit\` is not found yet."
+    echo "note: $PREFIX/bin is not on your PATH, so \`pionus\` is not found yet."
     echo "  Add this line to $file:"
     echo "    $line"
     echo "  Then open a new terminal, or run that line now."
@@ -320,21 +320,21 @@ case ":$PATH:" in
 esac
 
 if [ "$SETUP" = 1 ]; then
-    # With a terminal, `smart-commit setup` opens the full-screen setup (or
+    # With a terminal, `pionus setup` opens the full-screen setup (or
     # asks its questions, with --yes it asks none); with curl | bash, stdin is
     # the pipe, so it is given the terminal instead.
     if { : </dev/tty; } 2>/dev/null; then
-        "$PREFIX/bin/smart-commit" setup "${setup_args[@]}" </dev/tty
+        "$PREFIX/bin/pionus" setup "${setup_args[@]}" </dev/tty
     else
-        "$PREFIX/bin/smart-commit" setup "${setup_args[@]}"
+        "$PREFIX/bin/pionus" setup "${setup_args[@]}"
     fi
 elif [ "$UPDATE" = 0 ]; then
     # The name that works in this shell: the bare one only when it is the
     # binary just installed.
-    if [ "$(command -v smart-commit 2>/dev/null)" = "$PREFIX/bin/smart-commit" ]; then
-        next=smart-commit
+    if [ "$(command -v pionus 2>/dev/null)" = "$PREFIX/bin/pionus" ]; then
+        next=pionus
     else
-        next=$PREFIX/bin/smart-commit
+        next=$PREFIX/bin/pionus
     fi
     echo "Next: run \`$next setup\` to set up the devices and models."
 fi

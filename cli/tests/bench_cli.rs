@@ -1,16 +1,16 @@
-//! `smart-commit bench` and `smart-commit device`, without hardware: devices
+//! `pionus bench` and `pionus device`, without hardware: devices
 //! are unavailable (no models), and saved reports are written by hand.
 
 use std::fs;
 use std::path::Path;
 use std::process::Output;
 
-use smart_commit::backend::device::Target;
-use smart_commit::bench::{self, Entry, FastLoadTrial, Machine, Measurement, Report};
+use pionus::backend::device::Target;
+use pionus::bench::{self, Entry, FastLoadTrial, Machine, Measurement, Report};
 use tempfile::TempDir;
 
 mod common;
-use common::{FakeMachine, TestRepo, smart_commit};
+use common::{FakeMachine, TestRepo, pionus};
 
 struct Home {
     config: TempDir,
@@ -39,11 +39,11 @@ impl Home {
             ("XDG_DATA_HOME", self.data.path().to_str().unwrap()),
         ];
         env.extend(machine.iter().map(|(name, value)| (*name, value.as_str())));
-        smart_commit(args, dir, &env)
+        pionus(args, dir, &env)
     }
 
     fn bench_file(&self) -> std::path::PathBuf {
-        self.data.path().join("smart-commit/bench.json")
+        self.data.path().join("pionus/bench.json")
     }
 
     /// Saves a report where `per_message` is None for unavailable devices.
@@ -211,9 +211,7 @@ fn device_shows_the_fastest_as_selected() {
         "{out}"
     );
     assert!(
-        out.contains(
-            "smart-commit will use intel-gpu on this machine (~1.8 s per message): the fastest"
-        ),
+        out.contains("pionus will use intel-gpu on this machine (~1.8 s per message): the fastest"),
         "{out}"
     );
 }
@@ -255,7 +253,7 @@ fn device_use_changes_the_global_config_and_shows_the_estimate() {
 fn the_old_gpu_name_in_the_config_still_works_with_a_warning() {
     let home = Home::new();
     let dir = TempDir::new().unwrap();
-    let config = home.config.path().join("smart-commit/config.toml");
+    let config = home.config.path().join("pionus/config.toml");
     fs::create_dir_all(config.parent().unwrap()).unwrap();
     fs::write(&config, "[model]\ndevice = \"gpu\"\n").unwrap();
     home.save_report(&[(Target::IntelGpu, Some(1800.0))]);
@@ -269,7 +267,7 @@ fn the_old_gpu_name_in_the_config_still_works_with_a_warning() {
     let err = stderr(&output);
     assert!(
         err.starts_with("warning: model.device = gpu (global ")
-            && err.contains("`smart-commit config set model.device intel-gpu` renames it"),
+            && err.contains("`pionus config set model.device intel-gpu` renames it"),
         "{err}"
     );
 

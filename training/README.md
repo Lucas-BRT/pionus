@@ -1,11 +1,11 @@
 # Training pipeline
 
-Exploratory work toward smart-commit's own models; see
+Exploratory work toward pionus's own models; see
 [docs/training.md](../docs/training.md) for the goal and the decisions, and
 [HYPOTHESES.md](HYPOTHESES.md) for what was tried and measured.
 
 Everything runs on the training machine (RTX 3050 8 GB). Large files live
-outside the repository, in `~/.cache/smart-commit-training/`, and in
+outside the repository, in `~/.cache/pionus-training/`, and in
 `data/` and `runs/` here (ignored by git).
 
 ## Environment
@@ -27,26 +27,26 @@ python -I test_cascade_bench.py                        # H15's timing of the cas
 python -I test_audit_types.py                          # H17's audit set of acceptable types; see its docstring
 python -I test_pair_judge.py                           # H18's blind pairwise judge of the messages; see its docstring
 python -I test_common.py                              # the bootstrap and the subject type the analysis scripts share
-cargo build --locked --release -p smart-commit-training   # sc-training: the data tools, in Rust
-cargo test --locked -p smart-commit-training              # -U1 trimming against git, scoring, the scenarios
-cargo build --locked && cargo test --locked -p smart-commit-training -- --ignored   # every scenario, built twice
+cargo build --locked --release -p pionus-training   # pionus-training: the data tools, in Rust
+cargo test --locked -p pionus-training              # -U1 trimming against git, scoring, the scenarios
+cargo build --locked && cargo test --locked -p pionus-training -- --ignored   # every scenario, built twice
 ```
 
 ## Inputs
 
 | What | Pinned by |
 |---|---|
-| CommitChronicle | revision `5fd076e67b812a9f3d1999e5e40f71715f84bb51`, shards under `~/.cache/smart-commit-training/commit-chronicle/5fd076e/` |
+| CommitChronicle | revision `5fd076e67b812a9f3d1999e5e40f71715f84bb51`, shards under `~/.cache/pionus-training/commit-chronicle/5fd076e/` |
 | Qwen2.5-Coder-1.5B-Instruct | revision `2e1fd397ee46e1388853d2af2c993145b0f1098a` (the one `scripts/export-model.sh` pins) |
-| llama.cpp | `b11381` (the build smart-commit installs; source tarball sha256 `c07a6aeb3003f40159e336ba548593052288615dabe9f17b1341d512dc278927`) |
+| llama.cpp | `b11381` (the build pionus installs; source tarball sha256 `c07a6aeb3003f40159e336ba548593052288615dabe9f17b1341d512dc278927`) |
 
 ## Steps
 
 ```bash
-C=~/.cache/smart-commit-training
+C=~/.cache/pionus-training
 M=$C/models/qwen2.5-coder-1.5b-instruct@2e1fd397ee46e1388853d2af2c993145b0f1098a
-SC=../target/release/smart-commit        # cargo build --locked --release
-SCT=../target/release/sc-training        # cargo build --locked --release -p smart-commit-training
+SC=../target/release/pionus        # cargo build --locked --release
+SCT=../target/release/pionus-training        # cargo build --locked --release -p pionus-training
 
 # 1. Commits -> trace inputs + targets (one directory per set of shards).
 $SCT build-inputs data/train12 $C/commit-chronicle/5fd076e/train-000*.parquet
@@ -73,8 +73,8 @@ $SCT select data/releases data/h7 --conventional 400 --free 200 \
 # h3a (H3): the same commits without the targets the label filters reject.
 $SCT filter-supported data/h1 data/h3a
 
-# 3. Prompts built by smart-commit, joined with the targets (`--rules omitted`
-#    for a model trained without the fixed instructions, H6). smart-commit's
+# 3. Prompts built by pionus, joined with the targets (`--rules omitted`
+#    for a model trained without the fixed instructions, H6). pionus's
 #    file list is annotated by default since #10/#11, and every model so far
 #    was trained on the plain one: make-examples passes `--rules` and `--diff`
 #    always, plain by default, and `--diff annotated` builds the other (the
@@ -89,25 +89,25 @@ uv run --locked python -I train.py data/h1/examples.jsonl $M runs/h1 --quant 16b
 
 # 5. Merge and quantize like the upstream GGUF.
 uv run --locked python -I export_gguf.py $M runs/h1/model-q4_k_m.gguf --adapter runs/h1/adapter \
-  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/smart-commit/llama.cpp/llama-b11381
+  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/pionus/llama.cpp/llama-b11381
 
 # 5b. Or keep the upstream GGUF and apply the adapter on it (no re-quantization noise).
 uv run --locked python -I export_lora.py $M runs/h1/adapter runs/h1/adapter.gguf \
   --llama-src $C/llama.cpp-src/llama.cpp-b11381
-#     then run step 6 with, instead of SMART_COMMIT_GGUF:
-#     SMART_COMMIT_LLAMA_SERVER=$PWD/llama-server-lora.sh LORA_GGUF=$PWD/runs/h1/adapter.gguf \
-#     LORA_SERVER=~/.local/share/smart-commit/llama.cpp/llama-b11381/llama-server
+#     then run step 6 with, instead of PIONUS_GGUF:
+#     PIONUS_LLAMA_SERVER=$PWD/llama-server-lora.sh LORA_GGUF=$PWD/runs/h1/adapter.gguf \
+#     LORA_SERVER=~/.local/share/pionus/llama.cpp/llama-b11381/llama-server
 #     (traces then name the base model only: the adapter is not recorded).
 
-# 6. Evaluate with smart-commit itself, then score.
-XDG_CONFIG_HOME=$C/empty-config SMART_COMMIT_GGUF=$PWD/runs/h1/model-q4_k_m.gguf \
+# 6. Evaluate with pionus itself, then score.
+XDG_CONFIG_HOME=$C/empty-config PIONUS_GGUF=$PWD/runs/h1/model-q4_k_m.gguf \
   $SC eval data/eval-v1/inputs.jsonl --device vulkan > data/eval-v1/h1.jsonl
 $SCT score data/eval-v1 data/eval-v1/h1.jsonl
 ```
 
 `data/eval-v1` is frozen: it was built and selected with the
 `build_inputs.py` and `select.py` of commit 35a1ae8, before the version-only
-filter, which today's scripts apply; today's `sc-training select` alone gives other
+filter, which today's scripts apply; today's `pionus-training select` alone gives other
 hashes. It is identified by its hashes, `inputs.jsonl` sha256 `6d275f0d92c607e5f80cc3be204d5a8a4444391e029abc907eb311b3f29e428c`,
 `meta.jsonl` sha256 `9b8d53df9863d6b214c53d2de2839ce18f26fc088d9a3e8a2f84202a44e0faaf`.
 To rebuild it:
@@ -122,8 +122,8 @@ sha256sum data/eval-v1/*.jsonl
 ```
 
 `data/eval-short` (young repositories, see H5 in HYPOTHESES.md):
-`sc-training select data/test2to5h data/eval-short --conventional 100 --free 150
---min-history 1 --max-history 5 --per-repo 5`, from `sc-training build-inputs` over
+`pionus-training select data/test2to5h data/eval-short --conventional 100 --free 150
+--min-history 1 --max-history 5 --per-repo 5`, from `pionus-training build-inputs` over
 `test-00002`…`test-00005`; `inputs.jsonl` sha256 starts `42d212c0d2687dad`,
 `meta.jsonl` `867c9faf4c5e80bd`.
 
@@ -140,15 +140,15 @@ the validation set's `f6350a3c5cb71b58` (b2's).
 `513484be87384cf5`; `data/h7` `4c6a2cad2087a047` and `a35b23326e894b96`.
 
 `data/val1` (the validation set of b2) is
-`sc-training select data/test1 data/val1 --conventional 250 --free 250 --max-type-share 0.3 --supported-only`
+`pionus-training select data/test1 data/val1 --conventional 250 --free 250 --max-type-share 0.3 --supported-only`
 (`meta.jsonl` sha256 starts `2fb1dedba6e20939`; `val1-h4` is the same with
-the history paths, as `sc-training select` writes it today).
+the history paths, as `pionus-training select` writes it today).
 
 ## Preference pairs (DPO)
 
 What SFT never shows the model is what not to write: a history subject copied,
 a vague description, an invented detail, a wrong type. The pairs for DPO come
-from the model's own samples, judged by the checks of `sc-training score`: a
+from the model's own samples, judged by the checks of `pionus-training score`: a
 Conventional header, 72 columns, a history subject copied or nearly, a specific
 found nowhere in the diff, a description sharing no word with it and, for
 Conventional repositories, a scope the history never used (the prompt asks to
@@ -167,7 +167,7 @@ came from 20 repositories); the second run takes them from `data/train-all`,
 without the commits the SFT trained on.
 `mine_pairs.py` drops the commits of the evaluation sets' repositories
 (`data/eval-v1`, `data/eval-short`), so none of them reaches the pairs.
-`sc-training select` does the same before choosing, so the per-repository
+`pionus-training select` does the same before choosing, so the per-repository
 caps count what is left, with `--exclude-repos-of DIR...`; and
 `--exclude-hashes-of DIR...` leaves out the commits of other selections, such
 as `data/curve`, which the SFT trained on: `select` ranks by a hash of the
@@ -176,9 +176,9 @@ commit, so without it a small cap per repository picks those very commits.
 The first run, on the local GPU, from the test split:
 
 ```bash
-SCT=../target/release/sc-training
-SC=../target/release/smart-commit
-LLAMA=~/.local/share/smart-commit/llama.cpp/llama-b11381/llama-server
+SCT=../target/release/pionus-training
+SC=../target/release/pionus
+LLAMA=~/.local/share/pionus/llama.cpp/llama-b11381/llama-server
 SRC=data/test2to5h                      # or another split the model did not see
 mkdir -p data/dpo/mix
 # 1. Inputs: young repositories apart, since the prompt has their short history.
@@ -192,7 +192,7 @@ cat data/dpo/pool/meta.jsonl   data/dpo/young/meta.jsonl   > data/dpo/mix/meta.j
 #    (v0.1: `--rules full --diff plain`). Stopped, it resumes where it was.
 for size in 0.5b 1.5b; do
   python -I mine_pairs.py data/dpo/mix data/dpo/mined-$size \
-    ~/.local/share/smart-commit/models/smart-commit-$size-v0.1-q4_k_m.gguf \
+    ~/.local/share/pionus/models/pionus-$size-v0.1-q4_k_m.gguf \
     --binary $SC --server $LLAMA --device Vulkan0 --rules full --diff plain --samples 4 --workers 2 \
     --exclude-repos-of data/eval-v1 data/eval-short
 done
@@ -249,13 +249,13 @@ the bundle of the run, and is changed to it before pushing:
 
 ```bash
 K=$(mktemp -d)
-cp kaggle_dpo.ipynb $K/smart-commit-dpo.ipynb
+cp kaggle_dpo.ipynb $K/pionus-dpo.ipynb
 sed 's#training-dpo2-sweep2#training-NAME-OF-THE-BUNDLE#' kaggle/dpo-kernel-metadata.json > $K/kernel-metadata.json
-kaggle kernels push -p $K        # then: kaggle kernels status lucasbrt/smart-commit-dpo
+kaggle kernels push -p $K        # then: kaggle kernels status lucasbrt/pionus-dpo
 ```
 
 The same mining on two T4s, when the local GPU is busy: the prompts are built
-here, without a GPU, and only the sampling runs there. `sc-training kaggle-bundle mine`
+here, without a GPU, and only the sampling runs there. `pionus-training kaggle-bundle mine`
 splits the inputs into shards (every Nth input to each), pins what the
 notebook downloads (llama.cpp's CUDA 12.8 build by SHA-256, the models by the
 revision and SHA-256 of `cli/src/models/registry.rs`) and orders the jobs, a model
@@ -297,7 +297,7 @@ minute, not after an hour), and packs a job as soon as it ends.
 
 ### Balancing the pairs
 
-`sc-training balance` turns the pairs of the models' shards into the training
+`pionus-training balance` turns the pairs of the models' shards into the training
 and validation sets. The validation set is every pair of about a tenth of the
 repositories (chosen by a hash of the repository, so it does not depend on the
 order of the files); the training set takes at most `--max-per-repo` pairs per
@@ -344,13 +344,13 @@ M=$C/models/qwen2.5-coder-0.5b-instruct@ea3f2471cf1b1f0db85067f1ef93848e38e88c25
 uv run --locked python -I train_dpo.py data/dpo/pairs-0.5b.jsonl $M \
   runs/kaggle-v2/c40k-0.5b/adapter runs/dpo-0.5b --merged runs/dpo-0.5b/merged
 uv run --locked python -I export_gguf.py runs/dpo-0.5b/merged runs/dpo-0.5b/model-q4_k_m.gguf \
-  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/smart-commit/llama.cpp/llama-b11381
+  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/pionus/llama.cpp/llama-b11381
 ```
 
 The merged model is the `BASE_DIR` of step 5, without `--adapter`. Then step 6
 as for any model.
 
-On Kaggle (a T4 has no bf16, so `--dtype fp16`) `sc-training kaggle-bundle dpo` packs
+On Kaggle (a T4 has no bf16, so `--dtype fp16`) `pionus-training kaggle-bundle dpo` packs
 the runs, each with its adapter's two files, its pairs and its validation
 pairs, and `kaggle_dpo.ipynb` runs them, one per GPU, packing each as soon as
 it ends. A run is `NAME=MODEL:SFT_ADAPTER:TRAIN:VAL[:ARGS]`:
@@ -365,7 +365,7 @@ $SCT kaggle-bundle dpo data/kaggle/dpo2-train \
 # the adapter is trained on the merged SFT model, so both are merged, in that order:
 uv run --locked python -I export_gguf.py $M runs/kaggle-dpo2/b01-0.5b/model-q4_k_m.gguf \
   --adapter runs/kaggle-v2/c40k-0.5b/adapter --adapter runs/kaggle-dpo2/b01-0.5b/adapter \
-  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/smart-commit/llama.cpp/llama-b11381
+  --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/pionus/llama.cpp/llama-b11381
 ```
 
 Merging the two adapters one after the other gives the very weights `--merged`
@@ -373,9 +373,9 @@ wrote (checked: the largest difference is 0.0).
 
 To choose among runs, `export_runs.py` exports every run of a directory (the SFT
 adapter, then the run's, one GGUF each, kept) and prints `NAME=GGUF` for them,
-and `sc-training compare` evaluates each model on the
+and `pionus-training compare` evaluates each model on the
 validation set (`data/val1`: its repositories are in none of the pairs) with
-`smart-commit eval`, keeps the traces (`OUT/SET/NAME.jsonl`, with a `NAME.key` of the file's path,
+`pionus eval`, keeps the traces (`OUT/SET/NAME.jsonl`, with a `NAME.key` of the file's path,
 size and time and the settings: they are made again if either changes under the same name) and
 prints the metrics of each and, for
 each, the cases it gains and loses against the baseline, net of the direction
@@ -390,7 +390,7 @@ only these show it. `--read 30` prints that many cases side by side (half
 Conventional, the same whatever the models): what no metric counts is seen
 there. A candidate costs
 about two minutes of GPU on 500 inputs. The hand-written scenarios
-(`sc-training scenarios build data/scenarios-eval $SC --split eval`, 43 cases,
+(`pionus-training scenarios build data/scenarios-eval $SC --split eval`, 43 cases,
 14 Conventional) are a second set for the same purpose: small, so they confirm
 more than they decide, and they add the column `expected`, the share of cases
 whose message matches the patterns written for them. The evaluation sets
@@ -400,47 +400,47 @@ whose message matches the patterns written for them. The evaluation sets
 $SCT compare runs/compare $SC --sets data/val1 data/scenarios-eval --read 30 \
   --baseline sft=runs/kaggle-v2/c40k-0.5b/model-q4_k_m.gguf \
   $(uv run --locked python -I export_runs.py $M runs/kaggle-v2/c40k-0.5b/adapter runs/kaggle-dpo2 \
-      --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/smart-commit/llama.cpp/llama-b11381)
+      --llama-src $C/llama.cpp-src/llama.cpp-b11381 --llama-bin ~/.local/share/pionus/llama.cpp/llama-b11381)
 ```
 
 ## Continuing from another machine
 
 Git has the code, the documentation, the notebooks and the fixtures. It does not have what is
-ignored: `training/data/`, `training/runs/`, `target/` and `~/.cache/smart-commit-training/` (the base
+ignored: `training/data/`, `training/runs/`, `target/` and `~/.cache/pionus-training/` (the base
 models, CommitChronicle, the llama.cpp sources). What was made of them is kept in private places:
 
 | What | Where |
 |---|---|
-| Evaluation sets: `val1`, `eval-v1`, `eval-short`, `scenarios-eval` (`inputs.jsonl`, `meta.jsonl`, `SHA256SUMS`) | Kaggle dataset `lucasbrt/smart-commit-training-eval-sets` |
-| Inputs and prompts of the second run's mining (5,500) | `lucasbrt/smart-commit-training-dpo2-mine` |
-| The sampled replies (8 jobs) | the output of the kernel `lucasbrt/smart-commit-mine` |
-| The 0.5B's balanced pairs, validation pairs and SFT adapter | `lucasbrt/smart-commit-training-dpo2-sweep2` (matched marginals; `-dpo2-sweep` is the first sweep, unmatched) |
-| The 1.5B's, with two runs ready to start | `lucasbrt/smart-commit-training-dpo2-1p5b` |
-| The six trained runs of the 0.5B: adapters, logs, GGUF and results | Hugging Face `LucasBRT/smart-commit-0.5b-dpo-runs` (private) |
+| Evaluation sets: `val1`, `eval-v1`, `eval-short`, `scenarios-eval` (`inputs.jsonl`, `meta.jsonl`, `SHA256SUMS`) | Kaggle dataset `lucasbrt/pionus-training-eval-sets` |
+| Inputs and prompts of the second run's mining (5,500) | `lucasbrt/pionus-training-dpo2-mine` |
+| The sampled replies (8 jobs) | the output of the kernel `lucasbrt/pionus-mine` |
+| The 0.5B's balanced pairs, validation pairs and SFT adapter | `lucasbrt/pionus-training-dpo2-sweep2` (matched marginals; `-dpo2-sweep` is the first sweep, unmatched) |
+| The 1.5B's, with two runs ready to start | `lucasbrt/pionus-training-dpo2-1p5b` |
+| The six trained runs of the 0.5B: adapters, logs, GGUF and results | Hugging Face `LucasBRT/pionus-0.5b-dpo-runs` (private) |
 
 The SFT adapters of v0.1 are inside the bundles, in `sft-<12 hex digits of its weights>/`; the base
 models are the public Qwen2.5-Coder revisions pinned in `training/tools/src/kaggle.rs`. To go on:
 
 ```bash
 git fetch && git checkout feat/dpo-pairs && git pull
-cargo build --release --locked -p smart-commit -p smart-commit-training
+cargo build --release --locked -p pionus -p pionus-training
 cd training
 # The evaluation sets, file by file (kaggle 2.2.4 downloads nothing when asked for a whole dataset):
 for set in val1 eval-v1 eval-short scenarios-eval; do for file in inputs meta; do
-  kaggle datasets download lucasbrt/smart-commit-training-eval-sets -f $set/$file.jsonl -p data/$set --unzip
+  kaggle datasets download lucasbrt/pionus-training-eval-sets -f $set/$file.jsonl -p data/$set --unzip
 done; done
-kaggle datasets download lucasbrt/smart-commit-training-eval-sets -f SHA256SUMS -p data --unzip
+kaggle datasets download lucasbrt/pionus-training-eval-sets -f SHA256SUMS -p data --unzip
 (cd data && sha256sum -c SHA256SUMS)
 
 # The 1.5B on Kaggle: two runs, one on each T4 (not timed yet).
 K=$(mktemp -d)
-cp kaggle_dpo.ipynb $K/smart-commit-dpo.ipynb
+cp kaggle_dpo.ipynb $K/pionus-dpo.ipynb
 sed 's#training-dpo2-sweep2#training-dpo2-1p5b#' kaggle/dpo-kernel-metadata.json > $K/kernel-metadata.json
 kaggle kernels push -p $K
-kaggle kernels status lucasbrt/smart-commit-dpo        # until COMPLETE; ERROR means a run failed
+kaggle kernels status lucasbrt/pionus-dpo        # until COMPLETE; ERROR means a run failed
 ```
 
-Then download the output (`kaggle kernels output lucasbrt/smart-commit-dpo -p data/dpo2/sweep3-out`),
+Then download the output (`kaggle kernels output lucasbrt/pionus-dpo -p data/dpo2/sweep3-out`),
 unpack the archives in `runs/kaggle-dpo2-1p5b/`, and export and compare as above with the 1.5B's base
 model and SFT adapter, on `data/val1` and `data/scenarios-eval` first and `eval-v1` only for the run
 chosen (the criteria are those of H12).
@@ -453,8 +453,8 @@ the list differs between them (the targets and the system prompt are identical);
 the 500 commits of `data/b3/val`, built annotated and logged for both.
 
 ```bash
-SC=../target/release/smart-commit; SCT=../target/release/sc-training
-export XDG_CONFIG_HOME=~/.cache/smart-commit-training/empty-config   # no settings of the machine
+SC=../target/release/pionus; SCT=../target/release/pionus-training
+export XDG_CONFIG_HOME=~/.cache/pionus-training/empty-config   # no settings of the machine
 for d in s0 s1 s1-val; do mkdir -p data/v04/$d; done
 cp data/curve/inputs.jsonl data/curve/meta.jsonl data/v04/s0/; cp data/curve/inputs.jsonl data/curve/meta.jsonl data/v04/s1/
 cp data/b3/val/inputs.jsonl data/b3/val/meta.jsonl data/v04/s1-val/
@@ -463,8 +463,8 @@ $SCT make-examples data/v04/s1 $SC --rules full --diff annotated
 $SCT make-examples data/v04/s1-val $SC --rules full --diff annotated
 $SCT kaggle-bundle train data/kaggle/v04-s --val data/v04/s1-val/examples.jsonl \
   s0-0.5b=0.5b:data/v04/s0/examples.jsonl s1-0.5b=0.5b:data/v04/s1/examples.jsonl
-kaggle datasets create -p data/kaggle/v04-s --dir-mode zip      # private: lucasbrt/smart-commit-training-v04-s
-K=$(mktemp -d); cp kaggle_train.ipynb $K/smart-commit-lora.ipynb
+kaggle datasets create -p data/kaggle/v04-s --dir-mode zip      # private: lucasbrt/pionus-training-v04-s
+K=$(mktemp -d); cp kaggle_train.ipynb $K/pionus-lora.ipynb
 cp kaggle/train-kernel-metadata.json $K/kernel-metadata.json; kaggle kernels push -p $K
 ```
 
@@ -483,17 +483,17 @@ sed 's#training-v04-s"#training-v04-s2"#' kaggle/train-kernel-metadata.json > $K
 S2 is evaluated on sets that have the paths of the history (`data/val1-h4`, `data/eval-v1h`,
 `data/eval-short`): on `val1` and `eval-v1` the map falls back to the names, unseen.
 
-The binary is the one of the evaluations (smart-commit 0.9.0 plus `main` up to `236d51f`): the same
+The binary is the one of the evaluations (pionus 0.9.0 plus `main` up to `236d51f`): the same
 prompt code builds the training prompts and the evaluation's. Then `kaggle kernels output
-lucasbrt/smart-commit-lora`, `export_gguf.py` on each adapter and `sc-training compare` on `data/val1`
+lucasbrt/pionus-lora`, `export_gguf.py` on each adapter and `pionus-training compare` on `data/val1`
 with `--diff annotated` (S0 is the baseline).
 
 ## Scenarios
 
 Hand-written cases from `scenarios/`, in the same layout as a selection:
-`sc-training scenarios build data/scenarios-eval $SC --split eval` (or
+`pionus-training scenarios build data/scenarios-eval $SC --split eval` (or
 `--split train`) writes `inputs.jsonl` and `meta.jsonl`, which step 3
-(`sc-training make-examples`) and step 6 (`smart-commit eval`, `sc-training score`) take
+(`pionus-training make-examples`) and step 6 (`pionus eval`, `pionus-training score`) take
 unchanged. How to write a case: [scenarios/README.md](scenarios/README.md).
 
 ## Bundle b3 (v0.2)
@@ -506,7 +506,7 @@ directory under `data/b3/`, since `make-examples` writes there:
 
 ```bash
 py() { uv run --locked python -I "$@"; }
-SCT=../target/release/sc-training
+SCT=../target/release/pionus-training
 $SCT select data/test1 data/b3/val --conventional 250 --free 250 --max-type-share 0.3 --supported-only
 $SCT select data/train-all data/b3/main-cap30 --conventional 24000 --free 16000 \
   --max-type-share 0.3 --per-repo 150 --supported-only

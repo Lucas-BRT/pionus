@@ -17,8 +17,8 @@ pub async fn section() -> Result<impl View> {
             title: "Update",
             terminal(
                 title: "update",
-                label: "Update smart-commit",
-                "smart-commit update"
+                label: "Update pionus",
+                "pionus update"
             )
             <p>
                 "Installs the latest release. Models and settings stay. To be told about new releases, turn on the "

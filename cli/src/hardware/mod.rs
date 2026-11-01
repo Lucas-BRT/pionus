@@ -1,5 +1,5 @@
-//! The hardware of this machine, as smart-commit sees it: the CPU, every GPU
-//! and NPU, their vendor and kernel driver, and which smart-commit devices
+//! The hardware of this machine, as pionus sees it: the CPU, every GPU
+//! and NPU, their vendor and kernel driver, and which pionus devices
 //! each one gives. Read from sysfs and /proc/cpuinfo, without root.
 
 #[cfg(test)]
@@ -58,7 +58,7 @@ pub struct Gpu {
 pub enum Npu {
     None,
     Intel,
-    /// Ryzen AI (XDNA), which smart-commit does not use.
+    /// Ryzen AI (XDNA), which pionus does not use.
     AmdXdna,
 }
 
@@ -86,7 +86,7 @@ impl Gpu {
         self.vendor == "0x8086"
     }
 
-    /// The smart-commit devices this GPU gives.
+    /// The pionus devices this GPU gives.
     pub fn devices(&self) -> &'static str {
         match (self.vendor.as_str(), self.driver.as_str()) {
             ("0x8086", "i915" | "xe") => "intel-gpu (OpenVINO), vulkan (Mesa ANV)",
@@ -185,7 +185,7 @@ impl Hardware {
         self.npu == Npu::Intel || self.has_intel_gpu()
     }
 
-    /// The inventory, as `smart-commit hardware` prints it.
+    /// The inventory, as `pionus hardware` prints it.
     pub fn inventory(&self) -> String {
         let mut out = String::new();
         let _ = writeln!(out, "  CPU  {} ({})", self.cpu_model, self.arch);
@@ -195,7 +195,7 @@ impl Hardware {
             if self.arch == "x86_64" {
                 "cpu (llama.cpp); openvino-cpu where OpenVINO is installed"
             } else {
-                "none: smart-commit runs on x86_64 only"
+                "none: pionus runs on x86_64 only"
             }
         );
         for gpu in &self.gpus {

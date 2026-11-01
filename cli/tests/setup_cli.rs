@@ -1,4 +1,4 @@
-//! `smart-commit setup` as text (`--yes`, or without a terminal), on fake
+//! `pionus setup` as text (`--yes`, or without a terminal), on fake
 //! machines (a fake /sys and /proc/cpuinfo) with stub setup scripts: it lists
 //! the hardware, plans only what that hardware needs, exports the OpenVINO
 //! model only for Intel devices, and says what failed instead of stopping.
@@ -79,7 +79,7 @@ fn all_intel(sysfs: &Path) {
 
 fn amd_only(sysfs: &Path) {
     cpu(sysfs, "AuthenticAMD", "AMD Ryzen 7 8845HS");
-    // A Ryzen AI NPU, which smart-commit does not use.
+    // A Ryzen AI NPU, which pionus does not use.
     pci(
         sysfs,
         "0000:c4:00.1",
@@ -116,16 +116,12 @@ impl Machine {
         let sysfs = dir.path().join("sys");
         std::fs::create_dir_all(sysfs.join("bus/pci/devices")).unwrap();
         build(&sysfs);
-        // The installed layout: prefix/bin and prefix/share/smart-commit/scripts.
+        // The installed layout: prefix/bin and prefix/share/pionus/scripts.
         let prefix = dir.path().join("prefix");
-        let scripts = prefix.join("share/smart-commit/scripts");
+        let scripts = prefix.join("share/pionus/scripts");
         std::fs::create_dir_all(prefix.join("bin")).unwrap();
         std::fs::create_dir_all(&scripts).unwrap();
-        std::fs::copy(
-            env!("CARGO_BIN_EXE_smart-commit"),
-            prefix.join("bin/smart-commit"),
-        )
-        .unwrap();
+        std::fs::copy(env!("CARGO_BIN_EXE_pionus"), prefix.join("bin/pionus")).unwrap();
         let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../scripts");
         std::fs::copy(root.join("setup-gpu.sh"), scripts.join("setup-gpu.sh")).unwrap();
         let stub = |name: &str, body: &str| {
@@ -149,28 +145,28 @@ impl Machine {
     /// pinned size, with the sidecar that names the pinned hash).
     fn install_everything(&self) {
         let data = self.dir.path().join("data");
-        let server = smart_commit::paths::default_llama_server(|name| {
+        let server = pionus::paths::default_llama_server(|name| {
             (name == "XDG_DATA_HOME").then(|| data.display().to_string())
         })
         .unwrap();
         std::fs::create_dir_all(server.parent().unwrap()).unwrap();
         std::fs::write(&server, "").unwrap();
-        let model = smart_commit::models::find(smart_commit::models::DEFAULT).unwrap();
-        let file = data.join("smart-commit/models").join(model.gguf.file);
+        let model = pionus::models::find(pionus::models::DEFAULT).unwrap();
+        let file = data.join("pionus/models").join(model.gguf.file);
         std::fs::create_dir_all(file.parent().unwrap()).unwrap();
         std::fs::File::create(&file)
             .unwrap()
             .set_len(model.gguf.size)
             .unwrap();
         std::fs::write(
-            smart_commit::models::sidecar(&file),
+            pionus::models::sidecar(&file),
             format!("{}  {}\n", model.gguf.sha256, model.gguf.file),
         )
         .unwrap();
     }
 
     fn binary(&self) -> PathBuf {
-        self.dir.path().join("prefix/bin/smart-commit")
+        self.dir.path().join("prefix/bin/pionus")
     }
 
     /// Runs `setup` with `args`, no terminal; its output.
@@ -180,20 +176,14 @@ impl Machine {
         let output = common::isolate(&mut command)
             .arg("setup")
             .args(args)
-            .env("SMART_COMMIT_SYSFS", &sysfs)
-            .env("SMART_COMMIT_CPUINFO", sysfs.join("cpuinfo"))
-            .env(
-                "SMART_COMMIT_OPENVINO_DIR",
-                self.dir.path().join("no-openvino"),
-            )
-            .env("SMART_COMMIT_DPKG_QUERY", "false")
+            .env("PIONUS_SYSFS", &sysfs)
+            .env("PIONUS_CPUINFO", sysfs.join("cpuinfo"))
+            .env("PIONUS_OPENVINO_DIR", self.dir.path().join("no-openvino"))
+            .env("PIONUS_DPKG_QUERY", "false")
             .env("XDG_DATA_HOME", self.dir.path().join("data"))
             .env("XDG_CONFIG_HOME", self.dir.path().join("config"))
-            .env(
-                "SMART_COMMIT_LLAMACPP_URL",
-                "file:///nonexistent/llama.tar.gz",
-            )
-            .env("SMART_COMMIT_HF_BASE", "file:///nonexistent/hf")
+            .env("PIONUS_LLAMACPP_URL", "file:///nonexistent/llama.tar.gz")
+            .env("PIONUS_HF_BASE", "file:///nonexistent/hf")
             .stdin(Stdio::null())
             .output()
             .unwrap();
@@ -282,7 +272,7 @@ fn without_yes_and_without_a_terminal_the_export_is_not_started() {
     has(&out, "Export the model for OpenVINO here");
     has(
         &out,
-        "[skipped: no terminal; run `smart-commit setup` again to do it]",
+        "[skipped: no terminal; run `pionus setup` again to do it]",
     );
     lacks(&out, "stub export-model");
 }
@@ -337,7 +327,7 @@ fn steps_that_fail_are_reported_and_the_setup_goes_on() {
     let out = Machine::new(amd_nvidia).setup(&["--no-bench", "--no-drivers"]);
     has(&out, "Could not install llama.cpp");
     has(&out, "Could not install qwen2.5-coder-1.5b");
-    has(&out, "run `smart-commit setup` again");
+    has(&out, "run `pionus setup` again");
     has(&out, "==> Done");
     in_order(&out, "==> llama.cpp", "==> Done");
 }
@@ -350,8 +340,8 @@ fn a_setup_that_worked_says_what_to_do_next() {
     let out = machine.setup(&["--no-drivers", "--no-bench"]);
     in_order(&out, "==> Done", "Next:");
     has(&out, "git add -p");
-    has(&out, "smart-commit --commit");
-    has(&out, "smart-commit hook install");
+    has(&out, "pionus --commit");
+    has(&out, "pionus hook install");
 }
 
 #[test]
@@ -360,7 +350,7 @@ fn a_setup_with_a_failed_step_does_not_say_what_to_do_next() {
     let out = Machine::new(amd_nvidia).setup(&["--no-bench", "--no-drivers"]);
     has(&out, "==> Done");
     lacks(&out, "Next:");
-    lacks(&out, "smart-commit hook install");
+    lacks(&out, "pionus hook install");
 }
 
 #[test]
@@ -384,10 +374,7 @@ fn an_update_only_installs_llama_cpp() {
     let output = common::isolate(&mut command)
         .args(["setup", "--llamacpp-only"])
         .env("XDG_DATA_HOME", machine.dir.path().join("data"))
-        .env(
-            "SMART_COMMIT_LLAMACPP_URL",
-            "file:///nonexistent/llama.tar.gz",
-        )
+        .env("PIONUS_LLAMACPP_URL", "file:///nonexistent/llama.tar.gz")
         .stdin(Stdio::null())
         .output()
         .unwrap();
@@ -453,13 +440,10 @@ impl Machine {
             .args(args)
             .env("PATH", path)
             .env("HOME", self.dir.path().join("home-not-created"))
-            .env("SMART_COMMIT_SYSFS", &sysfs)
-            .env("SMART_COMMIT_CPUINFO", sysfs.join("cpuinfo"))
-            .env(
-                "SMART_COMMIT_OPENVINO_DIR",
-                self.dir.path().join("no-openvino"),
-            )
-            .env("SMART_COMMIT_DPKG_QUERY", "false")
+            .env("PIONUS_SYSFS", &sysfs)
+            .env("PIONUS_CPUINFO", sysfs.join("cpuinfo"))
+            .env("PIONUS_OPENVINO_DIR", self.dir.path().join("no-openvino"))
+            .env("PIONUS_DPKG_QUERY", "false")
             .env("XDG_DATA_HOME", self.dir.path().join("data"))
             .env("XDG_CONFIG_HOME", self.dir.path().join("config"))
             .stdin(Stdio::null())
@@ -485,10 +469,7 @@ fn a_dry_run_prints_the_plan_and_changes_nothing() {
     has(&out, "needs sudo: apt packages");
     has(&out, "downloads: 31 MB");
     has(&out, "Benchmark");
-    has(
-        &out,
-        "Nothing was changed. Run `smart-commit setup` to apply it.",
-    );
+    has(&out, "Nothing was changed. Run `pionus setup` to apply it.");
     in_order(&out, "==> Hardware", "==> Plan (dry run)");
     lacks(&out, "stub ");
     lacks(&out, "==> llama.cpp");

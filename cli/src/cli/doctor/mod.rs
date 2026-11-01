@@ -1,4 +1,4 @@
-//! `smart-commit doctor`: what is wrong with this installation, and how to
+//! `pionus doctor`: what is wrong with this installation, and how to
 //! fix it. It reads the machine and the files and never uses the network.
 
 mod checks;
@@ -9,11 +9,11 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Duration;
 
-use smart_commit::backend::server;
-use smart_commit::config::REPO_FILE;
-use smart_commit::git::Repo;
-use smart_commit::hardware::Hardware;
-use smart_commit::paths;
+use pionus::backend::server;
+use pionus::config::REPO_FILE;
+use pionus::git::Repo;
+use pionus::hardware::Hardware;
+use pionus::paths;
 
 use super::benchmark::last_report;
 use super::settings::{env, hardware_sources};

@@ -1,10 +1,10 @@
 //! Training examples from selected inputs, and subsets of them.
 //!
-//! `make-examples` builds the prompts with `smart-commit prompt --inputs` and
+//! `make-examples` builds the prompts with `pionus prompt --inputs` and
 //! an environment of nothing but an empty `XDG_CONFIG_HOME`, so only
-//! smart-commit's own defaults could shape them, and writes `examples.jsonl`:
+//! pionus's own defaults could shape them, and writes `examples.jsonl`:
 //! `{"system", "user", "target", "repo", "hash", "set"}` per line. `--rules`,
-//! `--diff` and `--scopes` are always passed, never left to smart-commit's defaults: the
+//! `--diff` and `--scopes` are always passed, never left to pionus's defaults: the
 //! default file list became `annotated` after every model was trained on the
 //! `plain` one, and a data set built with it would not have said so.
 //!
@@ -94,7 +94,7 @@ pub fn nest(src: &Path, prefix: &str, sizes: &[usize]) -> Result<Vec<String>> {
         let hash = example["hash"]
             .as_str()
             .context("an example without a hash")?;
-        let rank = smart_commit::models::sha256_hex(format!("nest:{hash}").as_bytes());
+        let rank = pionus::models::sha256_hex(format!("nest:{hash}").as_bytes());
         ranked.push((rank, line, example["set"] == "conventional"));
     }
     ranked.sort_by(|a, b| a.0.cmp(&b.0));

@@ -39,9 +39,9 @@ pub async fn section() -> Result<impl View> {
                 </li>
                 <li>
                     "Models and llama.cpp go to "
-                    <code>"~/.local/share/smart-commit"</code>
+                    <code>"~/.local/share/pionus"</code>
                     "; caches go to "
-                    <code>"~/.cache/smart-commit"</code>
+                    <code>"~/.cache/pionus"</code>
                     "."
                 </li>
             </ul>

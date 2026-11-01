@@ -7,8 +7,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-use smart_commit::context::RepoContext;
-use smart_commit::git::Repo;
+use pionus::context::RepoContext;
+use pionus::git::Repo;
 use tempfile::TempDir;
 
 /// Keeps git away from the developer's config and pins identities and dates,
@@ -27,26 +27,26 @@ pub const GIT_ENV: &[(&str, &str)] = &[
 /// Where the binary looks for config, models and caches during tests:
 /// nowhere real, so the developer's own config and exported model are never
 /// picked up. Tests that write config pass their own XDG_CONFIG_HOME.
-pub const CONFIG_HOME: &str = "/nonexistent/smart-commit-tests/config";
-pub const DATA_HOME: &str = "/nonexistent/smart-commit-tests/data";
-pub const CACHE_HOME: &str = "/nonexistent/smart-commit-tests/cache";
+pub const CONFIG_HOME: &str = "/nonexistent/pionus-tests/config";
+pub const DATA_HOME: &str = "/nonexistent/pionus-tests/data";
+pub const CACHE_HOME: &str = "/nonexistent/pionus-tests/cache";
 /// Where models kept loaded would listen: never the user's, whose kept
 /// model a benchmark in a test would stop.
-pub const RUNTIME_DIR: &str = "/nonexistent/smart-commit-tests/run";
+pub const RUNTIME_DIR: &str = "/nonexistent/pionus-tests/run";
 
 /// The hardware of a machine with nothing: no GPU, no NPU, no OpenVINO.
 /// Tests that need devices pass a [`FakeMachine`]'s variables.
-pub const NO_SYSFS: &str = "/nonexistent/smart-commit-tests/sys";
-pub const NO_CPUINFO: &str = "/nonexistent/smart-commit-tests/cpuinfo";
-pub const NO_OPENVINO: &str = "/nonexistent/smart-commit-tests/openvino";
+pub const NO_SYSFS: &str = "/nonexistent/pionus-tests/sys";
+pub const NO_CPUINFO: &str = "/nonexistent/pionus-tests/cpuinfo";
+pub const NO_OPENVINO: &str = "/nonexistent/pionus-tests/openvino";
 
-/// Applies [`GIT_ENV`], drops every `SMART_COMMIT_*` variable the developer
+/// Applies [`GIT_ENV`], drops every `PIONUS_*` variable the developer
 /// may have exported (settings and test overrides alike) and points the XDG directories at
 /// [`CONFIG_HOME`], [`DATA_HOME`], [`CACHE_HOME`] and [`RUNTIME_DIR`], so the command behaves
 /// the same on every machine.
 pub fn isolate(command: &mut Command) -> &mut Command {
     for (var, _) in std::env::vars_os() {
-        if var.to_string_lossy().starts_with("SMART_COMMIT_") {
+        if var.to_string_lossy().starts_with("PIONUS_") {
             command.env_remove(var);
         }
     }
@@ -55,16 +55,16 @@ pub fn isolate(command: &mut Command) -> &mut Command {
         .env("XDG_DATA_HOME", DATA_HOME)
         .env("XDG_CACHE_HOME", CACHE_HOME)
         .env("XDG_RUNTIME_DIR", RUNTIME_DIR)
-        .env("SMART_COMMIT_SYSFS", NO_SYSFS)
-        .env("SMART_COMMIT_CPUINFO", NO_CPUINFO)
-        .env("SMART_COMMIT_OPENVINO_DIR", NO_OPENVINO)
+        .env("PIONUS_SYSFS", NO_SYSFS)
+        .env("PIONUS_CPUINFO", NO_CPUINFO)
+        .env("PIONUS_OPENVINO_DIR", NO_OPENVINO)
         .envs(GIT_ENV.iter().copied())
 }
 
-/// Runs the `smart-commit` binary, isolated like [`TestRepo::git`].
-pub fn smart_commit(args: &[&str], dir: &Path, env: &[(&str, &str)]) -> Output {
+/// Runs the `pionus` binary, isolated like [`TestRepo::git`].
+pub fn pionus(args: &[&str], dir: &Path, env: &[(&str, &str)]) -> Output {
     isolate(
-        Command::new(env!("CARGO_BIN_EXE_smart-commit"))
+        Command::new(env!("CARGO_BIN_EXE_pionus"))
             .args(args)
             .current_dir(dir),
     )
@@ -134,7 +134,7 @@ impl TestRepo {
     }
 }
 
-/// A machine for `SMART_COMMIT_SYSFS` and friends: a sysfs tree and a
+/// A machine for `PIONUS_SYSFS` and friends: a sysfs tree and a
 /// cpuinfo in a temporary directory, never this machine's hardware.
 pub struct FakeMachine {
     dir: TempDir,
@@ -196,13 +196,10 @@ impl FakeMachine {
     pub fn env(&self) -> Vec<(&'static str, String)> {
         let path = |p: PathBuf| p.to_str().unwrap().to_owned();
         vec![
-            ("SMART_COMMIT_SYSFS", path(self.dir.path().join("sys"))),
+            ("PIONUS_SYSFS", path(self.dir.path().join("sys"))),
+            ("PIONUS_CPUINFO", path(self.dir.path().join("cpuinfo"))),
             (
-                "SMART_COMMIT_CPUINFO",
-                path(self.dir.path().join("cpuinfo")),
-            ),
-            (
-                "SMART_COMMIT_OPENVINO_DIR",
+                "PIONUS_OPENVINO_DIR",
                 path(self.dir.path().join("openvino")),
             ),
         ]

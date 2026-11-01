@@ -42,7 +42,7 @@ pub const KEYS: &[Key] = &[
         name: "backend",
         kind: Kind::Choice(&["auto", "openvino", "llamacpp", "mock"]),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_BACKEND"),
+        env: Some("PIONUS_BACKEND"),
         description: "What runs the model: `openvino` (Intel NPU, Intel GPU, openvino-cpu), \
                       `llamacpp` (any GPU through Vulkan, and the CPU), `auto` (whichever \
                       model.device needs) or `mock`, which replies with --mock-response \
@@ -52,11 +52,11 @@ pub const KEYS: &[Key] = &[
         name: "model.device",
         kind: Kind::Choice(&["auto", "npu", "intel-gpu", "vulkan", "cpu", "openvino-cpu"]),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_DEVICE"),
+        env: Some("PIONUS_DEVICE"),
         description: "Where the model runs: `npu` (Intel NPU) and `intel-gpu` through OpenVINO, \
                       `vulkan` (AMD, NVIDIA or Intel GPU) and `cpu` (any x86_64) through \
                       llama.cpp, `openvino-cpu` (the CPU through OpenVINO), or `auto`: the \
-                      fastest in the last `smart-commit bench`, else the first that works of \
+                      fastest in the last `pionus bench`, else the first that works of \
                       intel-gpu, npu, vulkan, cpu, openvino-cpu. `gpu` is the old name of \
                       intel-gpu.",
     },
@@ -64,39 +64,39 @@ pub const KEYS: &[Key] = &[
         name: "model.name",
         kind: Kind::Choice(models::IDS),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_MODEL"),
-        description: "Which recommended model runs (`smart-commit model` lists them), \
+        env: Some("PIONUS_MODEL"),
+        description: "Which recommended model runs (`pionus model` lists them), \
                       downloaded from Hugging Face, pinned and checked.",
     },
     Key {
         name: "model.dir",
         kind: Kind::Path,
         scope: Scope::User,
-        env: Some("SMART_COMMIT_MODEL_DIR"),
+        env: Some("PIONUS_MODEL_DIR"),
         description: "The OpenVINO model; by default model.name's, exported on this machine \
-                      by `smart-commit setup`. Another directory uses that model instead.",
+                      by `pionus setup`. Another directory uses that model instead.",
     },
     Key {
         name: "model.cache_dir",
         kind: Kind::Path,
         scope: Scope::User,
-        env: Some("SMART_COMMIT_CACHE_DIR"),
+        env: Some("PIONUS_CACHE_DIR"),
         description: "Where OpenVINO keeps compiled models, so loads after the first are fast.",
     },
     Key {
         name: "model.gguf",
         kind: Kind::Path,
         scope: Scope::User,
-        env: Some("SMART_COMMIT_GGUF"),
+        env: Some("PIONUS_GGUF"),
         description: "The GGUF model of the llama.cpp devices; by default model.name's. \
-                      Another file (`smart-commit model use FILE`) uses that model instead.",
+                      Another file (`pionus model use FILE`) uses that model instead.",
     },
     Key {
         name: "model.llama_server",
         kind: Kind::Path,
         scope: Scope::User,
-        env: Some("SMART_COMMIT_LLAMA_SERVER"),
-        description: "The llama-server binary, installed by `smart-commit setup`.",
+        env: Some("PIONUS_LLAMA_SERVER"),
+        description: "The llama-server binary, installed by `pionus setup`.",
     },
     Key {
         name: "model.vulkan_device",
@@ -110,10 +110,10 @@ pub const KEYS: &[Key] = &[
         name: "model.fast_load",
         kind: Kind::Choice(&["auto", "on", "off"]),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_FAST_LOAD"),
+        env: Some("PIONUS_FAST_LOAD"),
         description: "llama.cpp devices: start llama-server without repacking the weights \
                       and fitting them to GPU memory (`--no-repack --fit off`). `auto` uses \
-                      it where the last `smart-commit bench` found it faster.",
+                      it where the last `pionus bench` found it faster.",
     },
     Key {
         name: "model.threads_batch",
@@ -128,7 +128,7 @@ pub const KEYS: &[Key] = &[
         name: "model.keep_loaded",
         kind: Kind::Count { min: 0, max: 1440 },
         scope: Scope::User,
-        env: Some("SMART_COMMIT_KEEP_LOADED"),
+        env: Some("PIONUS_KEEP_LOADED"),
         description: "llama.cpp devices: minutes to keep the model loaded after a message, so \
                       the next commit skips loading it (most of a commit on a GPU), at the \
                       cost of its memory meanwhile. 0: stop it after each command. Replies \
@@ -138,7 +138,7 @@ pub const KEYS: &[Key] = &[
         name: "model.keep_loaded_max_ram",
         kind: Kind::Count { min: 1, max: 100 },
         scope: Scope::User,
-        env: Some("SMART_COMMIT_KEEP_LOADED_MAX_RAM"),
+        env: Some("PIONUS_KEEP_LOADED_MAX_RAM"),
         description: "The share of the machine's RAM, in percent, a model kept loaded may take: \
                       the model file and about 256 MB. A model that would take more is loaded \
                       for the commit only, one kept stops when it passes the share, and a \
@@ -149,8 +149,8 @@ pub const KEYS: &[Key] = &[
         name: "model.ask_type",
         kind: Kind::Choice(&["off", "low_confidence"]),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_ASK_TYPE"),
-        description: "`smart-commit --commit` in a terminal, on llama.cpp devices: with \
+        env: Some("PIONUS_ASK_TYPE"),
+        description: "`pionus --commit` in a terminal, on llama.cpp devices: with \
                       `low_confidence`, ask which type the message should have when the model \
                       is unsure of it (see model.ask_type_below), offering its likeliest ones, \
                       and write the message for the one chosen. `off`: never ask.",
@@ -159,7 +159,7 @@ pub const KEYS: &[Key] = &[
         name: "model.ask_type_below",
         kind: Kind::Count { min: 1, max: 99 },
         scope: Scope::User,
-        env: Some("SMART_COMMIT_ASK_TYPE_BELOW"),
+        env: Some("PIONUS_ASK_TYPE_BELOW"),
         description: "With model.ask_type on low_confidence: ask when the model's confidence in \
                       the type it would pick is below this percentage. On eval-v1, 50 asks \
                       about a quarter of the commits.",
@@ -235,11 +235,11 @@ pub const KEYS: &[Key] = &[
         name: "update.check",
         kind: Kind::Choice(&["false", "true"]),
         scope: Scope::User,
-        env: Some("SMART_COMMIT_UPDATE_CHECK"),
+        env: Some("PIONUS_UPDATE_CHECK"),
         description: "With `true`, at most once a day, an interactive command asks GitHub \
                       (api.github.com, over HTTPS, with curl) for the latest release and \
                       prints a line on stderr when it is newer than this one. The only \
-                      request smart-commit makes by itself; `false`: never.",
+                      request pionus makes by itself; `false`: never.",
     },
 ];
 

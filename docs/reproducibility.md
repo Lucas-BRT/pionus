@@ -30,7 +30,7 @@ pinned and how each guarantee is checked.
   machine's compiler, linker, glibc, `tar` and `gzip` (and, on Debian and
   Ubuntu, their packages) with `scripts/build/ENV`, which was made in the
   image, and says which differ. With
-  `SMART_COMMIT_PACKAGE_HOST=1 scripts/package.sh` a machine that matches
+  `PIONUS_PACKAGE_HOST=1 scripts/package.sh` a machine that matches
   builds without Docker. A match is not a proof, since a distribution can
   patch a package without changing its version: the hash in the release's
   `SHA256SUMS` is. To change the image (the Dockerfile, its snapshot date),
@@ -38,7 +38,7 @@ pinned and how each guarantee is checked.
   `scripts/build/IMAGE`, and regenerate `scripts/build/ENV` with
   `docker run --rm -v $PWD/scripts/build:/b:ro IMAGE sh /b/env-report.sh`.
   CI keeps the container's toolchain and downloaded crates between runs
-  (`SMART_COMMIT_BUILD_CACHE`); the build itself is never kept (its target
+  (`PIONUS_BUILD_CACHE`); the build itself is never kept (its target
   directory is gone with the container), so every packaging compiles from
   scratch, the hash CI prints is that of a build from scratch, and the two
   packagings of `test-install.sh` compare two real builds. Two packagings with
@@ -55,8 +55,8 @@ pinned and how each guarantee is checked.
   the commit's `install.sh` to the output directory, beside the tarball, and
   `SHA256SUMS` lists both. The release workflow uploads everything in
   `dist/`, so a release carries the installer that was tested with its
-  binary (the tarball has a copy too, which `smart-commit update` runs).
-- `SMART_COMMIT_PACKAGE_HOST=1` builds on the host, without Docker, at the
+  binary (the tarball has a copy too, which `pionus update` runs).
+- `PIONUS_PACKAGE_HOST=1` builds on the host, without Docker, at the
   cost of cross-machine reproducibility.
 - **CI pins what it runs on and with.** Every job names its runner image
   (`ubuntu-24.04`; the release `ubuntu-22.04`, for the oldest supported
@@ -79,7 +79,7 @@ download, not a replaced one. The release workflow also attests every asset
 with `actions/attest-build-provenance` (keyless, signed by GitHub's OIDC
 identity, no key to manage): the attestation says which repository, workflow
 and commit built the file. `gh attestation verify FILE --repo
-Lucas-BRT/smart-commit` or `install.sh --verify` checks it
+Lucas-BRT/pionus` or `install.sh --verify` checks it
 ([usage](usage.md#verify-a-download)). Combined with the byte-identical build
 above, anyone can also rebuild the commit and compare hashes.
 
@@ -116,7 +116,7 @@ weights matched but two files did not, which led to two fixes:
   `scripts/export/normalize_ir.py` renumbers them in order of appearance;
   nothing refers to nodes by those names, and the replies did not change.
 
-smart-commit re-hosts no publisher's model: `smart-commit setup` runs the
+pionus re-hosts no publisher's model: `pionus setup` runs the
 export on each machine that has an Intel NPU or GPU, from the publisher's
 files on Hugging Face, and the manifest check makes the result the same
 everywhere. It needs
@@ -128,9 +128,9 @@ is in [measurements](measurements.md#model-export).
 
 The GGUF models for llama.cpp are files on Hugging Face, each pinned in
 `cli/src/models/registry.rs` to a repository commit and to the file's SHA-256 at that
-commit: `smart-commit model use` refuses any other file. They are the
+commit: `pionus model use` refuses any other file. They are the
 publishers' own files (Qwen's for the `qwen2.5-coder-*` models), or for
-smart-commit's fine-tunes (`smart-commit-*`) the project's own, published
+pionus's fine-tunes (`pionus-*`) the project's own, published
 under its account. A model chosen from disk (`model.gguf`) is not checked;
 traces name it `sha256=unverified`.
 
@@ -166,7 +166,7 @@ quota and the sessions are in [training](training.md#kaggles-quota).
 | Component | How it is pinned |
 |---|---|
 | llama.cpp for the mining | b11381, the CUDA 12.8 build and its runtime libraries (`llama-b11381-bin-ubuntu-cuda-12.8-x64.tar.gz` and `cudart-llama-b11381-bin-ubuntu-cuda-12.8-x64.tar.gz`), each by SHA-256 in `training/tools/src/kaggle.rs`, checked by the notebook before it unpacks them |
-| The models it samples from | `smart-commit-0.5b-v0.1` and `smart-commit-1.5b-v0.1`, read from the registry (`cli/src/models/registry.rs`) by `sc-training kaggle-bundle` (repository commit and SHA-256), downloaded and checked by size and SHA-256 |
+| The models it samples from | `pionus-0.5b-v0.1` and `pionus-1.5b-v0.1`, read from the registry (`cli/src/models/registry.rs`) by `pionus-training kaggle-bundle` (repository commit and SHA-256), downloaded and checked by size and SHA-256 |
 | The base models of the training | the Qwen2.5-Coder revisions of `training/tools/src/kaggle.rs` (those `scripts/export-model.sh` pins) |
 | Python packages | the versions of `training/uv.lock` (`requirements.txt` of the bundle), except torch: Kaggle's own CUDA build is kept, and `run.json` records its version. Kaggle's `torchao` is removed, as the pinned `peft` refuses it |
 | The inputs of a run | the bundle holds them and the notebook checks them: the SHA-256 of each shard's prompts (mining), of the pairs and of the SFT adapter (DPO) |
@@ -186,7 +186,7 @@ input's number and the sample's; whether the CUDA candidates of the second run
 equal the Vulkan ones of the first for the same input has not been checked,
 and the first run's were sampled on an RTX 3050 through Vulkan. The pairs
 made from candidates are deterministic, and so are the balanced sets
-(`sc-training balance` takes its pairs in the order of a hash, not of the
+(`pionus-training balance` takes its pairs in the order of a hash, not of the
 files).
 
 ## Generation
@@ -204,9 +204,9 @@ files).
 ## Traces
 
 ```console
-$ smart-commit --trace t.json             # or SMART_COMMIT_TRACE=t.json git commit
-$ smart-commit replay t.json              # the pipeline again, with the recorded replies
-$ smart-commit replay t.json --with-model # asks the model again
+$ pionus --trace t.json             # or PIONUS_TRACE=t.json git commit
+$ pionus replay t.json              # the pipeline again, with the recorded replies
+$ pionus replay t.json --with-model # asks the model again
 ```
 
 A trace holds what git reported (branch, subjects and the paths each one
@@ -228,7 +228,7 @@ real use becomes a new fixture.
 ## Tests
 
 - `cargo test` needs no hardware, network, clock or randomness, and ignores
-  the machine's git config, smart-commit config, models and `SMART_COMMIT_*`
+  the machine's git config, pionus config, models and `PIONUS_*`
   variables (see `cli/tests/common::isolate`). Test repositories have fixed
   authors and dates, so even commit hashes are stable.
 - `cli/tests/scripts/` runs the shell scripts against fake sysfs trees, fake

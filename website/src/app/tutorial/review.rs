@@ -18,8 +18,8 @@ pub async fn section() -> Result<impl View> {
             id: "commit",
             title: "4. Review and commit",
             terminal(
-                title: "smart-commit --commit",
-                label: "Example review screen of smart-commit --commit",
+                title: "pionus --commit",
+                label: "Example review screen of pionus --commit",
                 boxed(
                     "┌ Commit message ──────────────────────┐
 │feat(retry): add a retry loop         │

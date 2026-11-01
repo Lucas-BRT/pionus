@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash
 ```
 
 Requirements: Linux on x86_64. glibc 2.35 or newer (Ubuntu 22.04+,
@@ -11,15 +11,15 @@ Debian 12+, Fedora 36+; not Alpine or other musl systems), `git`, and about
 1.5 GB free in `~/.local/share` for the default model. The setup downloads the
 default model (1.1 GB) and the pinned llama.cpp build (31.6 MB); the model sizes
 are in [models](models.md). Models and llama.cpp go to
-`~/.local/share/smart-commit`, and the caches to `~/.cache/smart-commit`.
+`~/.local/share/pionus`, and the caches to `~/.cache/pionus`.
 Before downloading, the installer stops with a message that names the package
 to install when `git` is missing, and stops when the C library is older than
 2.35 or is not glibc; with low free disk space it only warns and goes on.
 `--update` only warns about a missing `git`, and `--uninstall` checks nothing.
 
 The installer downloads the latest release, checks it against the release's
-`SHA256SUMS` and installs it in `~/.local/bin` and `~/.local/share/smart-commit`,
-without `sudo`. It then runs `smart-commit setup`, which:
+`SHA256SUMS` and installs it in `~/.local/bin` and `~/.local/share/pionus`,
+without `sudo`. It then runs `pionus setup`, which:
 
 1. lists the hardware: the CPU, each GPU with its vendor and driver, and the
    NPU, with the devices each one gives;
@@ -31,12 +31,12 @@ without `sudo`. It then runs `smart-commit setup`, which:
 4. benchmarks the devices and says which one will be used.
 
 When every step worked, the setup ends with a `Next:` block: `git add -p`,
-`smart-commit`, `smart-commit --commit` and `smart-commit hook install`. It
+`pionus`, `pionus --commit` and `pionus hook install`. It
 is left out when a step failed. With `--no-setup`, the installer tells you to
-run `smart-commit setup` (with the full path when `~/.local/bin` is not on
+run `pionus setup` (with the full path when `~/.local/bin` is not on
 `PATH`).
 
-In a terminal, `smart-commit setup` is a full-screen interface: the hardware,
+In a terminal, `pionus setup` is a full-screen interface: the hardware,
 then the plan, where Space turns each step on or off and `m` chooses another
 [model](models.md), then each step's output, with a progress bar for
 downloads, and the live benchmark at the end. Steps that use `sudo` run
@@ -51,11 +51,11 @@ Installer options (after `bash -s --` when piping):
 |---|---|
 | `--version 0.3.0` | install that release instead of the latest |
 | `--prefix DIR` | install in `DIR/bin` and `DIR/share` |
-| `--no-setup` | only install; run `smart-commit setup` later |
-| `--update` | install only if the release is not the version installed, without the setup; llama.cpp follows the new release's build (what `smart-commit update` runs) |
+| `--no-setup` | only install; run `pionus setup` later |
+| `--update` | install only if the release is not the version installed, without the setup; llama.cpp follows the new release's build (what `pionus update` runs) |
 | `--verify` | also verify the download's build provenance with `gh` (see [Verify a download](#verify-a-download)) |
 | `--yes` | answer yes to the setup's questions |
-| `--uninstall` | remove smart-commit (models, caches and config are kept) |
+| `--uninstall` | remove pionus (models, caches and config are kept) |
 | `--purge` | `--uninstall`, plus the models, llama.cpp, the benchmark, the caches and the config |
 | `--system` | `--uninstall`, plus the OpenVINO that the setup installed (asks before using `sudo`) |
 
@@ -67,25 +67,25 @@ your profile files. Running it
 again upgrades in place: it only replaces the binary, the scripts and the
 docs, so the models, llama.cpp and the benchmark stay.
 
-`smart-commit setup` can run again at any time, for example after adding a
-GPU; `smart-commit hardware` only prints the hardware list. `--no-drivers`
+`pionus setup` can run again at any time, for example after adding a
+GPU; `pionus hardware` only prints the hardware list. `--no-drivers`
 skips everything that needs `sudo`, and `--no-bench` skips the benchmark.
 
 To see the plan before anything is installed, install without the setup and
 ask for a dry run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash -s -- --no-setup
-smart-commit setup --dry-run
+curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash -s -- --no-setup
+pionus setup --dry-run
 ```
 
-`smart-commit setup --dry-run` prints the hardware and the plan as text, in a
+`pionus setup --dry-run` prints the hardware and the plan as text, in a
 terminal too: each step, whether it needs `sudo` and for what (apt packages,
 files in `/opt/intel` and `/etc/ld.so.conf.d`, the render group), what it
 downloads and how big (the sizes it knows: llama.cpp and the model; the total
 is printed only when every pending download has a known size), and which
 steps are already done and would be skipped. It ends with `Nothing was
-changed. Run `smart-commit setup` to apply it.` and changes nothing: no
+changed. Run `pionus setup` to apply it.` and changes nothing: no
 download, no file or directory written, no `sudo`. It only runs the
 read-only checks the setup itself uses to plan (`check-npu.sh`,
 `export-model.sh --check`, `setup-gpu.sh --dry-run`). It combines with
@@ -95,9 +95,9 @@ is accepted and ignored.
 To build from source instead:
 
 ```bash
-git clone https://github.com/Lucas-BRT/smart-commit && cd smart-commit
+git clone https://github.com/Lucas-BRT/pionus && cd pionus
 cargo build --release --locked      # the toolchain comes from rust-toolchain.toml
-target/release/smart-commit setup
+target/release/pionus setup
 ```
 
 To build the release package itself, byte for byte, see
@@ -115,14 +115,14 @@ Releases after 0.14.0 also carry a GitHub artifact attestation (signed build
 provenance, made by the release workflow). With the [GitHub CLI](https://cli.github.com):
 
 ```bash
-gh attestation verify smart-commit-x86_64-unknown-linux-gnu.tar.gz --repo Lucas-BRT/smart-commit
+gh attestation verify pionus-x86_64-unknown-linux-gnu.tar.gz --repo Lucas-BRT/pionus
 ```
 
 or let the installer do it after the `SHA256SUMS` check, failing if `gh` is
 missing or the verification fails:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash -s -- --verify
+curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash -s -- --verify
 ```
 
 Releases up to 0.14.0 have no attestation, so `--verify` with an older
@@ -131,7 +131,7 @@ Releases up to 0.14.0 have no attestation, so `--verify` with an older
 ## Update
 
 ```bash
-smart-commit update
+pionus update
 ```
 
 installs the latest release if it is newer than the one running, from
@@ -147,40 +147,40 @@ with `install.sh` itself, and a build from source with git and cargo.
 Nothing tells you that a release is out unless you ask for it:
 
 ```bash
-smart-commit config set update.check true
+pionus config set update.check true
 ```
 
-`update.check` is off by default, because smart-commit makes no request by
-itself otherwise. When it is on, at most once in 24 hours, `smart-commit`
+`update.check` is off by default, because pionus makes no request by
+itself otherwise. When it is on, at most once in 24 hours, `pionus`
 (bare or with `--commit`), `setup`, `device` and `model` run `curl` with a 2
 second limit against
-`https://api.github.com/repos/Lucas-BRT/smart-commit/releases/latest` and,
+`https://api.github.com/repos/Lucas-BRT/pionus/releases/latest` and,
 if the release is newer than the one running, print one line on stderr:
-`note: smart-commit X.Y.Z is available (you have A.B.C); run smart-commit update`.
+`note: pionus X.Y.Z is available (you have A.B.C); run pionus update`.
 GitHub sees the request over HTTPS (so your IP address) and the user agent
-`smart-commit/<version>`; nothing else is sent, no token or cookie. The
-answer and the time are kept in `$XDG_CACHE_HOME/smart-commit/update-check`.
+`pionus/<version>`; nothing else is sent, no token or cookie. The
+answer and the time are kept in `$XDG_CACHE_HOME/pionus/update-check`.
 It never runs in the git hook, with `--trace`, `replay`, `eval` or `prompt`,
 or when stderr is not a terminal. A failure (no network, no `curl`, a reply
 that is not a release) is silent, shown as a `debug:` line with `-v`, never
 changes the exit code, and counts as a check, so an offline machine does not
-retry at every run. `SMART_COMMIT_UPDATE_CHECK=false` turns it off for one
+retry at every run. `PIONUS_UPDATE_CHECK=false` turns it off for one
 command.
 
 ## Everyday use
 
 ```bash
 git add -p                     # choose what goes into the commit
-smart-commit                   # print the suggested message
-smart-commit --commit          # review it, then commit
-smart-commit -C ../other-repo  # work on another repository
-smart-commit -v                # also print what was decided and why
+pionus                   # print the suggested message
+pionus --commit          # review it, then commit
+pionus -C ../other-repo  # work on another repository
+pionus -v                # also print what was decided and why
 ```
 
 Errors, warnings and notes go to stderr as `error:`, `warning:` and `note:`
 lines. `-v` adds `debug:` lines (rejected replies, devices that were skipped, the
 fallback); `-vv` adds more. It works before or after a
-subcommand: `smart-commit -v device`.
+subcommand: `pionus -v device`.
 
 In a terminal, `--commit` shows the message, the model and device that
 wrote it, how long it took and the staged files:
@@ -210,7 +210,7 @@ message, as before.
 
 **Asking for the type.** The type is where the message is least certain:
 two readers of the same diff pick the author's type about 70% of the time.
-With `smart-commit config set model.ask_type low_confidence`, `--commit`
+With `pionus config set model.ask_type low_confidence`, `--commit`
 asks which type the message should have when the model is unsure of it,
 offering its likeliest ones:
 
@@ -240,9 +240,9 @@ name (`ABC-123`) when the history cites tickets. The message is in English.
 ### On every `git commit`, from any client
 
 ```bash
-smart-commit hook install      # in the current repository
+pionus hook install      # in the current repository
 git commit                     # the editor opens with the message written
-smart-commit hook uninstall
+pionus hook uninstall
 ```
 
 The hook only writes on a plain `git commit`. With `-m`, `--amend`, a merge
@@ -252,22 +252,22 @@ or a template it does nothing. If anything goes wrong it prints a warning and
 ### See what the model gets
 
 ```bash
-smart-commit context           # the style detected in the history
-smart-commit prompt            # the exact prompt for what is staged
+pionus context           # the style detected in the history
+pionus prompt            # the exact prompt for what is staged
 ```
 
-`smart-commit prompt --inputs FILE` builds prompts without a repository, from
+`pionus prompt --inputs FILE` builds prompts without a repository, from
 JSON Lines of the `inputs` object of [traces](reproducibility.md) (`-` reads
 stdin), and prints one `{"system": ..., "user": ...}` per line. Only global
 settings apply. It gives a training or evaluation set the exact prompts
-smart-commit sends.
+pionus sends.
 
-`smart-commit eval FILE` reads the same JSON Lines and runs the whole
+`pionus eval FILE` reads the same JSON Lines and runs the whole
 pipeline on each input (prompt, model, sanitizer, retry, fallback), loading
 the model once, its own, never the one kept loaded between commits
 (`model.keep_loaded`), which would stop in the middle of a long run. It prints one compact trace per line, which `replay` accepts,
 and takes the generation options (`--device`, `--backend`...); the model file
-comes from the settings, e.g. `SMART_COMMIT_GGUF`. `prompt` and `eval` take
+comes from the settings, e.g. `PIONUS_GGUF`. `prompt` and `eval` take
 `--rules omitted` to leave out the fixed instructions, for a model trained
 without them; otherwise the model in use decides (see
 [architecture](architecture.md#prompt)). They also take `--diff plain`, the
@@ -283,10 +283,10 @@ change declares and one with the comments it adds, to evaluate those.
 ## Devices
 
 ```bash
-smart-commit device            # the device in use and the measured times (choose another in a terminal)
-smart-commit device use npu    # use the NPU from now on
-smart-commit device use auto   # back to the fastest
-smart-commit bench             # measure again
+pionus device            # the device in use and the measured times (choose another in a terminal)
+pionus device use npu    # use the NPU from now on
+pionus device use auto   # back to the fastest
+pionus bench             # measure again
 ```
 
 `auto` uses the fastest device of the last benchmark, and falls back to the
@@ -299,47 +299,47 @@ kept only if it takes at most 15% of the RAM and leaves a tenth free, see
 `model.keep_loaded_max_ram`):
 
 ```bash
-smart-commit config set model.keep_loaded 30   # or 0
-smart-commit server status     # what is kept loaded, and how long it has been idle
-smart-commit server stop       # free its memory now
+pionus config set model.keep_loaded 30   # or 0
+pionus server status     # what is kept loaded, and how long it has been idle
+pionus server stop       # free its memory now
 ```
 
 ## Models
 
 ```bash
-smart-commit model                       # choose a model (a picker in a terminal)
-smart-commit model list                  # the recommended models and those from disk, and which is in use
-smart-commit model use qwen2.5-coder-7b  # download it from Hugging Face and use it
-smart-commit model use ~/models/my.gguf  # use a GGUF file from disk, unverified (remembered)
+pionus model                       # choose a model (a picker in a terminal)
+pionus model list                  # the recommended models and those from disk, and which is in use
+pionus model use qwen2.5-coder-7b  # download it from Hugging Face and use it
+pionus model use ~/models/my.gguf  # use a GGUF file from disk, unverified (remembered)
 ```
 
 Recommended models are downloaded from Hugging Face (their publishers'
-repositories, or the project's account for smart-commit's own fine-tunes),
+repositories, or the project's account for pionus's own fine-tunes),
 pinned to a revision and checked against a SHA-256. See [models](models.md).
 
 ## Settings
 
 ```bash
-smart-commit config list --show-origin                         # everything, and where it comes from
-smart-commit config set style.default_convention conventional
-smart-commit config set --repo style.convention conventional   # .smart-commit.toml, shared through git
-smart-commit config init                                       # a file with every key commented out
+pionus config list --show-origin                         # everything, and where it comes from
+pionus config set style.default_convention conventional
+pionus config set --repo style.convention conventional   # .pionus.toml, shared through git
+pionus config init                                       # a file with every key commented out
 ```
 
 | To… | Run |
 |---|---|
-| enforce Conventional Commits for a team | `smart-commit config set --repo style.convention conventional` |
-| get faster NPU replies that see less of the diff | `smart-commit config set model.max_prompt_tokens 512` |
-| use another GPU on a multi-GPU machine | `smart-commit config set model.vulkan_device 1` |
-| keep replies short | `smart-commit config set model.max_new_tokens 64` |
+| enforce Conventional Commits for a team | `pionus config set --repo style.convention conventional` |
+| get faster NPU replies that see less of the diff | `pionus config set model.max_prompt_tokens 512` |
+| use another GPU on a multi-GPU machine | `pionus config set model.vulkan_device 1` |
+| keep replies short | `pionus config set model.max_new_tokens 64` |
 
 Every key is described in [configuration](configuration.md).
 
 ## Diagnose an installation
 
 ```bash
-smart-commit doctor             # check this installation, offline
-smart-commit doctor --thorough  # also hash the model file (minutes for a big model)
+pionus doctor             # check this installation, offline
+pionus doctor --thorough  # also hash the model file (minutes for a big model)
 ```
 
 One line per finding, tagged `ok`, `warn` or `fail`, with the fix after
@@ -364,22 +364,22 @@ ok    path       /home/me/.local/bin is on PATH
 ok    git        git 2.43
 ok    config     no files: the defaults apply
 ok    model      qwen2.5-coder-1.5b-instruct-q4_k_m.gguf: size and record match (--thorough hashes the file)
-ok    llama.cpp  /home/me/.local/share/smart-commit/llama.cpp/llama-b11381/llama-server
+ok    llama.cpp  /home/me/.local/share/pionus/llama.cpp/llama-b11381/llama-server
 ok    device     cpu (auto: no benchmark, the default order)
-warn  device     no benchmark yet - run `smart-commit bench`
+warn  device     no benchmark yet - run `pionus bench`
 ok    server     none running: the next commit starts one
-warn  hook       not installed in this repository - `smart-commit hook install`
+warn  hook       not installed in this repository - `pionus hook install`
 ```
 
 On a machine where the model was never downloaded, the `model` line is
-`fail` (`no GGUF model at … - `smart-commit setup` downloads it`) and the
+`fail` (`no GGUF model at … - `pionus setup` downloads it`) and the
 command exits with 1.
 
 ## Report a bad message
 
 ```bash
-smart-commit --trace bad.json  # or: SMART_COMMIT_TRACE=bad.json git commit
-smart-commit replay bad.json   # checks that it reproduces
+pionus --trace bad.json  # or: PIONUS_TRACE=bad.json git commit
+pionus replay bad.json   # checks that it reproduces
 ```
 
 A trace contains the staged diff and recent commit subjects with the paths
@@ -390,40 +390,40 @@ it, the case can become a test fixture.
 
 | Message | What to do |
 |---|---|
-| `smart-commit is not set up yet` | Nothing is installed yet (no model, no llama.cpp): `smart-commit setup`. `-v` shows what each device lacks |
-| `no device could run the model` | `smart-commit setup`; the message lists what each device lacks |
-| `no model in …`, `no GGUF model at …`, `no llama-server at …` | `smart-commit setup` downloads them; `smart-commit model use <id>` downloads a model |
-| `… has no OpenVINO version, which npu needs` | the model runs on `vulkan` and `cpu` only; `smart-commit model use qwen2.5-coder-1.5b` for the NPU |
+| `pionus is not set up yet` | Nothing is installed yet (no model, no llama.cpp): `pionus setup`. `-v` shows what each device lacks |
+| `no device could run the model` | `pionus setup`; the message lists what each device lacks |
+| `no model in …`, `no GGUF model at …`, `no llama-server at …` | `pionus setup` downloads them; `pionus model use <id>` downloads a model |
+| `… has no OpenVINO version, which npu needs` | the model runs on `vulkan` and `cpu` only; `pionus model use qwen2.5-coder-1.5b` for the NPU |
 | `OpenVINO GenAI not found` | only `npu`, `intel-gpu` and `openvino-cpu` need it; on a machine without an Intel NPU or GPU, use `vulkan` or `cpu` |
-| `model.device = gpu … is the old name of intel-gpu` | `smart-commit device use intel-gpu` (or `auto`) |
-| `cannot load the model on the NPU` | `~/.local/share/smart-commit/scripts/check-npu.sh`; after being added to the `render` group, log out and back in |
-| NVIDIA GPU `has no driver bound` | install a driver (`sudo ubuntu-drivers install`) or use nouveau, then `smart-commit setup` |
-| anything else, or you do not know what is wrong | `smart-commit doctor` checks the installation and says how to fix each problem |
-| the hook does nothing | it only acts on `git commit` without `-m`; `smart-commit hook install` reinstalls it |
+| `model.device = gpu … is the old name of intel-gpu` | `pionus device use intel-gpu` (or `auto`) |
+| `cannot load the model on the NPU` | `~/.local/share/pionus/scripts/check-npu.sh`; after being added to the `render` group, log out and back in |
+| NVIDIA GPU `has no driver bound` | install a driver (`sudo ubuntu-drivers install`) or use nouveau, then `pionus setup` |
+| anything else, or you do not know what is wrong | `pionus doctor` checks the installation and says how to fix each problem |
+| the hook does nothing | it only acts on `git commit` without `-m`; `pionus hook install` reinstalls it |
 
 ## Uninstall
 
 ```bash
-smart-commit uninstall            # the binary, the models, llama.cpp, the benchmark, the caches and the config
-smart-commit uninstall --system   # and the OpenVINO the setup installed (asks before using sudo)
+pionus uninstall            # the binary, the models, llama.cpp, the benchmark, the caches and the config
+pionus uninstall --system   # and the OpenVINO the setup installed (asks before using sudo)
 ```
 
 lists what it removes, with the size of the models, and asks (`--yes` skips
 the question; without a terminal it is required). Model files the settings
-point to outside `~/.local/share/smart-commit` (`model.gguf`, `model.dir`)
-were not downloaded by smart-commit: they are named and kept. It runs
+point to outside `~/.local/share/pionus` (`model.gguf`, `model.dir`)
+were not downloaded by pionus: they are named and kept. It runs
 `install.sh --purge` (with `--system`), the installer that came with the
 release; `install.sh` keeps finer options:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/smart-commit/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/Lucas-BRT/pionus/main/install.sh | bash -s -- --uninstall
 ```
 
 | Option | Removes |
 |---|---|
 | `--uninstall` | the binary, the scripts and the docs; the models, llama.cpp, the benchmark, the caches and the config stay, for a later install |
-| `--purge` | also `~/.local/share/smart-commit`, `~/.cache/smart-commit` and `~/.config/smart-commit` |
-| `--system` | also OpenVINO, when the setup installed it: `/opt/intel/openvino_2026.3.1`, the `/opt/intel/openvino` link and `/etc/ld.so.conf.d/smart-commit-openvino.conf`; it lists them and asks before using `sudo` (`--yes` skips the question) |
+| `--purge` | also `~/.local/share/pionus`, `~/.cache/pionus` and `~/.config/pionus` |
+| `--system` | also OpenVINO, when the setup installed it: `/opt/intel/openvino_2026.3.1`, the `/opt/intel/openvino` link and `/etc/ld.so.conf.d/pionus-openvino.conf`; it lists them and asks before using `sudo` (`--yes` skips the question) |
 
 `--purge --system` removes all of it. `--system` recognises the setup's
 OpenVINO by its `ld.so.conf.d` file, so an OpenVINO installed another way is
@@ -435,4 +435,4 @@ and membership of the `render` group. Remove them with `apt` and `gpasswd`
 if nothing else needs them. The hook stays in the repositories where it was
 installed, and does nothing once the binary is gone (commits are not
 blocked): remove `.git/hooks/prepare-commit-msg` there, or run
-`smart-commit hook uninstall` before uninstalling.
+`pionus hook uninstall` before uninstalling.

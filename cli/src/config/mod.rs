@@ -1,8 +1,8 @@
 //! Settings from config files, the environment and flags.
 //!
 //! Precedence, highest first: command-line flags, environment variables,
-//! the repository's `.smart-commit.toml`, the global
-//! `$XDG_CONFIG_HOME/smart-commit/config.toml`, and the defaults.
+//! the repository's `.pionus.toml`, the global
+//! `$XDG_CONFIG_HOME/pionus/config.toml`, and the defaults.
 //!
 //! Every key is declared once in [`KEYS`], which drives parsing, validation,
 //! `config set`, listing and the `config init` template alike. Unknown keys
@@ -27,7 +27,7 @@ pub use store::{
 };
 
 /// The per-repository file, at the root of the work tree.
-pub const REPO_FILE: &str = ".smart-commit.toml";
+pub const REPO_FILE: &str = ".pionus.toml";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Value {

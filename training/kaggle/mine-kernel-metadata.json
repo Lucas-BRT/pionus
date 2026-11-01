@@ -1,7 +1,7 @@
 {
-  "id": "lucasbrt/smart-commit-mine",
-  "title": "smart-commit mine",
-  "code_file": "smart-commit-mine.ipynb",
+  "id": "lucasbrt/pionus-mine",
+  "title": "pionus mine",
+  "code_file": "pionus-mine.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": true,
@@ -12,7 +12,7 @@
     "gpu"
   ],
   "dataset_sources": [
-    "lucasbrt/smart-commit-training-dpo2-mine"
+    "lucasbrt/pionus-training-dpo2-mine"
   ],
   "kernel_sources": [],
   "competition_sources": [],

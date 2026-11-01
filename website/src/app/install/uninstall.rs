@@ -16,18 +16,18 @@ pub async fn section() -> Result<impl View> {
             title: "Uninstall",
             terminal(
                 title: "uninstall",
-                label: "Uninstall smart-commit",
-                "smart-commit uninstall\n"
+                label: "Uninstall pionus",
+                "pionus uninstall\n"
                 note(
                     "the binary, the models, llama.cpp, the benchmark, the caches and the config"
                 )
-                "smart-commit uninstall --system\n"
+                "pionus uninstall --system\n"
                 note("and the OpenVINO the setup installed (asks before using sudo)")
             )
             <p>"It lists what it removes and asks first."</p>
             <p>
                 "Drivers stay, since other programs may use them. The hook stays in each repository: run "
-                <code>"smart-commit hook uninstall"</code>
+                <code>"pionus hook uninstall"</code>
                 " first."
             </p>
         )

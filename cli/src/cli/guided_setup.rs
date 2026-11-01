@@ -1,4 +1,4 @@
-//! `smart-commit setup`: in a terminal, a full-screen setup (the hardware,
+//! `pionus setup`: in a terminal, a full-screen setup (the hardware,
 //! the plan, each step's output, the benchmark); with `--yes` or without a
 //! terminal, the same plan as text.
 
@@ -9,14 +9,14 @@ use std::sync::mpsc;
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
-use smart_commit::backend::llamacpp;
-use smart_commit::config;
-use smart_commit::hardware::{Hardware, Npu};
-use smart_commit::models::{self, Model};
-use smart_commit::paths;
-use smart_commit::setup::{self, Facts, StepKind};
-use smart_commit::tui::setup::{Action, SetupView, State};
-use smart_commit::tui::{self, Screen};
+use pionus::backend::llamacpp;
+use pionus::config;
+use pionus::hardware::{Hardware, Npu};
+use pionus::models::{self, Model};
+use pionus::paths;
+use pionus::setup::{self, Facts, StepKind};
+use pionus::tui::setup::{Action, SetupView, State};
+use pionus::tui::{self, Screen};
 
 use super::model::{self, Chosen};
 use super::settings::{env, hardware_sources, resolve};
@@ -48,14 +48,14 @@ pub(super) fn run(
 }
 
 /// The llama.cpp build this release pins, in the data directory (from
-/// `SMART_COMMIT_LLAMACPP_URL`, for tests; the pinned SHA-256 still applies).
+/// `PIONUS_LLAMACPP_URL`, for tests; the pinned SHA-256 still applies).
 fn install_llamacpp(progress: &mut dyn FnMut(u64)) -> Result<PathBuf> {
     let server = paths::default_llama_server(env).context("HOME is not set")?;
     let dir = server
         .parent()
         .and_then(Path::parent)
         .context("the llama.cpp directory has no parent")?;
-    let url = env("SMART_COMMIT_LLAMACPP_URL").unwrap_or_else(llamacpp::install::archive_url);
+    let url = env("PIONUS_LLAMACPP_URL").unwrap_or_else(llamacpp::install::archive_url);
     Ok(llamacpp::install::install(
         dir,
         &url,
@@ -117,7 +117,7 @@ fn plain(scripts: &Path, yes: bool, no_drivers: bool, no_bench: bool) -> Result<
                     Err(err) => {
                         failed = true;
                         println!(
-                            "  Could not install llama.cpp ({err:#}); run `smart-commit setup` again."
+                            "  Could not install llama.cpp ({err:#}); run `pionus setup` again."
                         );
                     }
                 }
@@ -131,7 +131,7 @@ fn plain(scripts: &Path, yes: bool, no_drivers: bool, no_bench: bool) -> Result<
                     Err(err) => {
                         failed = true;
                         println!(
-                            "  Could not install {} ({err:#}); run `smart-commit setup` again.",
+                            "  Could not install {} ({err:#}); run `pionus setup` again.",
                             model.id
                         );
                     }
@@ -168,14 +168,14 @@ fn plain(scripts: &Path, yes: bool, no_drivers: bool, no_bench: bool) -> Result<
                 ) && !run_script(&scripts.join("export-model.sh"), &[])
                 {
                     failed = true;
-                    println!("  Could not export the model; run `smart-commit setup` again.");
+                    println!("  Could not export the model; run `pionus setup` again.");
                 }
             }
             StepKind::Bench if render_group_pending() => {
                 println!("\n==> Benchmark postponed");
                 println!(
                     "  You were just added to the render group, which only applies after\n  \
-                     logging out and back in. Then run: smart-commit bench"
+                     logging out and back in. Then run: pionus bench"
                 );
             }
             StepKind::Bench => {
@@ -203,15 +203,15 @@ fn plain(scripts: &Path, yes: bool, no_drivers: bool, no_bench: bool) -> Result<
 /// What to do once the setup worked.
 const NEXT_STEPS: &str = "\nNext:\n  \
     git add -p                 choose what goes into the commit\n  \
-    smart-commit               print a message for what is staged\n  \
-    smart-commit --commit      review it, then commit\n  \
-    smart-commit hook install  fill in every `git commit` of this repository\n";
+    pionus               print a message for what is staged\n  \
+    pionus --commit      review it, then commit\n  \
+    pionus hook install  fill in every `git commit` of this repository\n";
 
 /// Downloads `model` into the models directory, as `setup` does for the
 /// one in use.
 fn plain_model(model: &'static Model) -> Result<PathBuf> {
     let dir = paths::default_models_dir(env).context("HOME is not set")?;
-    let base = env("SMART_COMMIT_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned());
+    let base = env("PIONUS_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned());
     println!(
         "  {} ({}, {}) from huggingface.co/{}",
         model.name,
@@ -237,7 +237,7 @@ fn ask(question: &str, yes: bool) -> bool {
         return true;
     }
     if !std::io::stdin().is_terminal() {
-        println!("{question} [skipped: no terminal; run `smart-commit setup` again to do it]");
+        println!("{question} [skipped: no terminal; run `pionus setup` again to do it]");
         return false;
     }
     print!("{question} [y/N] ");
@@ -258,7 +258,7 @@ fn set_aside_invalid_settings() -> Result<()> {
     for removed in config::set_aside_invalid(&path, env("HOME").as_deref())? {
         tracing::warn!(
             "{removed}; removed, so the default applies \
-             (`smart-commit model` or `smart-commit config set` choose again)"
+             (`pionus model` or `pionus config set` choose again)"
         );
     }
     Ok(())
@@ -268,12 +268,12 @@ fn set_aside_invalid_settings() -> Result<()> {
 fn scripts_dir(exe: &Path) -> Result<PathBuf> {
     let bin = exe.parent().context("the binary has no directory")?;
     [
-        bin.join("../share/smart-commit/scripts"),
+        bin.join("../share/pionus/scripts"),
         bin.join("../../scripts"),
     ]
     .into_iter()
     .find(|p| p.join("setup-gpu.sh").is_file())
-    .context("the setup scripts are not next to the binary; reinstall smart-commit")
+    .context("the setup scripts are not next to the binary; reinstall pionus")
 }
 
 /// What is already on this machine.
@@ -398,7 +398,7 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
             ),
             StepKind::Bench if render_group_pending() => Err(
                 "you were just added to the render group: log out and back in, then run \
-                 `smart-commit bench`"
+                 `pionus bench`"
                     .to_owned(),
             ),
             StepKind::Bench => bench(&mut screen),
@@ -591,7 +591,7 @@ fn install_model(
     model: &'static Model,
 ) -> Result<String, String> {
     let dir = paths::default_models_dir(env).ok_or("HOME is not set")?;
-    let base = env("SMART_COMMIT_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned());
+    let base = env("PIONUS_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned());
     view.log(&format!(
         "{} ({}, {}) from huggingface.co/{}",
         model.name,
@@ -654,8 +654,8 @@ fn bench(screen: &mut Screen) -> Result<String, String> {
             None => settings,
         };
     let target = match settings.device {
-        smart_commit::config::DeviceSetting::Fixed(target) => Some(target),
-        smart_commit::config::DeviceSetting::Auto => benchmarked.report.fastest(),
+        pionus::config::DeviceSetting::Fixed(target) => Some(target),
+        pionus::config::DeviceSetting::Auto => benchmarked.report.fastest(),
     };
     match target.and_then(|t| benchmarked.report.entry(t).map(|e| (t, e))) {
         Some((target, entry)) => Ok(match &entry.measurement {

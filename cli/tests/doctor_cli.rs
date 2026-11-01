@@ -1,4 +1,4 @@
-//! `smart-commit doctor`, against installations built in temporary
+//! `pionus doctor`, against installations built in temporary
 //! directories: a fresh one, a complete one, inside and outside a
 //! repository.
 
@@ -6,12 +6,12 @@ use std::fs;
 use std::path::Path;
 use std::process::Output;
 
-use smart_commit::backend::llamacpp::LLAMA_CPP_BUILD;
-use smart_commit::models;
+use pionus::backend::llamacpp::LLAMA_CPP_BUILD;
+use pionus::models;
 use tempfile::TempDir;
 
 mod common;
-use common::{TestRepo, smart_commit};
+use common::{TestRepo, pionus};
 
 struct Home {
     config: TempDir,
@@ -29,7 +29,7 @@ impl Home {
     fn doctor(&self, args: &[&str], dir: &Path) -> Output {
         let mut all = vec!["doctor"];
         all.extend_from_slice(args);
-        smart_commit(
+        pionus(
             &all,
             dir,
             &[
@@ -39,10 +39,10 @@ impl Home {
         )
     }
 
-    /// What `smart-commit setup` leaves for the llama.cpp devices: the
+    /// What `pionus setup` leaves for the llama.cpp devices: the
     /// pinned GGUF (its size and record, not its content) and llama-server.
     fn install(&self) {
-        let share = self.data.path().join("smart-commit");
+        let share = self.data.path().join("pionus");
         let model = models::find(models::DEFAULT).unwrap();
         fs::create_dir_all(share.join("models")).unwrap();
         let file = share.join("models").join(model.gguf.file);
@@ -77,7 +77,7 @@ fn a_fresh_home_fails_for_the_missing_model() {
     let report = stdout(&output);
     let model = line(&report, "fail  model");
     assert!(model.contains("no GGUF model at"), "{report}");
-    assert!(model.contains("smart-commit setup"), "{report}");
+    assert!(model.contains("pionus setup"), "{report}");
     assert!(line(&report, "warn  llama.cpp").contains("no llama-server"));
     assert!(line(&report, "warn  device").contains("no benchmark"));
     assert!(line(&report, "ok    config").contains("defaults"));
@@ -96,7 +96,7 @@ fn an_installed_tree_passes_and_warnings_keep_the_exit_code() {
     assert!(line(&report, "ok    model").contains("size and record match"));
     assert!(line(&report, "ok    llama.cpp").contains("llama-server"));
     // No benchmark yet: a warning, not a failure.
-    assert!(line(&report, "warn  device").contains("smart-commit bench"));
+    assert!(line(&report, "warn  device").contains("pionus bench"));
     assert!(line(&report, "ok    server").contains("none running"));
     assert!(!report.contains("\nfail"), "{report}");
 }
@@ -106,11 +106,7 @@ fn a_model_of_the_wrong_size_fails() {
     let home = Home::new();
     home.install();
     let model = models::find(models::DEFAULT).unwrap();
-    let file = home
-        .data
-        .path()
-        .join("smart-commit/models")
-        .join(model.gguf.file);
+    let file = home.data.path().join("pionus/models").join(model.gguf.file);
     fs::File::create(&file).unwrap().set_len(10).unwrap();
     let output = home.doctor(&[], home.data.path());
     assert_eq!(output.status.code(), Some(1));
@@ -121,7 +117,7 @@ fn a_model_of_the_wrong_size_fails() {
 fn a_config_that_does_not_parse_fails() {
     let home = Home::new();
     home.install();
-    let dir = home.config.path().join("smart-commit");
+    let dir = home.config.path().join("pionus");
     fs::create_dir_all(&dir).unwrap();
     fs::write(dir.join("config.toml"), "[model\n").unwrap();
     let output = home.doctor(&[], home.data.path());
@@ -136,9 +132,9 @@ fn inside_a_repository_it_checks_the_hook() {
     let repo = TestRepo::new();
     let report = stdout(&home.doctor(&[], repo.path()));
     let hook = line(&report, "warn  hook");
-    assert!(hook.contains("smart-commit hook install"), "{report}");
+    assert!(hook.contains("pionus hook install"), "{report}");
 
-    let installed = smart_commit(&["hook", "install"], repo.path(), &[]);
+    let installed = pionus(&["hook", "install"], repo.path(), &[]);
     assert!(installed.status.success());
     let report = stdout(&home.doctor(&[], repo.path()));
     assert!(
@@ -160,7 +156,7 @@ fn a_repository_file_is_checked_too() {
     let home = Home::new();
     home.install();
     let repo = TestRepo::new();
-    repo.write(".smart-commit.toml", "[style]\nnope = 1\n");
+    repo.write(".pionus.toml", "[style]\nnope = 1\n");
     let output = home.doctor(&[], repo.path());
     assert_eq!(output.status.code(), Some(1));
     assert!(line(&stdout(&output), "fail  config").contains("style.nope"));
@@ -173,11 +169,7 @@ fn thorough_is_accepted_and_still_checks_the_size_first() {
     let home = Home::new();
     home.install();
     let model = models::find(models::DEFAULT).unwrap();
-    let file = home
-        .data
-        .path()
-        .join("smart-commit/models")
-        .join(model.gguf.file);
+    let file = home.data.path().join("pionus/models").join(model.gguf.file);
     fs::File::create(&file).unwrap().set_len(10).unwrap();
     let output = home.doctor(&["--thorough"], home.data.path());
     assert_eq!(output.status.code(), Some(1));

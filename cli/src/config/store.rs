@@ -191,7 +191,7 @@ impl Resolved {
                 Value::Text(text) => renamed(name, text).map(|new| {
                     format!(
                         "{name} = {text} ({origin}) is the old name of {new}; \
-                         `smart-commit config set {name} {new}` renames it"
+                         `pionus config set {name} {new}` renames it"
                     )
                 }),
                 Value::Count(_) => None,
@@ -462,7 +462,7 @@ impl Settings {
             (Some(dir), _) => dir.clone(),
             (None, None) => {
                 return Err(format!(
-                    "{} has no OpenVINO version, which {} needs; `smart-commit model use {}` \
+                    "{} has no OpenVINO version, which {} needs; `pionus model use {}` \
                      has one",
                     self.model.id,
                     device.target().name(),

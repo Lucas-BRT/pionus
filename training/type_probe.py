@@ -2,7 +2,7 @@
 
 A bag of features (the paths, the file statuses, the words of the added and removed lines, the
 line counts and the types the history uses) and a logistic regression, trained on a selection
-of `sc-training select` and read on the Conventional commits of an evaluation set, like the
+of `pionus-training select` and read on the Conventional commits of an evaluation set, like the
 models: `type_match` and `type_macro_f1`. It tells whether the type has headroom a separate
 classifier could use, or whether the labels are the limit.
 

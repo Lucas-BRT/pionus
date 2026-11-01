@@ -1,10 +1,10 @@
 //! The notice of a newer release, after the commands a person runs by hand
-//! (see `smart_commit::update_notice`).
+//! (see `pionus::update_notice`).
 
 use std::io::IsTerminal as _;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use smart_commit::{paths, update_notice};
+use pionus::{paths, update_notice};
 
 use super::settings::{env, resolve};
 use super::ui::note;
@@ -13,8 +13,8 @@ use super::ui::note;
 /// has passed since the last request. Never fails: a command's result does
 /// not depend on it.
 pub(super) fn print() {
-    // `SMART_COMMIT_NOTICE_TTY` lets tests stand in for a terminal.
-    let terminal = std::io::stderr().is_terminal() || env("SMART_COMMIT_NOTICE_TTY").is_some();
+    // `PIONUS_NOTICE_TTY` lets tests stand in for a terminal.
+    let terminal = std::io::stderr().is_terminal() || env("PIONUS_NOTICE_TTY").is_some();
     if !terminal || !resolve(None, vec![]).is_ok_and(|resolved| resolved.update_check()) {
         return;
     }

@@ -1,11 +1,11 @@
 [package]
-name = "smart-commit"
+name = "pionus"
 version = "0.14.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Commit messages in your repository's style, from a small LLM running locally (NPU, GPU or CPU)"
 license = "MIT"
-repository = "https://github.com/Lucas-BRT/smart-commit"
+repository = "https://github.com/Lucas-BRT/pionus"
 readme = "../README.md"
 keywords = ["git", "commit", "llm", "npu", "openvino"]
 categories = ["command-line-utilities", "development-tools"]

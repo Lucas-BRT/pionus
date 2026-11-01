@@ -196,13 +196,13 @@ fn save_document(path: &Path, doc: &DocumentMut) -> Result<(), ConfigError> {
 /// with its description and default.
 pub fn template(for_repo: bool, resolved_defaults: &Resolved) -> String {
     let mut out = String::from(if for_repo {
-        "# smart-commit settings for this repository, shared through git.\n\
+        "# pionus settings for this repository, shared through git.\n\
          # They override the global config; flags and environment variables\n\
          # override them. Uncomment a line to change it.\n"
     } else {
-        "# smart-commit global settings. A repository's .smart-commit.toml overrides\n\
+        "# pionus global settings. A repository's .pionus.toml overrides\n\
          # the style.* keys; flags and environment variables override both.\n\
-         # `smart-commit config list --show-origin` shows where each value comes\n\
+         # `pionus config list --show-origin` shows where each value comes\n\
          # from. Uncomment a line to change it.\n"
     });
     let mut section = None;

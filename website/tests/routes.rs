@@ -1,4 +1,4 @@
-use smart_commit_website::router;
+use pionus_website::router;
 use topcoat::router::{Body, to_bytes};
 
 async fn get(path: &str) -> (u16, String, String) {
@@ -178,7 +178,7 @@ async fn every_page_names_the_version_of_the_product() {
         "/how-it-works",
         "/roadmap",
     ] {
-        page(path, &[&format!("smart-commit {version}")]).await;
+        page(path, &[&format!("pionus {version}")]).await;
     }
 }
 
@@ -242,8 +242,8 @@ async fn install_lists_the_platform_and_the_download_sizes() {
             "id=\"requirements\"",
             &format!("Platform: {platform}, with glibc {glibc} or newer, and git."),
             &format!("{:.1} MB", bytes / 1e6),
-            "~/.local/share/smart-commit",
-            "~/.cache/smart-commit",
+            "~/.local/share/pionus",
+            "~/.cache/pionus",
         ],
     )
     .await;
@@ -500,7 +500,7 @@ fn squeeze(text: &str) -> String {
     text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-/// The commands a page shows, each as typed: `smart-commit ...` without the
+/// The commands a page shows, each as typed: `pionus ...` without the
 /// prompt, a trailing comment or a placeholder.
 fn commands(html: &str) -> Vec<String> {
     snippets(html)
@@ -510,7 +510,7 @@ fn commands(html: &str) -> Vec<String> {
             let line = line.strip_prefix("$ ").unwrap_or(line);
             let line = line.split_once(" # ").map_or(line, |(command, _)| command);
             let line = squeeze(line);
-            (line.starts_with("smart-commit ") && !line.contains(['<', '…'])).then_some(line)
+            (line.starts_with("pionus ") && !line.contains(['<', '…'])).then_some(line)
         })
         .collect()
 }
@@ -628,10 +628,10 @@ async fn every_setting_and_variable_a_page_names_exists() {
                     );
                     checked += 1;
                 }
-                if let Some(name) = word.strip_prefix("SMART_COMMIT_") {
+                if let Some(name) = word.strip_prefix("PIONUS_") {
                     let name = name.split('=').next().unwrap();
                     if !name.contains('*') {
-                        let variable = format!("SMART_COMMIT_{name}");
+                        let variable = format!("PIONUS_{name}");
                         assert!(configuration.contains(&variable), "{path} names {variable}");
                         checked += 1;
                     }
@@ -649,7 +649,7 @@ async fn the_error_messages_of_troubleshooting_are_in_the_product() {
     // The fixed part of each message the page lists; a few are built with a
     // device's name, so the part before it is what the source holds.
     for message in [
-        "smart-commit is not set up yet",
+        "pionus is not set up yet",
         "no device could run the model",
         "cannot load the model on the",
         "has no driver bound",

@@ -1,10 +1,10 @@
 [package]
-name = "smart-commit-website"
+name = "pionus-website"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 publish = false
-description = "Website for smart-commit, built with Topcoat"
+description = "Website for pionus, built with Topcoat"
 
 [dependencies]
 # Pinned exactly: Topcoat is early-stage and breaks between releases.

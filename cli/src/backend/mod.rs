@@ -40,7 +40,7 @@ pub enum BackendError {
     #[error("backend unavailable: {0}")]
     Unavailable(String),
     /// Like [`Self::Unavailable`], for a file the backend needs that is not
-    /// installed (yet): what `smart-commit setup` fixes.
+    /// installed (yet): what `pionus setup` fixes.
     #[error("backend unavailable: {0}")]
     NotInstalled(String),
     #[error("generation failed: {0}")]

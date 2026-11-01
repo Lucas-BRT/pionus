@@ -1,7 +1,7 @@
 {
-  "id": "lucasbrt/smart-commit-lora",
-  "title": "smart-commit lora",
-  "code_file": "smart-commit-lora.ipynb",
+  "id": "lucasbrt/pionus-lora",
+  "title": "pionus lora",
+  "code_file": "pionus-lora.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": true,
@@ -12,7 +12,7 @@
     "gpu"
   ],
   "dataset_sources": [
-    "lucasbrt/smart-commit-training-v04-s"
+    "lucasbrt/pionus-training-v04-s"
   ],
   "kernel_sources": [],
   "competition_sources": [],

@@ -1,4 +1,4 @@
-//! `smart-commit bench` and `smart-commit device`: measure the devices of this
+//! `pionus bench` and `pionus device`: measure the devices of this
 //! machine, show which one is used, and change it.
 
 use std::path::{Path, PathBuf};
@@ -8,13 +8,13 @@ use std::time::Duration;
 
 use anyhow::{Context as _, Result, anyhow, bail};
 use clap::Subcommand;
-use smart_commit::backend::device::{self, Target};
-use smart_commit::bench::{self, Entry, Machine, Report};
-use smart_commit::config::{self, BackendKind, DeviceSetting, FastLoad, Origin, Settings};
-use smart_commit::hardware::Hardware;
-use smart_commit::paths;
-use smart_commit::tui::bench::{Action, BenchView};
-use smart_commit::tui::{self, Screen};
+use pionus::backend::device::{self, Target};
+use pionus::bench::{self, Entry, Machine, Report};
+use pionus::config::{self, BackendKind, DeviceSetting, FastLoad, Origin, Settings};
+use pionus::hardware::Hardware;
+use pionus::paths;
+use pionus::tui::bench::{Action, BenchView};
+use pionus::tui::{self, Screen};
 
 use super::args::DeviceArg;
 use super::load::{Retry, load_with};
@@ -37,7 +37,7 @@ pub(super) fn last_report() -> Option<Report> {
     Report::from_json(&text)
 }
 
-const HOW_TO_CHANGE: &str = "To use another device: smart-commit device use \
+const HOW_TO_CHANGE: &str = "To use another device: pionus device use \
                              <npu|intel-gpu|vulkan|cpu|openvino-cpu>, or `auto` for the fastest.";
 
 /// The devices of this machine: the ones a benchmark measures.
@@ -60,7 +60,7 @@ fn measure_all(
 ) -> Option<Report> {
     // A model kept loaded holds memory the measured loads need.
     if let Some(runtime) = paths::runtime_dir(env) {
-        smart_commit::backend::server::stop(&runtime);
+        pionus::backend::server::stop(&runtime);
     }
     let prompts = bench::prompts();
     let config = settings.generation_config();
@@ -256,7 +256,7 @@ fn print_summary(report: &Report, settings: &Settings, path: &Path) -> Result<()
         Some(target) => println!("{}", using_message(report, target, settings.device)),
         None => {
             bail!(
-                "no device could run the model; `smart-commit setup` installs \
+                "no device could run the model; `pionus setup` installs \
                  the drivers and models"
             );
         }
@@ -311,7 +311,7 @@ fn using_message(report: &Report, target: Target, device: DeviceSetting) -> Stri
         DeviceSetting::Auto => "the fastest, model.device = auto",
         _ => "set in model.device",
     };
-    format!("smart-commit will use {target} on this machine{estimate}: {why}.")
+    format!("pionus will use {target} on this machine{estimate}: {why}.")
 }
 
 pub(super) fn run_device(command: Option<DeviceCommand>) -> Result<()> {
@@ -361,7 +361,7 @@ fn show_device() -> Result<()> {
             }
         }
         None => println!(
-            "No benchmark yet: `smart-commit bench` measures the devices of this machine.\n\
+            "No benchmark yet: `pionus bench` measures the devices of this machine.\n\
              Until then, auto uses the first that works of {}.",
             present_devices()
                 .into_iter()
@@ -383,11 +383,11 @@ fn use_device(device: DeviceArg) -> Result<()> {
     if let Some(note) = stop_kept_after("model.device") {
         println!("{note}");
     }
-    if env("SMART_COMMIT_DEVICE").is_some_and(|v| !v.is_empty()) {
-        note!("SMART_COMMIT_DEVICE is set and overrides the config.");
+    if env("PIONUS_DEVICE").is_some_and(|v| !v.is_empty()) {
+        note!("PIONUS_DEVICE is set and overrides the config.");
     }
     let Some(report) = last_report() else {
-        println!("Run `smart-commit bench` to compare the devices of this machine.");
+        println!("Run `pionus bench` to compare the devices of this machine.");
         return Ok(());
     };
     match device.target() {

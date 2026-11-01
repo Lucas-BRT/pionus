@@ -44,13 +44,13 @@ The binary (`cli/src/main.rs` and the `cli/src/cli/` modules: `args`, `suggest`,
 tests build the installations) and `install` for the commands, and `session`, `load`,
 `logging` and `settings`, which they share) only parses
 arguments and wires these together; `update` and `uninstall` run the `install.sh` the release
-installed in `share/smart-commit/scripts`.
+installed in `share/pionus/scripts`.
 
-Tools for working on smart-commit are crates of their own in the workspace,
+Tools for working on pionus are crates of their own in the workspace,
 outside `default-members`: what they need never reaches the binary users
 install, and the release build does not compile them. `tools/` (the binary
-`sc-tools`) times llama-server on prompt files and writes the release notes;
-`training/tools/` (`sc-training`) builds, selects and scores the training data
+`pionus-tools`) times llama-server on prompt files and writes the release notes;
+`training/tools/` (`pionus-training`) builds, selects and scores the training data
 and the commit scenarios, and is the only place that reads parquet.
 
 Errors: the library returns typed errors (`thiserror`: `GitError`,
@@ -224,7 +224,7 @@ A merge, a revert or a cherry-pick in progress leaves git's own message in
 `MERGE_MSG` (`Merge branch 'x'`, `Revert "..."` with the reverted hash,
 the picked commit's message), which `git commit` would use. The diff does
 not show what is going on, so a model describes it as an ordinary change;
-smart-commit takes git's message instead, comments removed, **without
+pionus takes git's message instead, comments removed, **without
 loading the model**. A merge resolved to what HEAD already has stages
 nothing; that is not "nothing staged" then. `git merge --squash` writes
 `SQUASH_MSG`, a list of the squashed commits rather than a subject: the
@@ -234,7 +234,7 @@ message in the review asks the model.
 
 ## Git hook
 
-`smart-commit hook install` writes `prepare-commit-msg`, honouring
+`pionus hook install` writes `prepare-commit-msg`, honouring
 `core.hooksPath`. The script calls the binary by absolute path, because GUI
 clients often run hooks without the user's `PATH`. If that binary is gone
 (uninstalled, moved), the script does nothing and the commit goes on.
@@ -264,9 +264,9 @@ clients often run hooks without the user's `PATH`. If that binary is gone
   the network. A minimal HTTP/1.1 client talks to it, and requests are greedy
   and seeded, without prompt caching. The server stops when the backend is
   dropped, unless `model.keep_loaded` asks to keep it: then a detached
-  supervisor (`smart-commit keep-server`, in its own process group) owns it
+  supervisor (`pionus keep-server`, in its own process group) owns it
   and stops it after that many idle minutes, and commits connect to its
-  socket in `$XDG_RUNTIME_DIR/smart-commit/<key>/`. The key is a hash of the
+  socket in `$XDG_RUNTIME_DIR/pionus/<key>/`. The key is a hash of the
   server's options and of the model's and server's identity, so another
   model or device gets its own server; a lock keeps two commits from
   starting two. On `cpu` it offloads nothing (`--n-gpu-layers 0 --device none`),

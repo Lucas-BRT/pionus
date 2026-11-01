@@ -1,8 +1,8 @@
 ---
-source: src/tui/setup.rs
+source: cli/src/tui/setup.rs
 expression: "draw(90, 26, |f| view().render(f))"
 ---
-┌ smart-commit setup: hardware ──────────────────────────────────────────────────────────┐
+┌ pionus setup: hardware ────────────────────────────────────────────────────────────────┐
 │  CPU  AMD Ryzen 5 5500 (x86_64)                                                        │
 │       -> cpu (llama.cpp)                                                               │
 │  GPU  NVIDIA device 2507 [0000:01:00.0], driver nvidia 595.104.02                      │

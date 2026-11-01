@@ -5,10 +5,10 @@
 //! repository (`files/`, and `repo.toml`, the history that introduces them);
 //! `scenarios/cases/*.toml` hold the cases, each a list of operations from
 //! `OPS` applied on top of a base repository. Building a case runs
-//! smart-commit's mock backend on the result and keeps the trace's inputs, so
+//! pionus's mock backend on the result and keeps the trace's inputs, so
 //! the cases come out in the format `select` writes (`inputs.jsonl` and
 //! `meta.jsonl`): `make-examples` turns them into training examples, and
-//! `smart-commit eval` and `score` evaluate them, unchanged.
+//! `pionus eval` and `score` evaluate them, unchanged.
 //!
 //! Everything is deterministic: fixed author, dates and git config, sorted
 //! globs, seeded binary content. Building twice gives the same bytes.
@@ -875,7 +875,7 @@ pub fn apply(case: &Case, repo: &Repo, dest: &Path) -> Result<Git> {
 
 // ---------------------------------------------------------------- capture
 
-/// The trace inputs smart-commit records for `workdir`'s staged changes,
+/// The trace inputs pionus records for `workdir`'s staged changes,
 /// from its mock backend, with an empty configuration; or the error when it
 /// refuses to generate.
 pub fn capture(workdir: &Path, binary: &str) -> std::result::Result<Value, String> {

@@ -1,5 +1,5 @@
 ---
-source: src/tui/models.rs
+source: cli/src/tui/models.rs
 expression: "draw(80, 20, |f| picker().render(f))"
 ---
  Models: downloaded from Hugging Face, pinned and checked
@@ -8,11 +8,11 @@ expression: "draw(80, 20, |f| picker().render(f))"
 │> qwen2.5-coder-1.5b     1.1 GB  validated    gguf, openvino <- in use        │
 │  qwen2.5-coder-0.5b     491 MB  experimental gguf                            │
 │  qwen2.5-coder-7b       4.7 GB  experimental -                               │
-│  smart-commit-1.5b-v0.1 986 MB  experimental gguf                            │
-│  smart-commit-0.5b-v0.1 397 MB  experimental gguf                            │
-│  smart-commit-0.5b-v0.2 397 MB  experimental gguf                            │
-│  smart-commit-1.5b-v0.2 986 MB  experimental gguf                            │
-│  smart-commit-0.5b-v0.3 397 MB  experimental gguf                            │
+│  pionus-1.5b-v0.1       986 MB  experimental gguf                            │
+│  pionus-0.5b-v0.1       397 MB  experimental gguf                            │
+│  pionus-0.5b-v0.2       397 MB  experimental gguf                            │
+│  pionus-1.5b-v0.2       986 MB  experimental gguf                            │
+│  pionus-0.5b-v0.3       397 MB  experimental gguf                            │
 └──────────────────────────────────────────────────────────────────────────────┘
 ┌ Qwen2.5-Coder-1.5B-Instruct ─────────────────────────────────────────────────┐
 │the default: fast on every device, code-focused                               │

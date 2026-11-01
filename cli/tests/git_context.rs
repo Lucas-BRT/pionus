@@ -2,11 +2,11 @@
 
 use std::fs;
 
-use smart_commit::context::RepoContext;
-use smart_commit::diff;
-use smart_commit::git::{ChangeStatus, FileChange, GitError, Repo};
-use smart_commit::prompt::{self, PromptOptions};
-use smart_commit::style::Convention;
+use pionus::context::RepoContext;
+use pionus::diff;
+use pionus::git::{ChangeStatus, FileChange, GitError, Repo};
+use pionus::prompt::{self, PromptOptions};
+use pionus::style::Convention;
 use tempfile::TempDir;
 
 mod common;
@@ -32,7 +32,7 @@ fn diverged() -> TestRepo {
 
 #[test]
 fn git_prepared_messages_are_read() {
-    use smart_commit::git::Operation;
+    use pionus::git::Operation;
     let prepared = |repo: &TestRepo| {
         repo.repo()
             .prepared_message()

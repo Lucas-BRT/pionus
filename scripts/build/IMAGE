@@ -1,13 +1,13 @@
 # The build image `scripts/package.sh` builds the release in, as a registry
 # reference fixed by digest, for example
 #
-#   ghcr.io/lucas-brt/smart-commit-build@sha256:...
+#   ghcr.io/lucas-brt/pionus-build@sha256:...
 #
 # With a reference here, package.sh pulls that image: no `apt`, no package
 # snapshot, the same C toolchain for everyone. Without one (as long as the
 # image has not been published) it builds the image from scripts/build/Dockerfile,
-# which needs snapshot.ubuntu.com. SMART_COMMIT_BUILD_IMAGE overrides this file
+# which needs snapshot.ubuntu.com. PIONUS_BUILD_IMAGE overrides this file
 # with any image, local or not. See docs/reproducibility.md for how the image
 # is published and this line updated.
 
-ghcr.io/lucas-brt/smart-commit-build@sha256:81fa76d5f7d81bcd193a122c17894ea8d14ccfa7e254ac94dc365f138bcc2eab
+ghcr.io/lucas-brt/pionus-build@sha256:81fa76d5f7d81bcd193a122c17894ea8d14ccfa7e254ac94dc365f138bcc2eab

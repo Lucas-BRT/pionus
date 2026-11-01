@@ -20,12 +20,12 @@ pub async fn section() -> Result<impl View> {
                 row(
                     cell(
                         label: "Message",
-                        <code>"smart-commit is not set up yet"</code>
+                        <code>"pionus is not set up yet"</code>
                     )
                     cell(
                         label: "What to do",
                         "Run "
-                        <code>"smart-commit setup"</code>
+                        <code>"pionus setup"</code>
                         "."
                     )
                 )
@@ -34,7 +34,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "What to do",
                         "Run "
-                        <code>"smart-commit setup"</code>
+                        <code>"pionus setup"</code>
                         ". The message lists what each device lacks."
                     )
                 )
@@ -50,9 +50,9 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "What to do",
                         "Run "
-                        <code>"smart-commit setup"</code>
+                        <code>"pionus setup"</code>
                         ", or "
-                        <code>"smart-commit model use <id>"</code>
+                        <code>"pionus model use <id>"</code>
                         "."
                     )
                 )
@@ -68,7 +68,7 @@ pub async fn section() -> Result<impl View> {
                         " and "
                         <code>"cpu"</code>
                         " only. For the NPU: "
-                        <code>"smart-commit model use qwen2.5-coder-1.5b"</code>
+                        <code>"pionus model use qwen2.5-coder-1.5b"</code>
                         "."
                     )
                 )
@@ -98,7 +98,7 @@ pub async fn section() -> Result<impl View> {
                     )
                     cell(
                         label: "What to do",
-                        <code>"smart-commit device use intel-gpu"</code>
+                        <code>"pionus device use intel-gpu"</code>
                         " (or "
                         <code>"auto"</code>
                         ")."
@@ -112,7 +112,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "What to do",
                         "Run "
-                        <code>"~/.local/share/smart-commit/scripts/check-npu.sh"</code>
+                        <code>"~/.local/share/pionus/scripts/check-npu.sh"</code>
                         ". After joining the "
                         <code>"render"</code>
                         " group, log out and back in."
@@ -129,7 +129,7 @@ pub async fn section() -> Result<impl View> {
                         "Install a driver ("
                         <code>"sudo ubuntu-drivers install"</code>
                         ") or use nouveau, then "
-                        <code>"smart-commit setup"</code>
+                        <code>"pionus setup"</code>
                         "."
                     )
                 )
@@ -142,7 +142,7 @@ pub async fn section() -> Result<impl View> {
                         " without "
                         <code>"-m"</code>
                         ". Reinstall it with "
-                        <code>"smart-commit hook install"</code>
+                        <code>"pionus hook install"</code>
                         "."
                     )
                 )
@@ -154,7 +154,7 @@ pub async fn section() -> Result<impl View> {
                     cell(
                         label: "What to do",
                         "Run "
-                        <code>"smart-commit doctor"</code>
+                        <code>"pionus doctor"</code>
                         "."
                     )
                 )
