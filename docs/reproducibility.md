@@ -99,7 +99,10 @@ pinning:
 - the NPU's flags: `--weight-format int4 --sym --group-size 128 --ratio 1.0`.
 
 The result must match `scripts/export/MANIFEST.sha256` byte for byte, or the
-script fails. The manifest's hash is the model's identity in traces. uv
+script fails. The manifest's hash is the model's identity in traces. A
+change to the export (revision, flags, lock) needs two identical exports from
+scratch, the new manifest in the same commit, and a run of the **Model**
+workflow. uv
 0.13.1 is pinned too, by SHA-256, and downloaded into the cache when it is
 missing.
 

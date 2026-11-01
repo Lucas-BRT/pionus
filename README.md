@@ -113,18 +113,17 @@ see [devices](docs/devices.md) for how the device is chosen.
 - [Reproducibility](docs/reproducibility.md): what is pinned and how it is checked
 - [Training](docs/training.md): how smart-commit's own models are trained and measured
 - [Roadmap](docs/roadmap.md): what comes next, and the model candidates
+- [Contributing](docs/contributing.md): checks, tests, commits and releases
 
 ## Contributing
 
 ```bash
-cargo fmt --check
-cargo clippy --locked --workspace --all-targets -- -D warnings
-cargo test --locked --workspace
+scripts/check.sh   # everything CI runs
 ```
 
-The tests need no hardware. [AGENTS.md](AGENTS.md) describes the rules for
-changes (tests with every change, one purpose per commit, reproducibility)
-and how releases are made.
+The tests need no hardware. [AGENTS.md](AGENTS.md) has the rules for changes
+(tests with every change, one purpose per commit, reproducibility), and
+[contributing](docs/contributing.md) how to test, commit and release.
 
 ## License
 

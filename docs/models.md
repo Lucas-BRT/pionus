@@ -132,6 +132,13 @@ into `$XDG_DATA_HOME/smart-commit/models/`, resumes an interrupted
 download, and refuses any file whose SHA-256 differs. A model already
 there is not downloaded again.
 
+Other publishers' models are never re-hosted: users' machines download them
+from their publishers and export them. smart-commit's own fine-tunes,
+`smart-commit-<size>-v<version>`, live on Hugging Face under
+[LucasBRT](https://huggingface.co/LucasBRT), one repository per model and
+version, each with a model card. A new version is a new name, never a
+replaced file, pinned in the registry like any other model.
+
 `model.name` names the model in use; `model.gguf` and `model.dir` default
 to its files. Traces record the model's file and SHA-256.
 
@@ -183,8 +190,8 @@ and `auto` uses `vulkan` or `cpu`.
 ## Adding a recommended model
 
 1. An open licence, and the publisher's own GGUF file, or for a fine-tune
-   of this project, its repository under the project's account (AGENTS.md,
-   "Where models come from").
+   of this project, its repository under the project's account
+   ([Where they come from](#where-they-come-from)).
 2. Its repository commit, file size and SHA-256 (the Hugging Face API lists
    them: `https://huggingface.co/api/models/<repo>?blobs=true`), in
    `cli/src/models/registry.rs`.

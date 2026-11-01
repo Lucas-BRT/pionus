@@ -1,129 +1,80 @@
 # smart-commit website
 
-Read [../AGENTS.md](../AGENTS.md) first: commits, tests, documentation and
-reproducibility apply here as everywhere. This file adds what is only about the
-site.
+Adds to [../AGENTS.md](../AGENTS.md).
 
-Marketing and documentation site, written in Rust with Topcoat (pinned to
-`=0.11.0`). Server-rendered HTML, no JavaScript, one theme (dark, one violet accent). Run it with
-`cargo run -p smart-commit-website` (or `topcoat dev`, which reloads on
-change); `HOST=0.0.0.0` opens it from a phone. `docker compose up -d --build`
-here runs the image.
+Rust + Topcoat `=0.11.0`: server-rendered HTML, no JavaScript, one dark theme
+with one violet accent. Run: `cargo run -p smart-commit-website` (or
+`topcoat dev`; `HOST=0.0.0.0` for a phone). Release build:
+`cargo build --profile website -p smart-commit-website`; image:
+`docker compose up -d --build` here.
 
-## Where things come from
+## Content
 
-- **Facts come from the product, by build.** The version, repository, install
-  command, default model and its size, the devices table, the benchmark example
-  and the next roadmap items are read by `build.rs` from `../cli/Cargo.toml`,
-  `../cli/src/models/registry.rs` and `../docs/{devices,usage,roadmap}.md`, into
-  `facts`. Never type one of them into a page: change the source file.
-  The measurements page is the exception that needs care: the numbers it draws
-  are copied from `../docs/measurements.md` into `src/measures.rs`, and
-  `tests/routes.rs` reads that document and looks for each one on the page, so a
-  changed measurement fails a test until `measures.rs` follows. Charts are
-  HTML and CSS only: the bar decorates, the number is text.
-  Anything else the pages say is written by hand: check it against `../docs/`
-  and the CLI when the product changes, and never invent a number or a command.
-- **Styles:** `styles.css` is the Tailwind entry (the `topcoat ui` theme, with
-  the site palette: near-black, violet accent, Bricolage Grotesque headings); `build.rs` builds
-  it with the utilities used in `src/**/*.rs` and the hand-written
-  `assets/style.css`. Layout and spacing are Tailwind utilities in the Rust
-  sources; `style.css` holds only the font and the defaults of plain elements (type,
-  lists, `code`); the terminal, tables, steps and charts are components in `src/ui`. No animations or effects. The display font is a file of the site
-  (`assets/fonts`, SIL OFL), never a request to a font host.
-  A class in `style.css` that Tailwind also defines (`grid`, `hidden`) breaks the utility.
-  After editing a CSS file, touch `build.rs` if the served stylesheet looks
-  stale: Cargo does not always rerun it.
+- **Facts** (version, repo, installer, models, devices, benchmark, roadmap)
+  are read by `build.rs` into `src/facts.rs`. Never type one into a page.
+- **Measurements** are copied from `../docs/measurements.md` into
+  `src/measures.rs`; `tests/routes.rs` fails until they match. Charts are
+  HTML/CSS: the bar decorates, the number is text.
+- **Other copy** is handwritten: check it against `../docs/` and the CLI;
+  never invent a number or command.
+- Only `/` may sell; other pages are developer docs: plain titles, no
+  slogans, no calls to action. Linux only, no macOS conventions. Writing a
+  message is local; installing, updating and downloading models use the
+  network.
 
-## Code layout
+## Code
 
-```
-src/
-  app.rs            routes: the root layout, the home page, mod declarations
-  app/<page>.rs     a page: only the `#[page]` that composes its sections
-  app/<page>/*.rs   one component per section (`pub async fn section()`)
-  ui/               components of this site, built on the ones below
-  components/       Topcoat UI, copied with `topcoat ui add` (see components.toml)
-  site.rs           every page in one table: menu, title, description, section
-  assets.rs         the stylesheet, the mark and the font, as routes
-  facts.rs          what the site reads from the product (build.rs)
-  measures.rs       the numbers of docs/measurements.md the charts draw
-```
+- A page is `src/app/<page>.rs` with only its `#[page]` (a module without one
+  adds no route); its sections are components in `src/app/<page>/`, one per
+  file. Split by sections, not size.
+- New page: the module, a row in `site::PAGES` (identified by its handler,
+  never its path), a row in `tests/routes.rs::PAGES`.
+- `src/ui/` holds site components; `src/components/` is Topcoat UI, copied
+  with `topcoat ui add`. Never add one that needs the JS runtime (`sheet`,
+  `sidebar`, `navigation_menu`, `dialog`, `tabs`, `alert_dialog`), nor
+  `suspense`, `live!`, `emit!`.
+- Topcoat 0.11.0 guides: `~/.cargo/registry/src/*/topcoat-0.11.0/docs` and
+  `topcoat-view-macro-0.11.0/docs`. Not in 0.11.0: `with(...)`, `Metadata`,
+  `link`.
+- Reusable markup is a `#[component]` (called `card(item: x)`) with typed
+  props: enums for variants, `&str` for text, `#[default]`, `child: Child`.
+- Classes: `class="..."`, `class!(...)` to compose, `StaticClass` for
+  constants; never `format!` or a `&str` constant. Wrappers take
+  `attrs: Attributes` and merge with `class!(BASE, attrs.remove("class"))`;
+  callers cannot override a class the component sets.
+- Interpolate numbers directly, `(count)`; a non-text value gets its own
+  type (`ui::chart::Share`). Compute `let` values before the `view!`.
+- Links: `href!(handler)`, `.fragment("id")`, `.is_current(cx)`; only
+  external URLs are strings. Icons: `IconData` in `ui/icons.rs` via
+  `icon(...)`.
+- `cargo fmt` always; `topcoat fmt` only if the installed CLI handles 0.11.
 
-A page with sections is a folder; split a page when it has several sections,
-not by size. A module with no `#[page]` adds no route. New page: the module,
-a row in `site::PAGES` (its handler is its identity, never its path), a row in
-`tests/routes.rs::PAGES`.
+## Styles
 
-## Topcoat
+- `styles.css` is the Tailwind entry (theme + palette: near-black, violet,
+  Bricolage Grotesque); `build.rs` builds it from the utilities in
+  `src/**/*.rs` and `assets/style.css`. If the served CSS is stale, touch
+  `build.rs`.
+- Layout and spacing are Tailwind utilities in Rust. `assets/style.css` has
+  only the font and plain-element defaults; never a class Tailwind also
+  defines (`grid`, `hidden`).
+- No animations or effects. No fixed lengths (`rem`, `em`, `%`, `fr`,
+  `clamp()`); breakpoints in `rem`. Fonts are local (`assets/fonts`), never
+  a font host.
+- Use the `frontend-design` skill for visual changes, checked against the
+  existing page.
 
-Read [Topcoat's `llms.txt`](https://raw.githubusercontent.com/tokio-rs/topcoat/refs/heads/main/llms.txt)
-before writing markup. It describes the `main` branch; the site is pinned to
-`=0.11.0`, whose guides are in `~/.cargo/registry/src/*/topcoat-0.11.0/docs` and
-`topcoat-view-macro-0.11.0/docs`. Route context (`with(...)`), `Metadata` and
-`link` are not in 0.11.0. What the site relies on:
+## Done
 
-- **Reusable markup is a component** (`#[component]`), called as `card(item: x)`,
-  not a function that returns markup. Props are typed: enums for variants,
-  `&str` for text, `#[default]` for what may be left out, `child: Child` for content.
-- **Classes:** a fixed list is `class="..."`; a composed one is `class!(...)`, a
-  constant is `StaticClass`. Never `format!` a class, and never a `&str` constant
-  of classes. A component that wraps one element takes `attrs: Attributes` and
-  merges with `class!(BASE, attrs.remove("class"))`; Tailwind does not resolve
-  conflicts, so a caller cannot override a class the component already sets.
-- **Values:** interpolate numbers directly, `(count)`; a value that is not text
-  gets its own type (`ui::chart::Share` writes a `width:` style). `let` values
-  that a `view!` borrows are computed before it.
-- **Links:** `href!(handler)`, with `.fragment("id")` for an anchor and
-  `.is_current(cx)` for the page you are on. Only external URLs are strings.
-- **No JavaScript.** Do not add Topcoat UI components that need the runtime
-  (`sheet`, `sidebar`, `navigation_menu`, `dialog`, `tabs`, `alert_dialog`), and
-  skip `suspense`, `live!` and `emit!`: every page is rendered whole.
-- **Icons** are `IconData` constants (`ui/icons.rs`) rendered with `icon(...)`.
-- `topcoat fmt` formats `view!` bodies, but the installed CLI can be older than
-  the crate (its grammar is 0.5, the site's is 0.11) and fail; run `cargo fmt`
-  always, `topcoat fmt` only when it works.
+Tests check facts, commands, settings, errors and links against the product,
+never wording: do not test a sentence or heading.
 
-## Done means checked
+Any change to markup, CSS, assets or layout-affecting copy is also checked
+visually at 1280, 820 and 390 px:
 
-`cargo fmt --check`, `cargo clippy --all-targets -p smart-commit-website -- -D
-warnings` and `cargo test -p smart-commit-website` must pass, but tests cannot
-see a layout. Every change to markup, copy that changes the layout, CSS, the logo
-or an asset is also checked visually, on three devices:
-
-| Device | Width |
-|---|---|
-| Desktop | 1280 px |
-| Tablet | 820 px |
-| Mobile | 390 px |
-
-1. Start the site, then run `scripts/visual-check.sh /path ...` with every page
-   the change can reach (a change to the layout, the header or the stylesheet
-   reaches all of them).
-2. Open each screenshot and look at it. Do not assume.
-3. Look for horizontal overflow, clipped or badly wrapped text, orphaned items
-   in a grid, uneven spacing, misalignment, controls that are hidden or too
-   small to tap, contrast, and the states a change can alter (a menu, a scrolled
-   table, a focused control).
-4. Fix what you find and check again. Only then say it is done.
-5. In the report, say which pages and sizes you checked, and which you did not.
-
-## Style rules
-
-- Use the `frontend-design` skill for any visual change, and read its output
-  against the page that exists before editing.
-- No fixed lengths in CSS: use `rem`, `em`, `%`, `fr`, `clamp()` and similar.
-  Breakpoints are in `rem`.
-- The landing page (`/`) may sell. Every other page is documentation for
-  developers: plain titles, no slogans, no calls to action.
-- The product runs on Linux only: no macOS conventions in examples or terminal
-  blocks.
-- Say only what holds: writing a message is local, but installing, updating and
-  downloading models use the network.
-- Tests check the site against the product, never its copy: a fact (version,
-  repository, installer, models, devices, measurements) must match the file
-  that says it; every command, setting and error message a page shows must exist
-  in the documents or the sources; every link must resolve, fragments included.
-  A new page is added to `PAGES` in `tests/routes.rs`, which runs those checks on
-  it. Do not add a test that reads a sentence or a heading: rewording a page must
-  not need a test change.
+1. Start the site; `scripts/visual-check.sh /path ...` for every page it
+   reaches (layout, header, stylesheet: all).
+2. Look at every screenshot: overflow, clipped or badly wrapped text,
+   orphaned grid items, spacing, alignment, small tap targets, contrast,
+   altered states (menu, scrolled table, focus).
+3. Fix and recheck. Report which pages and sizes you checked and which not.

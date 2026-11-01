@@ -42,7 +42,7 @@ Two expected gains:
   Python; generate the inputs with the Rust code (see
   [Dataset](#dataset)).
 - **The fine-tunes are published on Hugging Face by the project**, as
-  `smart-commit-<size>-v<version>` (AGENTS.md, "Where models come from"); other
+  `smart-commit-<size>-v<version>` ([models](models.md#where-they-come-from)); other
   publishers' models are still never re-hosted.
 - **Evaluation comes before training.** Without a held-out set and metrics
   there is no way to tell whether a fine-tune, a smaller prompt budget or
@@ -280,8 +280,8 @@ What is published is one model per size smart-commit offers, named
    (`export_lora.py`, `llama-server --lora`) is for evaluation only.
 2. For the OpenVINO devices (NPU, Intel GPU), users' machines are to
    export the published safetensors through `scripts/export/`, following
-   AGENTS.md's model export rules (two identical exports, `MANIFEST.sha256`,
-   the **Model** workflow). Not done for v0.1, which runs on `vulkan` and
+   the model export rules of [reproducibility](reproducibility.md#the-model) (two
+   identical exports, `MANIFEST.sha256`, the **Model** workflow). Not done for v0.1, which runs on `vulkan` and
    `cpu` only.
 3. Upload both to the project's Hugging Face account,
    [LucasBRT](https://huggingface.co/LucasBRT), one repository per model and
