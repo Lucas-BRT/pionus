@@ -42,6 +42,7 @@ jobs:
       - run: cli/tests/scripts/test-workflows.sh
       - run: cli/tests/scripts/test-build-env.sh
       - run: cli/tests/scripts/test-build-image.sh
+      - run: cli/tests/scripts/test-check.sh
 
   # Packages in the pinned build container (twice: the bytes must match)
   # and installs the result; the printed hash is the one any machine gets
