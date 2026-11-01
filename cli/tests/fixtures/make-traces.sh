@@ -461,3 +461,7 @@ real_change conventional-en-language-removal-as-move 6af6697 'refactor: move lan
 # A local check script, its test and one CI step running that test: the reply's type was ci and it said the
 # script was added to CI.
 real_change conventional-en-check-script-as-ci df3e74c 'ci: add a check script to CI'
+
+# Contributing details moved from AGENTS.md to docs pages: the reply said a guide was added "to docs and website",
+# reading website/AGENTS.md as the website.
+real_change conventional-en-agents-docs-as-website bc0f7f9 'docs: add contributing guide to docs and website'
