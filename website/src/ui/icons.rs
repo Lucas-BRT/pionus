@@ -23,6 +23,15 @@ pub const PACKAGE: IconData = iconify_icon!("lucide:package");
 /// A signal crossed out: no network.
 pub const OFFLINE: IconData = iconify_icon!("lucide:wifi-off");
 
+/// Your machine.
+pub const LAPTOP: IconData = iconify_icon!("lucide:laptop");
+
+/// The network.
+pub const GLOBE: IconData = iconify_icon!("lucide:globe");
+
+/// A plug pulled out: no connection.
+pub const UNPLUG: IconData = iconify_icon!("lucide:unplug");
+
 pub const COPY: IconData = iconify_icon!("lucide:copy");
 
 /// Shown once something is copied.

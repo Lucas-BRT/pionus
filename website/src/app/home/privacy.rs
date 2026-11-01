@@ -1,6 +1,6 @@
 use topcoat::{
     Result,
-    icon::IconData,
+    icon::{IconData, icon as glyph},
     view::{Child, StaticClass, View, attributes, class, component, view},
 };
 
@@ -8,8 +8,7 @@ use crate::{
     facts::DEFAULT_MODEL_SIZE,
     ui::{
         container::container,
-        cut_cable::cut_cable,
-        icons::{NO_ACCOUNT, OFFLINE, PACKAGE, icon_badge},
+        icons::{GLOBE, LAPTOP, NO_ACCOUNT, OFFLINE, PACKAGE, UNPLUG, icon_badge},
     },
 };
 
@@ -17,6 +16,10 @@ const PANEL: StaticClass = class!(
     "grid items-center gap-10 rounded-3xl border border-border bg-card p-8",
     "md:p-14 lg:grid-cols-2 lg:gap-12",
 );
+
+/// Scene icons keep a thin line at any size, like the line between them.
+const SCENE_ICON: StaticClass =
+    class!("shrink-0 [&_*]:stroke-[3] [&_*]:[vector-effect:non-scaling-stroke]");
 
 /// One thing the tool does not need, with its icon.
 #[component]
@@ -60,7 +63,17 @@ pub async fn section() -> Result<impl View> {
                             )
                         </ul>
                     </div>
-                    cut_cable(attrs: attributes! { class="mx-auto max-w-[32rem]" })
+                    <div
+                        class="mx-auto flex w-full max-w-md items-center gap-3 text-muted-foreground"
+                        role="img"
+                        aria-label="A laptop unplugged from the internet"
+                    >
+                        glyph(data: LAPTOP, size: 64, attrs: attributes! { class=(class!(SCENE_ICON, "text-primary")) })
+                        <span class="h-0.75 flex-1 rounded-full bg-current"></span>
+                        glyph(data: UNPLUG, size: 64, attrs: attributes! { class=(class!(SCENE_ICON, "rotate-45")) })
+                        <span class="h-0.75 flex-1 rounded-full bg-current"></span>
+                        glyph(data: GLOBE, size: 64, attrs: attributes! { class=(SCENE_ICON) })
+                    </div>
                 </div>
             )
         </section>
