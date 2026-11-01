@@ -45,8 +45,8 @@ with one violet accent. Run: `cargo run -p smart-commit-website` (or
 - Interpolate numbers directly, `(count)`; a non-text value gets its own
   type (`ui::chart::Share`). Compute `let` values before the `view!`.
 - Links: `href!(handler)`, `.fragment("id")`, `.is_current(cx)`; only
-  external URLs are strings. Icons: `IconData` in `ui/icons.rs` via
-  `icon(...)`.
+  external URLs are strings. Icons: lucide constants in `ui/icons.rs`
+  (`iconify_icon!`, set pinned and committed in `icons/`) via `icon(...)`.
 - `cargo fmt` always; `topcoat fmt` only if the installed CLI handles 0.11.
 
 ## Styles

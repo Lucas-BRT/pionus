@@ -12,6 +12,12 @@ fn main() {
         config
     };
     config.render().unwrap();
+    // Pinned and committed in icons/, so the build reads it offline.
+    topcoat::icon::iconify::BuildConfig::new()
+        .cache_dir("icons")
+        .icon_set_version("lucide", "1.2.144")
+        .stage()
+        .unwrap();
     facts();
 }
 

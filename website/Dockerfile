@@ -42,6 +42,7 @@ COPY training/tools/src training/tools/src
 COPY website/build.rs website/styles.css website/
 COPY website/src website/src
 COPY website/assets website/assets
+COPY website/icons website/icons
 RUN find cli/src tools/src training/tools/src website/src website/build.rs -name '*.rs' -exec touch {} + \
     && cargo build --profile website --locked -p smart-commit-website \
     && cp target/website/smart-commit-website /server
