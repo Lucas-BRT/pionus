@@ -457,3 +457,7 @@ real_change conventional-en-examples-option-as-add-examples 08c6b2c 'feat(prompt
 # Language support removed from the style, prompt, retry and config code (and its tests, fixtures and docs): the
 # reply said the detection was moved.
 real_change conventional-en-language-removal-as-move 6af6697 'refactor: move language detection to style module'
+
+# A local check script, its test and one CI step running that test: the reply's type was ci and it said the
+# script was added to CI.
+real_change conventional-en-check-script-as-ci df3e74c 'ci: add a check script to CI'
