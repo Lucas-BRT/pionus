@@ -10,7 +10,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from pair_judge import (  # noqa: E402
-    agreement, build, check, comparisons_for, interval, merge, net, norm, outcome, render_comparisons, side,
+    ANSWER, agreement, build, check, comparisons_for, decided_alike, human, interval, merge, net, norm, outcome,
+    render_comparisons, sheet, side,
 )
 
 
@@ -112,6 +113,47 @@ def test_build_and_merge_end_to_end() -> None:
         js = json.loads((out / "judgments.json").read_text())
         assert len(js) == 2 * 12 and sum(bool(j.get("auto_tie")) for j in js) == 2
         assert all(j["outcome"] == "tie" for j in js)
+
+
+def test_a_whole_set_is_judged_in_as_many_batches_as_asked() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        set_dir, out = root / "set", root / "out"
+        set_dir.mkdir()
+        (set_dir / "inputs.jsonl").write_text("".join(json.dumps({"subjects": [], "staged": [], "files": []}) + "\n" for _ in range(5)))
+        (set_dir / "meta.jsonl").write_text("".join(json.dumps({"repo": "o/secret", "hash": f"h{n}", "target": f"fix: A{n}"}) + "\n" for n in range(5)))
+        (root / "m.jsonl").write_text("".join(json.dumps({"generation": {"message": {"subject": f"fix: M{n}"}}}) + "\n" for n in range(5)))
+        build(None, set_dir, out, [("m", root / "m.jsonl")], 29, batches=2)
+        key = json.loads((out / "sample.json").read_text())
+        assert [k["line"] for k in key] == list(range(5)) and len({k["id"] for k in key}) == 5
+        assert len(list(out.glob("PA-*.md"))) == 2 and len(list(out.glob("PB-*.ids"))) == 2
+        asked = [i for p in out.glob("PA-*.ids") for i in p.read_text().split()]
+        assert sorted(asked) == sorted(f"{k['id']}-1" for k in key)
+        assert "secret" not in "".join(p.read_text() for p in out.glob("P*.md"))
+
+
+def test_a_person_rates_what_the_passes_decided_alike(capsys=None) -> None:
+    js = [{"id": "c1-1", "pass": "A", "outcome": "win"}, {"id": "c1-1", "pass": "B", "outcome": "win"},
+          {"id": "c2-1", "pass": "A", "outcome": "win"}, {"id": "c2-1", "pass": "B", "outcome": "loss"},
+          {"id": "c3-1", "pass": "A", "outcome": "tie"}, {"id": "c3-1", "pass": "B", "outcome": "tie"}]
+    assert decided_alike(js) == {"c1-1": "win"}
+    with tempfile.TemporaryDirectory() as d:
+        out, set_dir = Path(d) / "out", Path(d) / "set"
+        out.mkdir(), set_dir.mkdir()
+        (set_dir / "inputs.jsonl").write_text(json.dumps({"subjects": [], "staged": [], "files": []}) + "\n")
+        case = {"id": "c1", "line": 0, "comparisons": comparisons_for("c1", {"m": "fix: M", "author": "fix: A"}, "m")}
+        (out / "pairs.json").write_text(json.dumps({"seed": 29, "focus": "m", "cases": [case]}))
+        (out / "judgments.json").write_text(json.dumps(js))
+        sheet(out, set_dir, 30)
+        text = (out / "human.md").read_text()
+        assert "fix: M" in text and "fix: A" in text and "author" not in text
+        focus = side(29, "human", "c1-1")
+        (out / "human.md").write_text(text.replace(f"{ANSWER}c1-1: ", f"{ANSWER}c1-1: {focus}"))
+        import contextlib, io
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said):
+            human(out)
+        assert "agrees with the two passes in 1 of 1" in said.getvalue()
 
 
 if __name__ == "__main__":

@@ -7,15 +7,20 @@ know where a message comes from which of two is the better commit message for th
   author's and with other models' (identical messages are a tie and are not asked). Each of two passes, A and B,
   has its own random side for each message, so the side and the pass can be told apart from the quality.
 - `merge` reads the annotators' answers and writes `judgments.json`, with each outcome from the focus model's side.
+- `sheet` draws comparisons the two passes decided alike and writes `human.md` for a person to fill, the messages on
+  a side of its own; `human` reads the filled sheet and counts how often the person agrees with the passes.
 - `report` shows wins, ties and losses against each, the scores, the messages that invent, the positional bias and the
   agreement of the two passes.
 
-    python -I pair_judge.py build AUDIT_DIR SET_DIR OUT_DIR FOCUS=TRACES.jsonl OTHER=TRACES.jsonl... [--seed 29]
+    python -I pair_judge.py build AUDIT_DIR SET_DIR OUT_DIR FOCUS=TRACES.jsonl OTHER=TRACES.jsonl... [--seed 29] [--batches 4]
     python -I pair_judge.py merge OUT_DIR
     python -I pair_judge.py report OUT_DIR/judgments.json
+    python -I pair_judge.py sheet OUT_DIR SET_DIR [--n 30]
+    python -I pair_judge.py human OUT_DIR
 
 `AUDIT_DIR/sample.json` lists the commits (`id`, `line`, `real_subject`); the first model given is the focus, the
-author is added as `author`. Standard library only.
+author is added as `author`. `-` as `AUDIT_DIR` takes every commit of the set and writes that list to
+`OUT_DIR/sample.json`. Standard library only.
 """
 
 import collections
@@ -76,9 +81,22 @@ def render_comparisons(case: dict, seed: int, pass_name: str) -> str:
     return "\n".join(lines)
 
 
-def build(audit_dir: Path, set_dir: Path, out_dir: Path, models: list[tuple[str, Path]], seed: int) -> None:
+def whole_set(set_dir: Path, seed: int) -> list[dict]:
+    """Every commit of the set as a sample, under ids that say nothing of its order."""
+    metas = [json.loads(line) for line in open(set_dir / "meta.jsonl")]
+    ids = random.Random(seed + 1).sample(range(1, 10000), len(metas))
+    return [{"id": f"c{k:04d}", "line": line, "repo": m["repo"], "hash": m["hash"], "real_subject": m["target"]}
+            for line, (k, m) in enumerate(zip(ids, metas))]
+
+
+def build(audit_dir: Path | None, set_dir: Path, out_dir: Path, models: list[tuple[str, Path]], seed: int,
+          batches: int = BATCHES) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
-    key = json.loads((audit_dir / "sample.json").read_text())
+    if audit_dir is None:
+        key = whole_set(set_dir, seed)
+        (out_dir / "sample.json").write_text(json.dumps(key, indent=1))
+    else:
+        key = json.loads((audit_dir / "sample.json").read_text())
     inputs = [json.loads(line) for line in open(set_dir / "inputs.jsonl")]
     lines = [k["line"] for k in key]
     focus = models[0][0]
@@ -91,7 +109,7 @@ def build(audit_dir: Path, set_dir: Path, out_dir: Path, models: list[tuple[str,
     ids = [c["id"] for c in cases]
     by_id = {c["id"]: c for c in cases}
     for pass_name in PASSES:
-        for number, batch in enumerate(batches_for(ids, f"pair-{pass_name}", seed, BATCHES), 1):
+        for number, batch in enumerate(batches_for(ids, f"pair-{pass_name}", seed, batches), 1):
             blocks = []
             for cid in batch:
                 case = by_id[cid]
@@ -190,6 +208,52 @@ def agreement(judgments: list[dict]) -> dict:
     }
 
 
+ANSWER = "Your answer (X, Y or tie) for "
+
+
+def decided_alike(judgments: list[dict]) -> dict[str, str]:
+    """The outcome of each comparison both passes decided the same way, ties left out."""
+    by = collections.defaultdict(dict)
+    for j in judgments:
+        if not j.get("auto_tie"):
+            by[j["id"]][j["pass"]] = j["outcome"]
+    return {i: v["A"] for i, v in by.items() if len(v) == 2 and v["A"] == v["B"] != "tie"}
+
+
+def sheet(out_dir: Path, set_dir: Path, n: int) -> None:
+    pairs = json.loads((out_dir / "pairs.json").read_text())
+    alike = decided_alike(json.loads((out_dir / "judgments.json").read_text()))
+    chosen = set(random.Random(f"{pairs['seed']}-human").sample(sorted(alike), min(n, len(alike))))
+    inputs = [json.loads(line) for line in open(set_dir / "inputs.jsonl")]
+    blocks = []
+    for case in pairs["cases"]:
+        for c in case["comparisons"]:
+            if c["id"] in chosen:
+                one = {**case, "comparisons": [c]}
+                blocks.append(render_case(case["id"], inputs[case["line"]]) + "\n"
+                              + render_comparisons(one, pairs["seed"], "human") + f"\n{ANSWER}{c['id']}: \n")
+    random.Random(f"{pairs['seed']}-human-order").shuffle(blocks)
+    (out_dir / "human.md").write_text("\n\n".join(blocks) + "\n")
+    print(f"{len(blocks)} comparisons to rate in {out_dir / 'human.md'}")
+
+
+def human(out_dir: Path) -> None:
+    pairs = json.loads((out_dir / "pairs.json").read_text())
+    alike = decided_alike(json.loads((out_dir / "judgments.json").read_text()))
+    same = ties = total = 0
+    for line in (out_dir / "human.md").read_text().splitlines():
+        if not line.startswith(ANSWER):
+            continue
+        cid, _, answer = line[len(ANSWER):].partition(":")
+        answer = answer.strip()
+        if answer not in ("X", "Y", "tie"):
+            sys.exit(f"{cid}: answer {answer!r} is not X, Y or tie")
+        focus_side = side(pairs["seed"], "human", cid)
+        mine = "tie" if answer == "tie" else ("win" if answer == focus_side else "loss")
+        total, same, ties = total + 1, same + (mine == alike[cid]), ties + (mine == "tie")
+    print(f"the person agrees with the two passes in {same} of {total} comparisons ({ties} rated a tie)")
+
+
 def report(path: Path) -> None:
     js = json.loads(path.read_text())
     real = [j for j in js if not j.get("auto_tie")]
@@ -227,11 +291,16 @@ def main() -> None:
     if args[:1] == ["build"]:
         seed = int(args[args.index("--seed") + 1]) if "--seed" in args else SEED
         models = [(a.split("=", 1)[0], Path(a.split("=", 1)[1])) for a in args[4:] if "=" in a]
-        build(Path(args[1]), Path(args[2]), Path(args[3]), models, seed)
+        batches = int(args[args.index("--batches") + 1]) if "--batches" in args else BATCHES
+        build(None if args[1] == "-" else Path(args[1]), Path(args[2]), Path(args[3]), models, seed, batches)
     elif args[:1] == ["merge"]:
         merge(Path(args[1]))
     elif args[:1] == ["report"]:
         report(Path(args[1]))
+    elif args[:1] == ["sheet"]:
+        sheet(Path(args[1]), Path(args[2]), int(args[args.index("--n") + 1]) if "--n" in args else 30)
+    elif args[:1] == ["human"]:
+        human(Path(args[1]))
     else:
         sys.exit(__doc__)
 
