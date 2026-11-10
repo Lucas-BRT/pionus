@@ -1,0 +1,6006 @@
+{
+ "seed": 29,
+ "focus": "1.5b-v0.3",
+ "cases": [
+  {
+   "id": "c8833",
+   "line": 0,
+   "comparisons": [
+    {
+     "id": "c8833-1",
+     "other": "author",
+     "focus_text": "added read and write methods to IPlugin",
+     "other_text": "added IPlugin json read and write",
+     "auto_tie": false
+    },
+    {
+     "id": "c8833-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "added read and write methods to IPlugin",
+     "other_text": "add iplugin write/read methods",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4739",
+   "line": 1,
+   "comparisons": [
+    {
+     "id": "c4739-1",
+     "other": "author",
+     "focus_text": "Fixup zkapp_command_builder to handle None_given authorization",
+     "other_text": "Add correct authorization kinds in mk_zkapp_command",
+     "auto_tie": false
+    },
+    {
+     "id": "c4739-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixup zkapp_command_builder to handle None_given authorization",
+     "other_text": "Fix up zkapp command builder for authorization kind",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0493",
+   "line": 2,
+   "comparisons": [
+    {
+     "id": "c0493-1",
+     "other": "author",
+     "focus_text": "Remove test-snapp from genesis ledger",
+     "other_text": "put new genesis ledger in genesis_ledger dir",
+     "auto_tie": false
+    },
+    {
+     "id": "c0493-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove test-snapp from genesis ledger",
+     "other_text": "Remove genesis_ledgers/test-snapps.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3441",
+   "line": 3,
+   "comparisons": [
+    {
+     "id": "c3441-1",
+     "other": "author",
+     "focus_text": "update ci net artifact path",
+     "other_text": "shorten ci-net testnet ids",
+     "auto_tie": false
+    },
+    {
+     "id": "c3441-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "update ci net artifact path",
+     "other_text": "fix ci net name",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4216",
+   "line": 4,
+   "comparisons": [
+    {
+     "id": "c4216-1",
+     "other": "author",
+     "focus_text": "Remove unnecessary wpantund leave call in web-service",
+     "other_text": "remove 'leave' operation to avoid change existing WPAN status",
+     "auto_tie": false
+    },
+    {
+     "id": "c4216-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove unnecessary wpantund leave call in web-service",
+     "other_text": "Remove unnecessary exit from wpan_service",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0795",
+   "line": 5,
+   "comparisons": [
+    {
+     "id": "c0795-1",
+     "other": "author",
+     "focus_text": "Add GetMaxCapacityNode to controller service",
+     "other_text": "Move building csi sidecar binaries to release container image",
+     "auto_tie": false
+    },
+    {
+     "id": "c0795-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add GetMaxCapacityNode to controller service",
+     "other_text": "Add node publish volume test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6508",
+   "line": 6,
+   "comparisons": [
+    {
+     "id": "c6508-1",
+     "other": "author",
+     "focus_text": "Fix background evaluate method",
+     "other_text": "add clean up",
+     "auto_tie": false
+    },
+    {
+     "id": "c6508-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix background evaluate method",
+     "other_text": "Fix background evaluate",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6164",
+   "line": 7,
+   "comparisons": [
+    {
+     "id": "c6164-1",
+     "other": "author",
+     "focus_text": "Fix graph serialization",
+     "other_text": "Made edges save for keras models",
+     "auto_tie": false
+    },
+    {
+     "id": "c6164-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix graph serialization",
+     "other_text": "Add edges to graph",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2197",
+   "line": 8,
+   "comparisons": [
+    {
+     "id": "c2197-1",
+     "other": "author",
+     "focus_text": "Fix healthcheck output for archive sync",
+     "other_text": "update coda-automation submodule and fix archive healthcheck typo",
+     "auto_tie": false
+    },
+    {
+     "id": "c2197-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix healthcheck output for archive sync",
+     "other_text": "Fix healthcheck-utilities script for archive sync",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1333",
+   "line": 9,
+   "comparisons": [
+    {
+     "id": "c1333-1",
+     "other": "author",
+     "focus_text": "astarte_data_updater_plant: update mix",
+     "other_text": "mix: update distillery",
+     "auto_tie": false
+    },
+    {
+     "id": "c1333-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "astarte_data_updater_plant: update mix",
+     "other_text": "mix: update distillery to 1.5",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7562",
+   "line": 10,
+   "comparisons": [
+    {
+     "id": "c7562-1",
+     "other": "author",
+     "focus_text": "Add proto_lang_toolchain rule and test it",
+     "other_text": "Fix deserialization/wrapping of ProtoLangToolchainProvider",
+     "auto_tie": false
+    },
+    {
+     "id": "c7562-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add proto_lang_toolchain rule and test it",
+     "other_text": "Add proto language toolchain provider",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0125",
+   "line": 11,
+   "comparisons": [
+    {
+     "id": "c0125-1",
+     "other": "author",
+     "focus_text": "Fix linode driver to use connection request method",
+     "other_text": "remove local variable assignment",
+     "auto_tie": false
+    },
+    {
+     "id": "c0125-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix linode driver to use connection request method",
+     "other_text": "Fix linode request",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8559",
+   "line": 12,
+   "comparisons": [
+    {
+     "id": "c8559-1",
+     "other": "author",
+     "focus_text": "mol-plugin: add field labels to Vec3Param",
+     "other_text": "added fieldLabels to param defs",
+     "auto_tie": false
+    },
+    {
+     "id": "c8559-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "mol-plugin: add field labels to Vec3Param",
+     "other_text": "add fieldLabels to param definitions",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3976",
+   "line": 13,
+   "comparisons": [
+    {
+     "id": "c3976-1",
+     "other": "author",
+     "focus_text": "Add tooltip to upload button",
+     "other_text": "Add tooltip to Upload Attachments button",
+     "auto_tie": false
+    },
+    {
+     "id": "c3976-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add tooltip to upload button",
+     "other_text": "Add tooltip to upload button",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c0424",
+   "line": 14,
+   "comparisons": [
+    {
+     "id": "c0424-1",
+     "other": "author",
+     "focus_text": "Add ubuntu 16.04 setup worker docker doc",
+     "other_text": "updata how set docker on ubuntu16.04",
+     "auto_tie": false
+    },
+    {
+     "id": "c0424-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add ubuntu 16.04 setup worker docker doc",
+     "other_text": "Add ubuntu 16.04 setup for docker",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1191",
+   "line": 15,
+   "comparisons": [
+    {
+     "id": "c1191-1",
+     "other": "author",
+     "focus_text": "Fix test for preview.js generated config entry",
+     "other_text": "Updated test to untrace generated entry file",
+     "auto_tie": false
+    },
+    {
+     "id": "c1191-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix test for preview.js generated config entry",
+     "other_text": "Add test for untraced files",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2620",
+   "line": 16,
+   "comparisons": [
+    {
+     "id": "c2620-1",
+     "other": "author",
+     "focus_text": "Remove ForwardedParser class",
+     "other_text": "Add copyright compliance",
+     "auto_tie": false
+    },
+    {
+     "id": "c2620-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove ForwardedParser class",
+     "other_text": "Add ForwardedParser",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9824",
+   "line": 17,
+   "comparisons": [
+    {
+     "id": "c9824-1",
+     "other": "author",
+     "focus_text": "fix: hierarchy model & structure labels",
+     "other_text": "mol-plugin-state: StructureHierarchy tweaks",
+     "auto_tie": false
+    },
+    {
+     "id": "c9824-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: hierarchy model & structure labels",
+     "other_text": "fix: structure hierarchy model",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8698",
+   "line": 18,
+   "comparisons": [
+    {
+     "id": "c8698-1",
+     "other": "author",
+     "focus_text": "Add a build step to test-replayer.sh",
+     "other_text": "Better progress messages",
+     "auto_tie": false
+    },
+    {
+     "id": "c8698-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add a build step to test-replayer.sh",
+     "other_text": "Add build step to test-replayer.sh",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6583",
+   "line": 19,
+   "comparisons": [
+    {
+     "id": "c6583-1",
+     "other": "author",
+     "focus_text": "Add container images to buildkite config",
+     "other_text": "[docker] update images following adding a dependency to opam.export",
+     "auto_tie": false
+    },
+    {
+     "id": "c6583-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add container images to buildkite config",
+     "other_text": "Add container images to buildkite constants",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5709",
+   "line": 20,
+   "comparisons": [
+    {
+     "id": "c5709-1",
+     "other": "author",
+     "focus_text": "Add StarlarkExecGroup test",
+     "other_text": "Test a combination of toolchain and tools on a rule",
+     "auto_tie": false
+    },
+    {
+     "id": "c5709-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add StarlarkExecGroup test",
+     "other_text": "Add StarlarkExecGroupTest",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8769",
+   "line": 21,
+   "comparisons": [
+    {
+     "id": "c8769-1",
+     "other": "author",
+     "focus_text": "Add support for draft and deck format updates",
+     "other_text": "Update schema issues",
+     "auto_tie": false
+    },
+    {
+     "id": "c8769-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add support for draft and deck format updates",
+     "other_text": "Add support for draft and deck format",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1109",
+   "line": 22,
+   "comparisons": [
+    {
+     "id": "c1109-1",
+     "other": "author",
+     "focus_text": "Reduce margin on links",
+     "other_text": "Reduce spacing between menu items",
+     "auto_tie": false
+    },
+    {
+     "id": "c1109-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Reduce margin on links",
+     "other_text": "Fix slight margin on search bar",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6577",
+   "line": 23,
+   "comparisons": [
+    {
+     "id": "c6577-1",
+     "other": "author",
+     "focus_text": "Fix typo in CROSSTOOL compilation support",
+     "other_text": "Iterable -> ImmutableList for ACTIVATED_ACTIONS in order to respect",
+     "auto_tie": false
+    },
+    {
+     "id": "c6577-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix typo in CROSSTOOL compilation support",
+     "other_text": "Fix CROSSTOOL compilation support for objc",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0386",
+   "line": 24,
+   "comparisons": [
+    {
+     "id": "c0386-1",
+     "other": "author",
+     "focus_text": "add tooltip to cube name",
+     "other_text": "Add mouseover text to cube preview cards",
+     "auto_tie": false
+    },
+    {
+     "id": "c0386-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "add tooltip to cube name",
+     "other_text": "add title to cube preview",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4074",
+   "line": 25,
+   "comparisons": [
+    {
+     "id": "c4074-1",
+     "other": "author",
+     "focus_text": "azure_arm: Add ex_fetch_status parameter to list_nodes and _to_node",
+     "other_text": "Add ex_fetch_status option to list_nodes().",
+     "auto_tie": false
+    },
+    {
+     "id": "c4074-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "azure_arm: Add ex_fetch_status parameter to list_nodes and _to_node",
+     "other_text": "azure_arm: Add ex_fetch_status parameter to NodeDriver",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9222",
+   "line": 26,
+   "comparisons": [
+    {
+     "id": "c9222-1",
+     "other": "author",
+     "focus_text": "Added a debug mode to the engine",
+     "other_text": "Made the FPS debug display toggleable by pressing F3",
+     "auto_tie": false
+    },
+    {
+     "id": "c9222-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Added a debug mode to the engine",
+     "other_text": "Added debug mode to engine",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4585",
+   "line": 27,
+   "comparisons": [
+    {
+     "id": "c4585-1",
+     "other": "author",
+     "focus_text": "fix: Remove decodeURI from LocationUtils",
+     "other_text": "Remove location pathname decoding",
+     "auto_tie": false
+    },
+    {
+     "id": "c4585-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Remove decodeURI from LocationUtils",
+     "other_text": "fix: Remove decodeURI from LocationUtils",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c7026",
+   "line": 28,
+   "comparisons": [
+    {
+     "id": "c7026-1",
+     "other": "author",
+     "focus_text": "Add tracking issues to backward compatibility page",
+     "other_text": "Add more GitHub links in the backward-compatibility page",
+     "auto_tie": false
+    },
+    {
+     "id": "c7026-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add tracking issues to backward compatibility page",
+     "other_text": "Add tracking issues to backward-compatibility page",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9268",
+   "line": 29,
+   "comparisons": [
+    {
+     "id": "c9268-1",
+     "other": "author",
+     "focus_text": "move GitHub scripts into sub-directory",
+     "other_text": "move GitHub script commands into subdirectory",
+     "auto_tie": false
+    },
+    {
+     "id": "c9268-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "move GitHub scripts into sub-directory",
+     "other_text": "rename github logo",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1565",
+   "line": 30,
+   "comparisons": [
+    {
+     "id": "c1565-1",
+     "other": "author",
+     "focus_text": "lint: add space-before-blocks rule",
+     "other_text": "lint: add func-call-spacing rule",
+     "auto_tie": false
+    },
+    {
+     "id": "c1565-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "lint: add space-before-blocks rule",
+     "other_text": "lint: add eslintrc",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4562",
+   "line": 31,
+   "comparisons": [
+    {
+     "id": "c4562-1",
+     "other": "author",
+     "focus_text": "Operator: Skip setting error when machineconfigpool is degraded",
+     "other_text": "temporarily skip setting failures on degraded machine config pool",
+     "auto_tie": false
+    },
+    {
+     "id": "c4562-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Operator: Skip setting error when machineconfigpool is degraded",
+     "other_text": "pkg: add error handling for machineconfigpool status changes",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9213",
+   "line": 32,
+   "comparisons": [
+    {
+     "id": "c9213-1",
+     "other": "author",
+     "focus_text": "Fix BzlCompileFunction test to use correct classpath",
+     "other_text": "Add basic unit test coverage for Starlark BigInteger compilation",
+     "auto_tie": false
+    },
+    {
+     "id": "c9213-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix BzlCompileFunction test to use correct classpath",
+     "other_text": "Add test for BzlCompileFunction",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1831",
+   "line": 33,
+   "comparisons": [
+    {
+     "id": "c1831-1",
+     "other": "author",
+     "focus_text": "Fix: Table vertical collection container class name",
+     "other_text": "Fix: Table headers and body horizontal scrolling alignment",
+     "auto_tie": false
+    },
+    {
+     "id": "c1831-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix: Table vertical collection container class name",
+     "other_text": "Fix: Table vertical collection widget",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8102",
+   "line": 34,
+   "comparisons": [
+    {
+     "id": "c8102-1",
+     "other": "author",
+     "focus_text": "Add print button to dashboard tab",
+     "other_text": "Print option.",
+     "auto_tie": false
+    },
+    {
+     "id": "c8102-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add print button to dashboard tab",
+     "other_text": "Add print button to tabbed views",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5066",
+   "line": 35,
+   "comparisons": [
+    {
+     "id": "c5066-1",
+     "other": "author",
+     "focus_text": "Add GitHub action to check for banned git tags",
+     "other_text": "Add GitHub action to keep old tags off the repo",
+     "auto_tie": false
+    },
+    {
+     "id": "c5066-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add GitHub action to check for banned git tags",
+     "other_text": "Add no banned git tags workflow",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2120",
+   "line": 36,
+   "comparisons": [
+    {
+     "id": "c2120-1",
+     "other": "author",
+     "focus_text": "Add map event sampler",
+     "other_text": "Implement MapEventSampler class into inverse_cdf.py",
+     "auto_tie": false
+    },
+    {
+     "id": "c2120-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add map event sampler",
+     "other_text": "Add MapEventSampler class",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5057",
+   "line": 37,
+   "comparisons": [
+    {
+     "id": "c5057-1",
+     "other": "author",
+     "focus_text": "Fixes whitespace in rasa_core_sdk/__init__.py",
+     "other_text": "Fixes max line lenghts",
+     "auto_tie": false
+    },
+    {
+     "id": "c5057-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixes whitespace in rasa_core_sdk/__init__.py",
+     "other_text": "Fix indentation in __init__.py",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5108",
+   "line": 38,
+   "comparisons": [
+    {
+     "id": "c5108-1",
+     "other": "author",
+     "focus_text": "Fix saving of best model",
+     "other_text": "fixed bug when keras callback is used without validation data",
+     "auto_tie": false
+    },
+    {
+     "id": "c5108-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix saving of best model",
+     "other_text": "Fix wandb_keras summary update",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4130",
+   "line": 39,
+   "comparisons": [
+    {
+     "id": "c4130-1",
+     "other": "author",
+     "focus_text": "fix test method",
+     "other_text": "refoctor for upgrade",
+     "auto_tie": false
+    },
+    {
+     "id": "c4130-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix test method",
+     "other_text": "fix committee test for request object",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8307",
+   "line": 40,
+   "comparisons": [
+    {
+     "id": "c8307-1",
+     "other": "author",
+     "focus_text": "Add property length to inverted index and filter",
+     "other_text": "Add property length filters",
+     "auto_tie": false
+    },
+    {
+     "id": "c8307-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add property length to inverted index and filter",
+     "other_text": "Update 4 files in adapters/repos/db/",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1317",
+   "line": 41,
+   "comparisons": [
+    {
+     "id": "c1317-1",
+     "other": "author",
+     "focus_text": "Fixed minos_contour test",
+     "other_text": "Modify minos_contour test",
+     "auto_tie": false
+    },
+    {
+     "id": "c1317-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixed minos_contour test",
+     "other_text": "Fix minos contour test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2267",
+   "line": 42,
+   "comparisons": [
+    {
+     "id": "c2267-1",
+     "other": "author",
+     "focus_text": "fix database mapping for mmcif",
+     "other_text": "guard against atom_site not being available",
+     "auto_tie": false
+    },
+    {
+     "id": "c2267-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix database mapping for mmcif",
+     "other_text": "fix best database mapping",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3985",
+   "line": 43,
+   "comparisons": [
+    {
+     "id": "c3985-1",
+     "other": "author",
+     "focus_text": "[web] add joinActiveDataset and formActiveDataset methods",
+     "other_text": "[web-service] fix join operation to use Active Timestamp = 0",
+     "auto_tie": false
+    },
+    {
+     "id": "c3985-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "[web] add joinActiveDataset and formActiveDataset methods",
+     "other_text": "[web-service] add WpanService::joinActiveDataset",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5155",
+   "line": 44,
+   "comparisons": [
+    {
+     "id": "c5155-1",
+     "other": "author",
+     "focus_text": "remove hash placeholder from json generator",
+     "other_text": "remove place holders to shrink json file sizes",
+     "auto_tie": false
+    },
+    {
+     "id": "c5155-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "remove hash placeholder from json generator",
+     "other_text": "fix json generator hash and id placeholders",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1942",
+   "line": 45,
+   "comparisons": [
+    {
+     "id": "c1942-1",
+     "other": "author",
+     "focus_text": "Use ubuntu 20.04 for pyjion tests",
+     "other_text": "Try fixing CI.",
+     "auto_tie": false
+    },
+    {
+     "id": "c1942-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Use ubuntu 20.04 for pyjion tests",
+     "other_text": "Add ubuntu-20.04 to github actions",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0471",
+   "line": 46,
+   "comparisons": [
+    {
+     "id": "c0471-1",
+     "other": "author",
+     "focus_text": "Fix draft util to stop after picking",
+     "other_text": "Don't change pack if we've reached the desired pick or step number.",
+     "auto_tie": false
+    },
+    {
+     "id": "c0471-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix draft util to stop after picking",
+     "other_text": "Fix draft util step limit",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6713",
+   "line": 47,
+   "comparisons": [
+    {
+     "id": "c6713-1",
+     "other": "author",
+     "focus_text": "Add a test for Gandi Live driver to verify that the TTL is not",
+     "other_text": "Add a test case for Gandi Live DNS driver.",
+     "auto_tie": false
+    },
+    {
+     "id": "c6713-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add a test for Gandi Live driver to verify that the TTL is not",
+     "other_text": "Add test for Gandi live record creation without TTL",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8287",
+   "line": 48,
+   "comparisons": [
+    {
+     "id": "c8287-1",
+     "other": "author",
+     "focus_text": "Fixed add blog and deck names script",
+     "other_text": "Updated one shot scripts to cache and batch (batch and cache?)",
+     "auto_tie": false
+    },
+    {
+     "id": "c8287-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixed add blog and deck names script",
+     "other_text": "add cache for blog and deck names",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4931",
+   "line": 49,
+   "comparisons": [
+    {
+     "id": "c4931-1",
+     "other": "author",
+     "focus_text": "Remove AspectCreationException",
+     "other_text": "Extract AspectCreationException to its own class.",
+     "auto_tie": false
+    },
+    {
+     "id": "c4931-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove AspectCreationException",
+     "other_text": "Remove AspectCreationException from skyframe",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2935",
+   "line": 50,
+   "comparisons": [
+    {
+     "id": "c2935-1",
+     "other": "author",
+     "focus_text": "Fix for python3-neutron-dynamic-routing package name",
+     "other_text": "neutron-dynamic-routing wrong package for Debian",
+     "auto_tie": false
+    },
+    {
+     "id": "c2935-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix for python3-neutron-dynamic-routing package name",
+     "other_text": "Use python3-neutron-dynamic-routing for bgp dragent",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8581",
+   "line": 51,
+   "comparisons": [
+    {
+     "id": "c8581-1",
+     "other": "author",
+     "focus_text": "test: Fix test for optional storage",
+     "other_text": "test: Rework cpp.result unit test",
+     "auto_tie": false
+    },
+    {
+     "id": "c8581-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: Fix test for optional storage",
+     "other_text": "test: Fix test_cpp.cpp to use const uint8_t",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3054",
+   "line": 52,
+   "comparisons": [
+    {
+     "id": "c3054-1",
+     "other": "author",
+     "focus_text": "remove armv7 from list of vm to download",
+     "other_text": "remove a code I put to test",
+     "auto_tie": false
+    },
+    {
+     "id": "c3054-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "remove armv7 from list of vm to download",
+     "other_text": "remove headless vm from virtual machine manager",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7734",
+   "line": 53,
+   "comparisons": [
+    {
+     "id": "c7734-1",
+     "other": "author",
+     "focus_text": "Fix EC2 pricing for US East and EU West regions",
+     "other_text": "Corrected EC2 region mapping names",
+     "auto_tie": false
+    },
+    {
+     "id": "c7734-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix EC2 pricing for US East and EU West regions",
+     "other_text": "Add us-east-2 to EC2 pricing",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5428",
+   "line": 54,
+   "comparisons": [
+    {
+     "id": "c5428-1",
+     "other": "author",
+     "focus_text": "Add ntriple and wikidata import scripts",
+     "other_text": "pushed import scripts",
+     "auto_tie": false
+    },
+    {
+     "id": "c5428-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add ntriple and wikidata import scripts",
+     "other_text": "Remove unused import files",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8407",
+   "line": 55,
+   "comparisons": [
+    {
+     "id": "c8407-1",
+     "other": "author",
+     "focus_text": "llvm: Add static option to LLVMDependency",
+     "other_text": "llvm: Add support for linking statically",
+     "auto_tie": false
+    },
+    {
+     "id": "c8407-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "llvm: Add static option to LLVMDependency",
+     "other_text": "llvm: Add --static to llvm dependencies",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7394",
+   "line": 56,
+   "comparisons": [
+    {
+     "id": "c7394-1",
+     "other": "author",
+     "focus_text": "mco: add mcoconfig api",
+     "other_text": "add MCOConfig object",
+     "auto_tie": false
+    },
+    {
+     "id": "c7394-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "mco: add mcoconfig api",
+     "other_text": "pkg/generated: add mcoconfig clientset",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5444",
+   "line": 57,
+   "comparisons": [
+    {
+     "id": "c5444-1",
+     "other": "author",
+     "focus_text": "added features section to README.md",
+     "other_text": "added initial features list",
+     "auto_tie": false
+    },
+    {
+     "id": "c5444-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "added features section to README.md",
+     "other_text": "add README.md",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8520",
+   "line": 58,
+   "comparisons": [
+    {
+     "id": "c8520-1",
+     "other": "author",
+     "focus_text": "mol-plugin: added structure type selection to representation controls",
+     "other_text": "hide non-applicable repr types in repr ui",
+     "auto_tie": false
+    },
+    {
+     "id": "c8520-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "mol-plugin: added structure type selection to representation controls",
+     "other_text": "structure selection: show only applicable structures",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5533",
+   "line": 59,
+   "comparisons": [
+    {
+     "id": "c5533-1",
+     "other": "author",
+     "focus_text": "Fixing a memory leak in the destroyable image",
+     "other_text": "More memory leak fixes",
+     "auto_tie": false
+    },
+    {
+     "id": "c5533-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixing a memory leak in the destroyable image",
+     "other_text": "Fixing memory leak in main",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1119",
+   "line": 60,
+   "comparisons": [
+    {
+     "id": "c1119-1",
+     "other": "author",
+     "focus_text": "Add support for multipart form with file upload in client",
+     "other_text": "Add implementation of sending multipart form",
+     "auto_tie": false
+    },
+    {
+     "id": "c1119-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add support for multipart form with file upload in client",
+     "other_text": "Add support for multipart form data in HttpContext",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0332",
+   "line": 61,
+   "comparisons": [
+    {
+     "id": "c0332-1",
+     "other": "author",
+     "focus_text": "Internals: Added ImLinearSweep()",
+     "other_text": "Internals: Added ImLinearSweep() helper.",
+     "auto_tie": false
+    },
+    {
+     "id": "c0332-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Internals: Added ImLinearSweep()",
+     "other_text": "Internals: Added ImLinearSweep()",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c1684",
+   "line": 62,
+   "comparisons": [
+    {
+     "id": "c1684-1",
+     "other": "author",
+     "focus_text": "Fix Link component to use the correct import path",
+     "other_text": "Fix the issue with undefined Link",
+     "auto_tie": false
+    },
+    {
+     "id": "c1684-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix Link component to use the correct import path",
+     "other_text": "Fix link component import",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7771",
+   "line": 63,
+   "comparisons": [
+    {
+     "id": "c7771-1",
+     "other": "author",
+     "focus_text": "Fix title and widget methods in TitledTreeModel",
+     "other_text": "Use #label: instead of #text:",
+     "auto_tie": false
+    },
+    {
+     "id": "c7771-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix title and widget methods in TitledTreeModel",
+     "other_text": "Add title to titled tree model",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7957",
+   "line": 64,
+   "comparisons": [
+    {
+     "id": "c7957-1",
+     "other": "author",
+     "focus_text": "Add channel creation to configtxgen",
+     "other_text": "Add channel information for configtx.yaml",
+     "auto_tie": false
+    },
+    {
+     "id": "c7957-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add channel creation to configtxgen",
+     "other_text": "Add configtx to dashboard",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4286",
+   "line": 65,
+   "comparisons": [
+    {
+     "id": "c4286-1",
+     "other": "author",
+     "focus_text": "Add color class to tag input",
+     "other_text": "Fix tag color.",
+     "auto_tie": false
+    },
+    {
+     "id": "c4286-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add color class to tag input",
+     "other_text": "Fix tag input colors",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7846",
+   "line": 66,
+   "comparisons": [
+    {
+     "id": "c7846-1",
+     "other": "author",
+     "focus_text": "Refactor cube routes",
+     "other_text": "Revised more api routes",
+     "auto_tie": false
+    },
+    {
+     "id": "c7846-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Refactor cube routes",
+     "other_text": "refactor cube routes",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c4157",
+   "line": 67,
+   "comparisons": [
+    {
+     "id": "c4157-1",
+     "other": "author",
+     "focus_text": "Fixing the Makefile to use .inc instead of .wren.inc",
+     "other_text": "handle tweaks to all .inc files, not just wren.inc files",
+     "auto_tie": false
+    },
+    {
+     "id": "c4157-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixing the Makefile to use .inc instead of .wren.inc",
+     "other_text": "Fixing the Makefile for wren.inc",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9513",
+   "line": 68,
+   "comparisons": [
+    {
+     "id": "c9513-1",
+     "other": "author",
+     "focus_text": "Remove \"Add a Project\" button from the repo settings page",
+     "other_text": "Move New Project link to header nav",
+     "auto_tie": false
+    },
+    {
+     "id": "c9513-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove \"Add a Project\" button from the repo settings page",
+     "other_text": "Remove add project new link feature",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4188",
+   "line": 69,
+   "comparisons": [
+    {
+     "id": "c4188-1",
+     "other": "author",
+     "focus_text": "Add LXC driver",
+     "other_text": "Add basic functionality on LXCContainerDriver class",
+     "auto_tie": false
+    },
+    {
+     "id": "c4188-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add LXC driver",
+     "other_text": "Add LXC driver",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c2785",
+   "line": 70,
+   "comparisons": [
+    {
+     "id": "c2785-1",
+     "other": "author",
+     "focus_text": "pkg/controller: add gce cloud provider support",
+     "other_text": "controller/template: update the cloud provider value for GCP to gce",
+     "auto_tie": false
+    },
+    {
+     "id": "c2785-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "pkg/controller: add gce cloud provider support",
+     "other_text": "pkg/controller: use gce for GCE cloud provider",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3035",
+   "line": 71,
+   "comparisons": [
+    {
+     "id": "c3035-1",
+     "other": "author",
+     "focus_text": "Add P39 and P106 to the list of labels for isa star",
+     "other_text": "P39 or P106 as instance ofs",
+     "auto_tie": false
+    },
+    {
+     "id": "c3035-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add P39 and P106 to the list of labels for isa star",
+     "other_text": "Add P39 and P106 to elasticsearch manager",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3063",
+   "line": 72,
+   "comparisons": [
+    {
+     "id": "c3063-1",
+     "other": "author",
+     "focus_text": "doc: Fix r7rs.md",
+     "other_text": "doc: Update TODO",
+     "auto_tie": false
+    },
+    {
+     "id": "c3063-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "doc: Fix r7rs.md",
+     "other_text": "docs: Fix r7rs doc typo",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8396",
+   "line": 73,
+   "comparisons": [
+    {
+     "id": "c8396-1",
+     "other": "author",
+     "focus_text": "Fix select test port numbers",
+     "other_text": "Fix Resolve issues of auto tests in parallel build",
+     "auto_tie": false
+    },
+    {
+     "id": "c8396-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix select test port numbers",
+     "other_text": "Fix select test port numbers",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c4667",
+   "line": 74,
+   "comparisons": [
+    {
+     "id": "c4667-1",
+     "other": "author",
+     "focus_text": "pkg/daemon: Close file after writing to it",
+     "other_text": "pkg/daemon: add missing defer file.Close",
+     "auto_tie": false
+    },
+    {
+     "id": "c4667-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "pkg/daemon: Close file after writing to it",
+     "other_text": "daemon: Close files in update()",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6884",
+   "line": 75,
+   "comparisons": [
+    {
+     "id": "c6884-1",
+     "other": "author",
+     "focus_text": "Fix for ACL control box",
+     "other_text": "Will now refresh pane as expected",
+     "auto_tie": false
+    },
+    {
+     "id": "c6884-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix for ACL control box",
+     "other_text": "Added a little delay to ACL control box",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3695",
+   "line": 76,
+   "comparisons": [
+    {
+     "id": "c3695-1",
+     "other": "author",
+     "focus_text": "examples: Fix example.c build",
+     "other_text": "example: allow passing in evmc path as an argument",
+     "auto_tie": false
+    },
+    {
+     "id": "c3695-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "examples: Fix example.c build",
+     "other_text": "ci: Add example to circle CI",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3496",
+   "line": 77,
+   "comparisons": [
+    {
+     "id": "c3496-1",
+     "other": "author",
+     "focus_text": "Use keyword list for client options",
+     "other_text": "Use a keyword list instead of a tuple for client init opts",
+     "auto_tie": false
+    },
+    {
+     "id": "c3496-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Use keyword list for client options",
+     "other_text": "Add client opts to AstarteE2E.Client init/2",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7815",
+   "line": 78,
+   "comparisons": [
+    {
+     "id": "c7815-1",
+     "other": "author",
+     "focus_text": "pass logger to vector cache",
+     "other_text": "fix logger nil-pointer in vector cache delete",
+     "auto_tie": false
+    },
+    {
+     "id": "c7815-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "pass logger to vector cache",
+     "other_text": "add logger to vector cache",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6060",
+   "line": 79,
+   "comparisons": [
+    {
+     "id": "c6060-1",
+     "other": "author",
+     "focus_text": "Improve clean issue filters to only remove projects when needed",
+     "other_text": "Avoid API call when possible in `clean-issue-filters`",
+     "auto_tie": false
+    },
+    {
+     "id": "c6060-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Improve clean issue filters to only remove projects when needed",
+     "other_text": "Add feature to hide projects in organization",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7074",
+   "line": 80,
+   "comparisons": [
+    {
+     "id": "c7074-1",
+     "other": "author",
+     "focus_text": "Update to pyupgrade 2.34.0",
+     "other_text": "Pin pyupgrade version",
+     "auto_tie": false
+    },
+    {
+     "id": "c7074-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update to pyupgrade 2.34.0",
+     "other_text": "Upgrade to python 3.8",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4907",
+   "line": 81,
+   "comparisons": [
+    {
+     "id": "c4907-1",
+     "other": "author",
+     "focus_text": "Update README to point to product roadmap",
+     "other_text": "Updating Roadmap link",
+     "auto_tie": false
+    },
+    {
+     "id": "c4907-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update README to point to product roadmap",
+     "other_text": "Add link to product roadmap",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8368",
+   "line": 82,
+   "comparisons": [
+    {
+     "id": "c8368-1",
+     "other": "author",
+     "focus_text": "install: disable nss cache for etcd quorum guard pod",
+     "other_text": "Work around bz1571183",
+     "auto_tie": false
+    },
+    {
+     "id": "c8368-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "install: disable nss cache for etcd quorum guard pod",
+     "other_text": "install: disable sdb cache in etcdquorumguard",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6229",
+   "line": 83,
+   "comparisons": [
+    {
+     "id": "c6229-1",
+     "other": "author",
+     "focus_text": "d: Add -isystem support to d compiler",
+     "other_text": "d: Translate the -isystem flag for LDC and DMD",
+     "auto_tie": false
+    },
+    {
+     "id": "c6229-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "d: Add -isystem support to d compiler",
+     "other_text": "compiler: Add -isystem support to DCompiler",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6264",
+   "line": 84,
+   "comparisons": [
+    {
+     "id": "c6264-1",
+     "other": "author",
+     "focus_text": "remove notebook from docs folder",
+     "other_text": "Remove docs/notebooks from repo; was committed accidentally",
+     "auto_tie": false
+    },
+    {
+     "id": "c6264-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "remove notebook from docs folder",
+     "other_text": "Add docs/notebooks directory to gitignore",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4939",
+   "line": 85,
+   "comparisons": [
+    {
+     "id": "c4939-1",
+     "other": "author",
+     "focus_text": "node_manager_fkie: added Ctrl+R shortcut for restart nodes",
+     "other_text": "node_manager_fkie: added shortcut Ctrl+R to restart nodes",
+     "auto_tie": false
+    },
+    {
+     "id": "c4939-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "node_manager_fkie: added Ctrl+R shortcut for restart nodes",
+     "other_text": "node_manager_fkie: added restart nodes shortcut",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7723",
+   "line": 86,
+   "comparisons": [
+    {
+     "id": "c7723-1",
+     "other": "author",
+     "focus_text": "examples: Add example for vm configuration",
+     "other_text": "examples: Move example_vm into the examples/example_vm subdirectory",
+     "auto_tie": false
+    },
+    {
+     "id": "c7723-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "examples: Add example for vm configuration",
+     "other_text": "ci: Add example vm to CI",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6115",
+   "line": 87,
+   "comparisons": [
+    {
+     "id": "c6115-1",
+     "other": "author",
+     "focus_text": "Remove NuGetFallbackFolder from acceptance tests",
+     "other_text": "Windows only and gone (I think) in .NET Core 3",
+     "auto_tie": false
+    },
+    {
+     "id": "c6115-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove NuGetFallbackFolder from acceptance tests",
+     "other_text": "Remove dotnet fallback folder from isolated workspace manager",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5085",
+   "line": 88,
+   "comparisons": [
+    {
+     "id": "c5085-1",
+     "other": "author",
+     "focus_text": "qt: Add moc_extra_arguments to Qt module",
+     "other_text": "Qt5-Module: Add `moc_extra_arguments` keyword support.",
+     "auto_tie": false
+    },
+    {
+     "id": "c5085-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "qt: Add moc_extra_arguments to Qt module",
+     "other_text": "docs: Add moc_extra_arguments to Qt5 module",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8486",
+   "line": 89,
+   "comparisons": [
+    {
+     "id": "c8486-1",
+     "other": "author",
+     "focus_text": "Update spec for new solr field names in file_set_indexer",
+     "other_text": "Replace solr_name calls w/ field names in file_set_indexer_spec.rb",
+     "auto_tie": false
+    },
+    {
+     "id": "c8486-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update spec for new solr field names in file_set_indexer",
+     "other_text": "Update spec for Solrizer.solr_name",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2272",
+   "line": 90,
+   "comparisons": [
+    {
+     "id": "c2272-1",
+     "other": "author",
+     "focus_text": "docs: add swagger for astarte pairing api",
+     "other_text": "Add astarte_pairing_api_v1_swagger.yaml",
+     "auto_tie": false
+    },
+    {
+     "id": "c2272-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: add swagger for astarte pairing api",
+     "other_text": "astarte_pairing_api: add swagger",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2600",
+   "line": 91,
+   "comparisons": [
+    {
+     "id": "c2600-1",
+     "other": "author",
+     "focus_text": "Fix server client node id",
+     "other_text": "Fix logux/processed for cross-tab actions",
+     "auto_tie": false
+    },
+    {
+     "id": "c2600-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix server client node id",
+     "other_text": "Fix node ID in server client",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4849",
+   "line": 92,
+   "comparisons": [
+    {
+     "id": "c4849-1",
+     "other": "author",
+     "focus_text": "Removed redundant id from SQL query",
+     "other_text": "Fix bug in SQL storage remove statement.",
+     "auto_tie": false
+    },
+    {
+     "id": "c4849-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Removed redundant id from SQL query",
+     "other_text": "SQL: fix insert query for csetvalues",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8664",
+   "line": 93,
+   "comparisons": [
+    {
+     "id": "c8664-1",
+     "other": "author",
+     "focus_text": "Fix for JMS connection factory method lookup",
+     "other_text": "looping over several methods to try and fit the dynamic attribute.",
+     "auto_tie": false
+    },
+    {
+     "id": "c8664-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix for JMS connection factory method lookup",
+     "other_text": "Fix JMS connection factory provider",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5256",
+   "line": 94,
+   "comparisons": [
+    {
+     "id": "c5256-1",
+     "other": "author",
+     "focus_text": "fix size theme for representation plugins",
+     "other_text": "filter repr size themes to applicable types",
+     "auto_tie": false
+    },
+    {
+     "id": "c5256-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix size theme for representation plugins",
+     "other_text": "fix size theme registry",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0336",
+   "line": 95,
+   "comparisons": [
+    {
+     "id": "c0336-1",
+     "other": "author",
+     "focus_text": "Simplify SpectrumFitResult and ParameterList",
+     "other_text": "remove covariance from SpectrumFitResult",
+     "auto_tie": false
+    },
+    {
+     "id": "c0336-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Simplify SpectrumFitResult and ParameterList",
+     "other_text": "Add to_dict to ParameterList",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3094",
+   "line": 96,
+   "comparisons": [
+    {
+     "id": "c3094-1",
+     "other": "author",
+     "focus_text": "Fixing python slate slots",
+     "other_text": "improved padding api for SHorizontalBox and SVerticalBox",
+     "auto_tie": false
+    },
+    {
+     "id": "c3094-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixing python slate slots",
+     "other_text": "fix python SSlot args parsing",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1959",
+   "line": 97,
+   "comparisons": [
+    {
+     "id": "c1959-1",
+     "other": "author",
+     "focus_text": "build: Add `get_command` method to Executable",
+     "other_text": "build: Add a get_command method to Executable",
+     "auto_tie": false
+    },
+    {
+     "id": "c1959-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "build: Add `get_command` method to Executable",
+     "other_text": "build: Add get_command method to Executable",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5483",
+   "line": 98,
+   "comparisons": [
+    {
+     "id": "c5483-1",
+     "other": "author",
+     "focus_text": "Add metrics for startup and disk I/O",
+     "other_text": "track LSM startup operations",
+     "auto_tie": false
+    },
+    {
+     "id": "c5483-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add metrics for startup and disk I/O",
+     "other_text": "add metrics for lsmkv startup",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0536",
+   "line": 99,
+   "comparisons": [
+    {
+     "id": "c0536-1",
+     "other": "author",
+     "focus_text": "added unit test for RecipeList component",
+     "other_text": "Add spec for the RecipeList component",
+     "auto_tie": false
+    },
+    {
+     "id": "c0536-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "added unit test for RecipeList component",
+     "other_text": "added unit test for RecipeList",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9529",
+   "line": 100,
+   "comparisons": [
+    {
+     "id": "c9529-1",
+     "other": "author",
+     "focus_text": "Fix for tensorboard not logging gradients",
+     "other_text": "fix(wandb_torch): extract graph.criterion for RNN models",
+     "auto_tie": false
+    },
+    {
+     "id": "c9529-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix for tensorboard not logging gradients",
+     "other_text": "Fix torch graph criterion",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9058",
+   "line": 101,
+   "comparisons": [
+    {
+     "id": "c9058-1",
+     "other": "author",
+     "focus_text": "Remove plumbing conversion package from acceptance tests",
+     "other_text": "Bump src/code.cloudfoundry.org/loggregator",
+     "auto_tie": false
+    },
+    {
+     "id": "c9058-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove plumbing conversion package from acceptance tests",
+     "other_text": "Remove gosub from loggregator",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4159",
+   "line": 102,
+   "comparisons": [
+    {
+     "id": "c4159-1",
+     "other": "author",
+     "focus_text": "What3Words: update to v2 API",
+     "other_text": "What3Words: raise on `http`, return bad api key error handling",
+     "auto_tie": false
+    },
+    {
+     "id": "c4159-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "What3Words: update to v2 API",
+     "other_text": "What3Words: update scheme to https",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6419",
+   "line": 103,
+   "comparisons": [
+    {
+     "id": "c6419-1",
+     "other": "author",
+     "focus_text": "Use PropertyPatternDate.from_kv for date validation",
+     "other_text": "Condense duplicated date parsing code.",
+     "auto_tie": false
+    },
+    {
+     "id": "c6419-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Use PropertyPatternDate.from_kv for date validation",
+     "other_text": "Fix PropertyPatternDate validation",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8712",
+   "line": 104,
+   "comparisons": [
+    {
+     "id": "c8712-1",
+     "other": "author",
+     "focus_text": "Added Client Authentication to ListenHTTP processor",
+     "other_text": "Updated ListenHTTP with inferred Client Authentication Policy",
+     "auto_tie": false
+    },
+    {
+     "id": "c8712-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Added Client Authentication to ListenHTTP processor",
+     "other_text": "Added ClientAuthentication to ListenHTTP",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0606",
+   "line": 105,
+   "comparisons": [
+    {
+     "id": "c0606-1",
+     "other": "author",
+     "focus_text": "Added support for filtering by active and third party",
+     "other_text": "Adding active and third_party flags to account view",
+     "auto_tie": false
+    },
+    {
+     "id": "c0606-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Added support for filtering by active and third party",
+     "other_text": "Added support for active and third_party filters to account view",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7254",
+   "line": 106,
+   "comparisons": [
+    {
+     "id": "c7254-1",
+     "other": "author",
+     "focus_text": "Fixes FreeMarker template caching issue",
+     "other_text": "add caching tests to all engines",
+     "auto_tie": false
+    },
+    {
+     "id": "c7254-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixes FreeMarker template caching issue",
+     "other_text": "Add caching to FreeMarker template engine",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0110",
+   "line": 107,
+   "comparisons": [
+    {
+     "id": "c0110-1",
+     "other": "author",
+     "focus_text": "fix lexer error handling",
+     "other_text": "fix location of mismatch error",
+     "auto_tie": false
+    },
+    {
+     "id": "c0110-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix lexer error handling",
+     "other_text": "fix lexer: match syntax errors",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2363",
+   "line": 108,
+   "comparisons": [
+    {
+     "id": "c2363-1",
+     "other": "author",
+     "focus_text": "Remove code that attempts to fetch parameters from providers",
+     "other_text": "Removing fetch parameters on startup",
+     "auto_tie": false
+    },
+    {
+     "id": "c2363-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove code that attempts to fetch parameters from providers",
+     "other_text": "Remove parameter provider node fetching from VersionedFlowSynchronizer",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9750",
+   "line": 109,
+   "comparisons": [
+    {
+     "id": "c9750-1",
+     "other": "author",
+     "focus_text": "Add global parameters to command page",
+     "other_text": "Update command docs generation to include details about global params",
+     "auto_tie": false
+    },
+    {
+     "id": "c9750-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add global parameters to command page",
+     "other_text": "Add global parameters to command page",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c8135",
+   "line": 110,
+   "comparisons": [
+    {
+     "id": "c8135-1",
+     "other": "author",
+     "focus_text": ".travis.yml: add cassandra wait script",
+     "other_text": ".travis.yml: wait for Cassandra to start in CI",
+     "auto_tie": false
+    },
+    {
+     "id": "c8135-2",
+     "other": "0.5b-v0.3",
+     "focus_text": ".travis.yml: add cassandra wait script",
+     "other_text": ".travis.yml: install wait-for-cassandra",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6111",
+   "line": 111,
+   "comparisons": [
+    {
+     "id": "c6111-1",
+     "other": "author",
+     "focus_text": "data_updater_plant_test: use database client instead of helper",
+     "other_text": "Use DataAccess.Database.connect",
+     "auto_tie": false
+    },
+    {
+     "id": "c6111-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "data_updater_plant_test: use database client instead of helper",
+     "other_text": "data_updater_plant: use database client in test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4336",
+   "line": 112,
+   "comparisons": [
+    {
+     "id": "c4336-1",
+     "other": "author",
+     "focus_text": "Fix compiler path resolution for empty build dir",
+     "other_text": "Fix how rpath directories are handled.",
+     "auto_tie": false
+    },
+    {
+     "id": "c4336-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix compiler path resolution for empty build dir",
+     "other_text": "compiler: Use join to resolve relative path in compilers",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7178",
+   "line": 113,
+   "comparisons": [
+    {
+     "id": "c7178-1",
+     "other": "author",
+     "focus_text": "Site to Site Reporting Task: Fix serialization of Process Group",
+     "other_text": "Add parent name and parent path in SiteToSiteStatusReportingTask",
+     "auto_tie": false
+    },
+    {
+     "id": "c7178-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Site to Site Reporting Task: Fix serialization of Process Group",
+     "other_text": "SiteToSiteStatusReportingTask: add process group id to status",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8466",
+   "line": 114,
+   "comparisons": [
+    {
+     "id": "c8466-1",
+     "other": "author",
+     "focus_text": "Fix typo in deploy/README.md",
+     "other_text": "fix deploy.md for manual certificate setup.",
+     "auto_tie": false
+    },
+    {
+     "id": "c8466-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix typo in deploy/README.md",
+     "other_text": "fix: update deploy README for mutating webhook",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2271",
+   "line": 115,
+   "comparisons": [
+    {
+     "id": "c2271-1",
+     "other": "author",
+     "focus_text": "Remove sherpa backend from fitting utils",
+     "other_text": "Remove old sherpa wrapper code",
+     "auto_tie": false
+    },
+    {
+     "id": "c2271-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove sherpa backend from fitting utils",
+     "other_text": "Add sherpa backend to spectrum fit",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2185",
+   "line": 116,
+   "comparisons": [
+    {
+     "id": "c2185-1",
+     "other": "author",
+     "focus_text": "skip immediate replication test until fixed",
+     "other_text": "temporarily remove flaky test",
+     "auto_tie": false
+    },
+    {
+     "id": "c2185-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "skip immediate replication test until fixed",
+     "other_text": "skip replication crud test until reworked",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6385",
+   "line": 117,
+   "comparisons": [
+    {
+     "id": "c6385-1",
+     "other": "author",
+     "focus_text": "add padding to md page elements",
+     "other_text": "adjust colour",
+     "auto_tie": false
+    },
+    {
+     "id": "c6385-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "add padding to md page elements",
+     "other_text": "md-page-elements padding",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8642",
+   "line": 118,
+   "comparisons": [
+    {
+     "id": "c8642-1",
+     "other": "author",
+     "focus_text": "astarte_pairing_api: add unregister_device RPC method",
+     "other_text": "rpc: add unregister_device function",
+     "auto_tie": false
+    },
+    {
+     "id": "c8642-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "astarte_pairing_api: add unregister_device RPC method",
+     "other_text": "astarte_pairing_api: add unregister_device/1",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1201",
+   "line": 119,
+   "comparisons": [
+    {
+     "id": "c1201-1",
+     "other": "author",
+     "focus_text": "compiler: add support for js libraries in emscripten compiler",
+     "other_text": "Add support for finding Javascript source libraries with Emscripten.",
+     "auto_tie": false
+    },
+    {
+     "id": "c1201-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "compiler: add support for js libraries in emscripten compiler",
+     "other_text": "compilers: add js library support to emscripten",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5445",
+   "line": 120,
+   "comparisons": [
+    {
+     "id": "c5445-1",
+     "other": "author",
+     "focus_text": "add lexer functions for strings and identifiers",
+     "other_text": "make <string> and <ident> generics checking indepence of AST node",
+     "auto_tie": false
+    },
+    {
+     "id": "c5445-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "add lexer functions for strings and identifiers",
+     "other_text": "add string and identifier tokens",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0428",
+   "line": 121,
+   "comparisons": [
+    {
+     "id": "c0428-1",
+     "other": "author",
+     "focus_text": "added fill_width and auto_width to UEPySHorizontalBox",
+     "other_text": "improved SHorizontalBox",
+     "auto_tie": false
+    },
+    {
+     "id": "c0428-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "added fill_width and auto_width to UEPySHorizontalBox",
+     "other_text": "added fill_width to UEPyHorizontalBox",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3173",
+   "line": 122,
+   "comparisons": [
+    {
+     "id": "c3173-1",
+     "other": "author",
+     "focus_text": "FIX chromatic deployment to GitHub",
+     "other_text": "Add compatibility to run on forked PRs",
+     "auto_tie": false
+    },
+    {
+     "id": "c3173-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "FIX chromatic deployment to GitHub",
+     "other_text": "FIX: add deployment id to chromatic",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6677",
+   "line": 123,
+   "comparisons": [
+    {
+     "id": "c6677-1",
+     "other": "author",
+     "focus_text": "Remove option to disable monospace textareas",
+     "other_text": "Reduce disable-features notice",
+     "auto_tie": false
+    },
+    {
+     "id": "c6677-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove option to disable monospace textareas",
+     "other_text": "Add options page",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9461",
+   "line": 124,
+   "comparisons": [
+    {
+     "id": "c9461-1",
+     "other": "author",
+     "focus_text": "Fix tags and run page filters",
+     "other_text": "Fix tag filters",
+     "auto_tie": false
+    },
+    {
+     "id": "c9461-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix tags and run page filters",
+     "other_text": "Fix filter for tags",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7803",
+   "line": 125,
+   "comparisons": [
+    {
+     "id": "c7803-1",
+     "other": "author",
+     "focus_text": "Add completion check function",
+     "other_text": "helpers: Add _completion_exists helper",
+     "auto_tie": false
+    },
+    {
+     "id": "c7803-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add completion check function",
+     "other_text": "Add _completion_exists function",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0053",
+   "line": 126,
+   "comparisons": [
+    {
+     "id": "c0053-1",
+     "other": "author",
+     "focus_text": "Fix snapshot and upload stories",
+     "other_text": "ctx.onlyStoryFiles is an array now",
+     "auto_tie": false
+    },
+    {
+     "id": "c0053-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix snapshot and upload stories",
+     "other_text": "Fix snapshot and upload stories to use correct options",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2339",
+   "line": 127,
+   "comparisons": [
+    {
+     "id": "c2339-1",
+     "other": "author",
+     "focus_text": "Update Site to Site Provenance Reporting Task",
+     "other_text": "Correcting Event Type text in S2S provenance reporting task",
+     "auto_tie": false
+    },
+    {
+     "id": "c2339-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update Site to Site Provenance Reporting Task",
+     "other_text": "Add more information to SiteToSiteProvenanceReportingTask",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6969",
+   "line": 128,
+   "comparisons": [
+    {
+     "id": "c6969-1",
+     "other": "author",
+     "focus_text": "fixes PhLImagesPresenter class>>#resetLaunchConfigurationList",
+     "other_text": "check nil item for image selction + extract method",
+     "auto_tie": false
+    },
+    {
+     "id": "c6969-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fixes PhLImagesPresenter class>>#resetLaunchConfigurationList",
+     "other_text": "fixes PhLImagesPresenter resetLaunchConfigurationList",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1051",
+   "line": 129,
+   "comparisons": [
+    {
+     "id": "c1051-1",
+     "other": "author",
+     "focus_text": "Update CPython 3.7.0b4 to 3.7.0b5",
+     "other_text": "CPython 3.7.0b5",
+     "auto_tie": false
+    },
+    {
+     "id": "c1051-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update CPython 3.7.0b4 to 3.7.0b5",
+     "other_text": "CPython 3.7.0b5",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6238",
+   "line": 130,
+   "comparisons": [
+    {
+     "id": "c6238-1",
+     "other": "author",
+     "focus_text": "Add script for airpods switch",
+     "other_text": "added toggle airpods script",
+     "auto_tie": false
+    },
+    {
+     "id": "c6238-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add script for airpods switch",
+     "other_text": "Add command for airpods",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4086",
+   "line": 131,
+   "comparisons": [
+    {
+     "id": "c4086-1",
+     "other": "author",
+     "focus_text": "Add time offset and clear filter menu items to events list popup",
+     "other_text": "Add set time to offset context and clear filter menu items",
+     "auto_tie": false
+    },
+    {
+     "id": "c4086-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add time offset and clear filter menu items to events list popup",
+     "other_text": "Add time offset menu to trace event list popup",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4794",
+   "line": 132,
+   "comparisons": [
+    {
+     "id": "c4794-1",
+     "other": "author",
+     "focus_text": "Fix test failures due to typo in t.Fatalf()",
+     "other_text": "Extend presubmit to covert test and request",
+     "auto_tie": false
+    },
+    {
+     "id": "c4794-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix test failures due to typo in t.Fatalf()",
+     "other_text": "Fix test failures in Makefile",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4898",
+   "line": 133,
+   "comparisons": [
+    {
+     "id": "c4898-1",
+     "other": "author",
+     "focus_text": "Fix clang version regex to match the end of line",
+     "other_text": "Detect clang version at end of line",
+     "auto_tie": false
+    },
+    {
+     "id": "c4898-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix clang version regex to match the end of line",
+     "other_text": "Fix clang version regex",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0228",
+   "line": 134,
+   "comparisons": [
+    {
+     "id": "c0228-1",
+     "other": "author",
+     "focus_text": "docs: add legacy readme",
+     "other_text": "Create legacyREADME.md",
+     "auto_tie": false
+    },
+    {
+     "id": "c0228-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: add legacy readme",
+     "other_text": "docs: add legacy readme",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c5156",
+   "line": 135,
+   "comparisons": [
+    {
+     "id": "c5156-1",
+     "other": "author",
+     "focus_text": "Fix: `quick-review-comment-deletion` doesn't work on mobile",
+     "other_text": "Fix `quick-review-comment-deletion`",
+     "auto_tie": false
+    },
+    {
+     "id": "c5156-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix: `quick-review-comment-deletion` doesn't work on mobile",
+     "other_text": "Fix: `quick-review-comment-deletion` deletes comment",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5607",
+   "line": 136,
+   "comparisons": [
+    {
+     "id": "c5607-1",
+     "other": "author",
+     "focus_text": "set log to true when debug is enabled",
+     "other_text": "set log to true if (!log-file and debug)",
+     "auto_tie": false
+    },
+    {
+     "id": "c5607-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "set log to true when debug is enabled",
+     "other_text": "add debug flag to root command",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0043",
+   "line": 137,
+   "comparisons": [
+    {
+     "id": "c0043-1",
+     "other": "author",
+     "focus_text": "Fixing mouse position",
+     "other_text": "Fixing events",
+     "auto_tie": false
+    },
+    {
+     "id": "c0043-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixing mouse position",
+     "other_text": "Fixing mouse",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7842",
+   "line": 138,
+   "comparisons": [
+    {
+     "id": "c7842-1",
+     "other": "author",
+     "focus_text": "Fix the link to conda activate in install details",
+     "other_text": "Minor rewording on activate problems.",
+     "auto_tie": false
+    },
+    {
+     "id": "c7842-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix the link to conda activate in install details",
+     "other_text": "Update install details doc",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7333",
+   "line": 139,
+   "comparisons": [
+    {
+     "id": "c7333-1",
+     "other": "author",
+     "focus_text": "Add more tests to test_kgtk_cat",
+     "other_text": "json map test case is succeeding",
+     "auto_tie": false
+    },
+    {
+     "id": "c7333-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Add more tests to test_kgtk_cat",
+     "other_text": "Add test for kgtk cat output json map",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1654",
+   "line": 140,
+   "comparisons": [
+    {
+     "id": "c1654-1",
+     "other": "author",
+     "focus_text": "Fixes test_utter_message_with_response_param",
+     "other_text": "Fixes test_utter_message_with_response_param",
+     "auto_tie": true
+    },
+    {
+     "id": "c1654-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fixes test_utter_message_with_response_param",
+     "other_text": "Fixes utter_message with response param",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5836",
+   "line": 141,
+   "comparisons": [
+    {
+     "id": "c5836-1",
+     "other": "author",
+     "focus_text": "Remove the default for reverse-log-proxy",
+     "other_text": "Remove default for the doppler.addrs in RLP",
+     "auto_tie": false
+    },
+    {
+     "id": "c5836-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Remove the default for reverse-log-proxy",
+     "other_text": "Remove the default from reverse log proxy spec",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8014",
+   "line": 142,
+   "comparisons": [
+    {
+     "id": "c8014-1",
+     "other": "author",
+     "focus_text": "Fix stability for various religious and labor civics",
+     "other_text": "Update civic stability section in civilopedia",
+     "auto_tie": false
+    },
+    {
+     "id": "c8014-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix stability for various religious and labor civics",
+     "other_text": "Add stability for Individualism",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7819",
+   "line": 143,
+   "comparisons": [
+    {
+     "id": "c7819-1",
+     "other": "author",
+     "focus_text": "daemon: Fix log message for disk config override",
+     "other_text": "daemon: Reduce/clean up logging",
+     "auto_tie": false
+    },
+    {
+     "id": "c7819-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "daemon: Fix log message for disk config override",
+     "other_text": "daemon: Log disk current config instead of node config",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9407",
+   "line": 144,
+   "comparisons": [
+    {
+     "id": "c9407-1",
+     "other": "author",
+     "focus_text": "Fix Record to use LinkedHashMap for performance",
+     "other_text": "Changed HashMap to LinkedHashMap in JsonTreeRowRecordReader",
+     "auto_tie": false
+    },
+    {
+     "id": "c9407-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix Record to use LinkedHashMap for performance",
+     "other_text": "Use LinkedHashMap for MapRecord",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2907",
+   "line": 145,
+   "comparisons": [
+    {
+     "id": "c2907-1",
+     "other": "author",
+     "focus_text": "updated version to 2.7.0",
+     "other_text": "prepared release of version 2.7.0",
+     "auto_tie": false
+    },
+    {
+     "id": "c2907-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "updated version to 2.7.0",
+     "other_text": "update version to 2.7.0",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1939",
+   "line": 146,
+   "comparisons": [
+    {
+     "id": "c1939-1",
+     "other": "author",
+     "focus_text": "Fix hero text on index page",
+     "other_text": "update landing page copy",
+     "auto_tie": false
+    },
+    {
+     "id": "c1939-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix hero text on index page",
+     "other_text": "fix hero storybook description",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3977",
+   "line": 147,
+   "comparisons": [
+    {
+     "id": "c3977-1",
+     "other": "author",
+     "focus_text": "Fix collection list modal layout",
+     "other_text": "Style the add to collection modal",
+     "auto_tie": false
+    },
+    {
+     "id": "c3977-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Fix collection list modal layout",
+     "other_text": "Add collection list modal to dashboard",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5449",
+   "line": 148,
+   "comparisons": [
+    {
+     "id": "c5449-1",
+     "other": "author",
+     "focus_text": "add subscribe command to prompt mode",
+     "other_text": "separate subscribe in case of prompt mode",
+     "auto_tie": false
+    },
+    {
+     "id": "c5449-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "add subscribe command to prompt mode",
+     "other_text": "add subscribe command",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7931",
+   "line": 149,
+   "comparisons": [
+    {
+     "id": "c7931-1",
+     "other": "author",
+     "focus_text": "Move all jobs to the application job class",
+     "other_text": "Add a base class for all Hyrax jobs",
+     "auto_tie": false
+    },
+    {
+     "id": "c7931-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Move all jobs to the application job class",
+     "other_text": "Add application job base class",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6397",
+   "line": 150,
+   "comparisons": [
+    {
+     "id": "c6397-1",
+     "other": "author",
+     "focus_text": "test: add unit test for trace command",
+     "other_text": "fix: allow default trace function to work",
+     "auto_tie": false
+    },
+    {
+     "id": "c6397-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: add unit test for trace command",
+     "other_text": "chore: add trace test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1733",
+   "line": 151,
+   "comparisons": [
+    {
+     "id": "c1733-1",
+     "other": "author",
+     "focus_text": "chore: update razzle package version",
+     "other_text": "fix(razzle): more relaxed deps",
+     "auto_tie": false
+    },
+    {
+     "id": "c1733-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update razzle package version",
+     "other_text": "fix(razzle): remove unused package.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3187",
+   "line": 152,
+   "comparisons": [
+    {
+     "id": "c3187-1",
+     "other": "author",
+     "focus_text": "docs: update mqtt client to reflect new default will topic",
+     "other_text": "fix: change default hass birth/will topic",
+     "auto_tie": false
+    },
+    {
+     "id": "c3187-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: update mqtt client to reflect new default will topic",
+     "other_text": "fix: fix MQTT topic for Hass 4.0.0",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3288",
+   "line": 153,
+   "comparisons": [
+    {
+     "id": "c3288-1",
+     "other": "author",
+     "focus_text": "fix: filter out certain args from docker args",
+     "other_text": "fix: filter resource args from deploy tasks",
+     "auto_tie": false
+    },
+    {
+     "id": "c3288-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: filter out certain args from docker args",
+     "other_text": "fix: filter docker args in app-json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7809",
+   "line": 154,
+   "comparisons": [
+    {
+     "id": "c7809-1",
+     "other": "author",
+     "focus_text": "feat: add calculate max shards function",
+     "other_text": "fix: concurrency typo thx giveawayboat <3",
+     "auto_tie": false
+    },
+    {
+     "id": "c7809-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add calculate max shards function",
+     "other_text": "feat: add calculateMaxShards to gateway manager",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1551",
+   "line": 155,
+   "comparisons": [
+    {
+     "id": "c1551-1",
+     "other": "author",
+     "focus_text": "fix(handlers/member): fix editMember to return new member object",
+     "other_text": "fix(handlers/member): change editMember() to return a Member object",
+     "auto_tie": false
+    },
+    {
+     "id": "c1551-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(handlers/member): fix editMember to return new member object",
+     "other_text": "fix(handlers/member): fix member create",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1746",
+   "line": 156,
+   "comparisons": [
+    {
+     "id": "c1746-1",
+     "other": "author",
+     "focus_text": "chore(package): add package version to package.json",
+     "other_text": "chore(changelog): update generator version",
+     "auto_tie": false
+    },
+    {
+     "id": "c1746-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(package): add package version to package.json",
+     "other_text": "chore(package): remove package.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6475",
+   "line": 157,
+   "comparisons": [
+    {
+     "id": "c6475-1",
+     "other": "author",
+     "focus_text": "docs: add basic serverless example",
+     "other_text": "feat: add serverless example",
+     "auto_tie": false
+    },
+    {
+     "id": "c6475-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: add basic serverless example",
+     "other_text": "docs: add basic serverless example",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c1874",
+   "line": 158,
+   "comparisons": [
+    {
+     "id": "c1874-1",
+     "other": "author",
+     "focus_text": "fix(webpack): enable webpack caching",
+     "other_text": "chore(package): Add npm run script for webpack",
+     "auto_tie": false
+    },
+    {
+     "id": "c1874-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(webpack): enable webpack caching",
+     "other_text": "feat: enable webpack cache in package.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2823",
+   "line": 159,
+   "comparisons": [
+    {
+     "id": "c2823-1",
+     "other": "author",
+     "focus_text": "feat: add pending shards to resharder",
+     "other_text": "feat: untested resharder",
+     "auto_tie": false
+    },
+    {
+     "id": "c2823-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add pending shards to resharder",
+     "other_text": "feat: add pending shards collection",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2601",
+   "line": 160,
+   "comparisons": [
+    {
+     "id": "c2601-1",
+     "other": "author",
+     "focus_text": "fix(razzle): remove postcss-flexbugfixes",
+     "other_text": "fix(razzle): back to older postcss loader",
+     "auto_tie": false
+    },
+    {
+     "id": "c2601-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(razzle): remove postcss-flexbugfixes",
+     "other_text": "fix(razzle): remove postcss flex bug fix",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8483",
+   "line": 161,
+   "comparisons": [
+    {
+     "id": "c8483-1",
+     "other": "author",
+     "focus_text": "chore: update package lock file",
+     "other_text": "feat: support multi state",
+     "auto_tie": false
+    },
+    {
+     "id": "c8483-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update package lock file",
+     "other_text": "chore: update react-compat-moveable package",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5635",
+   "line": 162,
+   "comparisons": [
+    {
+     "id": "c5635-1",
+     "other": "author",
+     "focus_text": "fix: dream aiml",
+     "other_text": "fix: fix program-y & program-y-dangerous templates to alexa restrictions",
+     "auto_tie": false
+    },
+    {
+     "id": "c5635-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: dream aiml",
+     "other_text": "fix: add bot profile category to dream aiml",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0350",
+   "line": 163,
+   "comparisons": [
+    {
+     "id": "c0350-1",
+     "other": "author",
+     "focus_text": "chore(docs): upgrade nuxt to 2.0",
+     "other_text": "build: setup install config",
+     "auto_tie": false
+    },
+    {
+     "id": "c0350-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(docs): upgrade nuxt to 2.0",
+     "other_text": "chore: update chakra-ui-docs package",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9279",
+   "line": 164,
+   "comparisons": [
+    {
+     "id": "c9279-1",
+     "other": "author",
+     "focus_text": "chore: update package versions",
+     "other_text": "chore(deps): bump and",
+     "auto_tie": false
+    },
+    {
+     "id": "c9279-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update package versions",
+     "other_text": "chore: update package.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2715",
+   "line": 165,
+   "comparisons": [
+    {
+     "id": "c2715-1",
+     "other": "author",
+     "focus_text": "fix: fix test for tags:deploy command",
+     "other_text": "fix: call tags:deploy",
+     "auto_tie": false
+    },
+    {
+     "id": "c2715-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix test for tags:deploy command",
+     "other_text": "fix: deploy tags",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6108",
+   "line": 166,
+   "comparisons": [
+    {
+     "id": "c6108-1",
+     "other": "author",
+     "focus_text": "feat: add certs:show command",
+     "other_text": "feat: Add show option to the certs plugin",
+     "auto_tie": false
+    },
+    {
+     "id": "c6108-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add certs:show command",
+     "other_text": "feat: add certs:show command",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c8479",
+   "line": 167,
+   "comparisons": [
+    {
+     "id": "c8479-1",
+     "other": "author",
+     "focus_text": "test: remove unnecessary providers from tests",
+     "other_text": "test: remove unnecessary providers CheckboxGroup CircularProgress Drawer",
+     "auto_tie": false
+    },
+    {
+     "id": "c8479-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: remove unnecessary providers from tests",
+     "other_text": "test: remove default providers from all test files",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8720",
+   "line": 168,
+   "comparisons": [
+    {
+     "id": "c8720-1",
+     "other": "author",
+     "focus_text": "refactor: move list and default to internal-functions",
+     "other_text": "fix: add missing source calls",
+     "auto_tie": false
+    },
+    {
+     "id": "c8720-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "refactor: move list and default to internal-functions",
+     "other_text": "refactor: update 4 files in plugins/",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4982",
+   "line": 169,
+   "comparisons": [
+    {
+     "id": "c4982-1",
+     "other": "author",
+     "focus_text": "fix(ui): add command class version to node details",
+     "other_text": "feat(ui): add cc version",
+     "auto_tie": false
+    },
+    {
+     "id": "c4982-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(ui): add command class version to node details",
+     "other_text": "fix(ui): add configuration CC group to node details",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3121",
+   "line": 170,
+   "comparisons": [
+    {
+     "id": "c3121-1",
+     "other": "author",
+     "focus_text": "fix: fix app-json plugin function name",
+     "other_text": "fix: correct variable declaration",
+     "auto_tie": false
+    },
+    {
+     "id": "c3121-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix app-json plugin function name",
+     "other_text": "fix: use correct image variable name in app-json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9794",
+   "line": 171,
+   "comparisons": [
+    {
+     "id": "c9794-1",
+     "other": "author",
+     "focus_text": "fix: Parse raw values as buffer",
+     "other_text": "fix: Buffer support on write requests",
+     "auto_tie": false
+    },
+    {
+     "id": "c9794-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Parse raw values as buffer",
+     "other_text": "fix: handle raw payloads in gateway",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5745",
+   "line": 172,
+   "comparisons": [
+    {
+     "id": "c5745-1",
+     "other": "author",
+     "focus_text": "fix: mark nodes as initialized",
+     "other_text": "fix: prevent reset poll timers on node status updates",
+     "auto_tie": false
+    },
+    {
+     "id": "c5745-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: mark nodes as initialized",
+     "other_text": "fix: add inited flag to Z2MNode",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2453",
+   "line": 173,
+   "comparisons": [
+    {
+     "id": "c2453-1",
+     "other": "author",
+     "focus_text": "docs: add nested target and stop click event propagation",
+     "other_text": "test: test nested moveable",
+     "auto_tie": false
+    },
+    {
+     "id": "c2453-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: add nested target and stop click event propagation",
+     "other_text": "test: add click story for react moveable",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9456",
+   "line": 174,
+   "comparisons": [
+    {
+     "id": "c9456-1",
+     "other": "author",
+     "focus_text": "feat: remove game from link to weights",
+     "other_text": "feat: revert links to all skills from friendship",
+     "auto_tie": false
+    },
+    {
+     "id": "c9456-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: remove game from link to weights",
+     "other_text": "feat: update link to skills",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3744",
+   "line": 175,
+   "comparisons": [
+    {
+     "id": "c3744-1",
+     "other": "author",
+     "focus_text": "fix(ui): fix battery icon on ZwaveGraph and nodes-table",
+     "other_text": "fix: use `isListening` node prop to distinguish battery from mains",
+     "auto_tie": false
+    },
+    {
+     "id": "c3744-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(ui): fix battery icon on ZwaveGraph and nodes-table",
+     "other_text": "fix: use isListening instead of isBatteryPowered",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3160",
+   "line": 176,
+   "comparisons": [
+    {
+     "id": "c3160-1",
+     "other": "author",
+     "focus_text": "feat/common/music: add music class",
+     "other_text": "fix: remove some linkto questions for music skill",
+     "auto_tie": false
+    },
+    {
+     "id": "c3160-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat/common/music: add music class",
+     "other_text": "feat: add music module",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9793",
+   "line": 177,
+   "comparisons": [
+    {
+     "id": "c9793-1",
+     "other": "author",
+     "focus_text": "chore: add dep for go build",
+     "other_text": "chore: use dep to manage vendor",
+     "auto_tie": false
+    },
+    {
+     "id": "c9793-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: add dep for go build",
+     "other_text": "build: add dep",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2255",
+   "line": 178,
+   "comparisons": [
+    {
+     "id": "c2255-1",
+     "other": "author",
+     "focus_text": "feat(hooks): add hooks",
+     "other_text": "feat(hook): add useKeyPress",
+     "auto_tie": false
+    },
+    {
+     "id": "c2255-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(hooks): add hooks",
+     "other_text": "fix: fix menu search not work",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2347",
+   "line": 179,
+   "comparisons": [
+    {
+     "id": "c2347-1",
+     "other": "author",
+     "focus_text": "feat(Menu): add `position` prop to MenuItem and MenuMenu",
+     "other_text": "feat(Menu): add `left` value to the position prop",
+     "auto_tie": false
+    },
+    {
+     "id": "c2347-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(Menu): add `position` prop to MenuItem and MenuMenu",
+     "other_text": "feat(Menu): add left and right positions to MenuItem",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7259",
+   "line": 180,
+   "comparisons": [
+    {
+     "id": "c7259-1",
+     "other": "author",
+     "focus_text": "feat: support pass drag area",
+     "other_text": "feat: add passDragArea prop",
+     "auto_tie": false
+    },
+    {
+     "id": "c7259-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: support pass drag area",
+     "other_text": "feat: add passDragArea prop for dragArea",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2006",
+   "line": 181,
+   "comparisons": [
+    {
+     "id": "c2006-1",
+     "other": "author",
+     "focus_text": "fix: rule based selector bug",
+     "other_text": "fix: skill selector turn on 5th turn",
+     "auto_tie": false
+    },
+    {
+     "id": "c2006-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: rule based selector bug",
+     "other_text": "fix: rule based selector utterance limit",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9806",
+   "line": 182,
+   "comparisons": [
+    {
+     "id": "c9806-1",
+     "other": "author",
+     "focus_text": "chore: fix build_all.sh",
+     "other_text": "feat: readd dos2unix",
+     "auto_tie": false
+    },
+    {
+     "id": "c9806-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: fix build_all.sh",
+     "other_text": "chore: build all",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3647",
+   "line": 183,
+   "comparisons": [
+    {
+     "id": "c3647-1",
+     "other": "author",
+     "focus_text": "feat(accordion): allow multiple items to be expanded at once",
+     "other_text": "feat(accordion): allow multiple",
+     "auto_tie": false
+    },
+    {
+     "id": "c3647-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(accordion): allow multiple items to be expanded at once",
+     "other_text": "feat(accordion): add expand multiple items",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5269",
+   "line": 184,
+   "comparisons": [
+    {
+     "id": "c5269-1",
+     "other": "author",
+     "focus_text": "fix: decode utif image on extended image component",
+     "other_text": "fix: image quality switch on previewer",
+     "auto_tie": false
+    },
+    {
+     "id": "c5269-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: decode utif image on extended image component",
+     "other_text": "fix: decode image on extended image",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8221",
+   "line": 185,
+   "comparisons": [
+    {
+     "id": "c8221-1",
+     "other": "author",
+     "focus_text": "fix: fix dp formatter for text",
+     "other_text": "fix: list of segments with deepcopy",
+     "auto_tie": false
+    },
+    {
+     "id": "c8221-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix dp formatter for text",
+     "other_text": "fix: fix dp_formatter text",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2349",
+   "line": 186,
+   "comparisons": [
+    {
+     "id": "c2349-1",
+     "other": "author",
+     "focus_text": "fix: remove templates from server.py",
+     "other_text": "fix: flags=re.IGNORECASE to compile",
+     "auto_tie": false
+    },
+    {
+     "id": "c2349-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: remove templates from server.py",
+     "other_text": "fix: spelling preprocessing templates",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3110",
+   "line": 187,
+   "comparisons": [
+    {
+     "id": "c3110-1",
+     "other": "author",
+     "focus_text": "feat: add dragstart group manually",
+     "other_text": "fix: fix drag start edge",
+     "auto_tie": false
+    },
+    {
+     "id": "c3110-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add dragstart group manually",
+     "other_text": "feat: add dragstart event",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2698",
+   "line": 188,
+   "comparisons": [
+    {
+     "id": "c2698-1",
+     "other": "author",
+     "focus_text": "test(form-control): refactor use screen",
+     "other_text": "test(form-control): refactor use screen",
+     "auto_tie": true
+    },
+    {
+     "id": "c2698-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test(form-control): refactor use screen",
+     "other_text": "test(control): use screen",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4937",
+   "line": 189,
+   "comparisons": [
+    {
+     "id": "c4937-1",
+     "other": "author",
+     "focus_text": "fix: fix socket flag usage",
+     "other_text": "fix: address",
+     "auto_tie": false
+    },
+    {
+     "id": "c4937-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix socket flag usage",
+     "other_text": "fix: fix socket flag error message",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6800",
+   "line": 190,
+   "comparisons": [
+    {
+     "id": "c6800-1",
+     "other": "author",
+     "focus_text": "chore: fix vite plugin",
+     "other_text": "fix: fix require error",
+     "auto_tie": false
+    },
+    {
+     "id": "c6800-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: fix vite plugin",
+     "other_text": "chore: add vite plugin for build",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3304",
+   "line": 191,
+   "comparisons": [
+    {
+     "id": "c3304-1",
+     "other": "author",
+     "focus_text": "fix: fix groupable with no border radius",
+     "other_text": "feat: add borderRadius style state",
+     "auto_tie": false
+    },
+    {
+     "id": "c3304-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix groupable with no border radius",
+     "other_text": "fix: fix groupable border radius",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4717",
+   "line": 192,
+   "comparisons": [
+    {
+     "id": "c4717-1",
+     "other": "author",
+     "focus_text": "feat: Support matrix for transform",
+     "other_text": "feat: Support SVG Offset",
+     "auto_tie": false
+    },
+    {
+     "id": "c4717-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Support matrix for transform",
+     "other_text": "feat: Support multiplies matrix",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0414",
+   "line": 193,
+   "comparisons": [
+    {
+     "id": "c0414-1",
+     "other": "author",
+     "focus_text": "refactor(avatargroup): use flex api",
+     "other_text": "refactor(avatar+avatargroup): use  api",
+     "auto_tie": false
+    },
+    {
+     "id": "c0414-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "refactor(avatargroup): use flex api",
+     "other_text": "refactor(flex): use attrs api for avatar group",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6791",
+   "line": 194,
+   "comparisons": [
+    {
+     "id": "c6791-1",
+     "other": "author",
+     "focus_text": "docs: enable file contributors in docs",
+     "other_text": "chore: defer file-contributions tasks",
+     "auto_tie": false
+    },
+    {
+     "id": "c6791-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: enable file contributors in docs",
+     "other_text": "docs: fix file contributors link",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4744",
+   "line": 195,
+   "comparisons": [
+    {
+     "id": "c4744-1",
+     "other": "author",
+     "focus_text": "docs: update readme",
+     "other_text": "docs: update docker iamge",
+     "auto_tie": false
+    },
+    {
+     "id": "c4744-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: update readme",
+     "other_text": "docs: update readme",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c0069",
+   "line": 196,
+   "comparisons": [
+    {
+     "id": "c0069-1",
+     "other": "author",
+     "focus_text": "ci: add yarn cache",
+     "other_text": "chore: change to setup syntax",
+     "auto_tie": false
+    },
+    {
+     "id": "c0069-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "ci: add yarn cache",
+     "other_text": "ci: add yarn cache",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c6548",
+   "line": 197,
+   "comparisons": [
+    {
+     "id": "c6548-1",
+     "other": "author",
+     "focus_text": "chore: add stale bot to repo",
+     "other_text": "chore(.github): add probot configurations",
+     "auto_tie": false
+    },
+    {
+     "id": "c6548-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: add stale bot to repo",
+     "other_text": "chore: add stale github action",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4508",
+   "line": 198,
+   "comparisons": [
+    {
+     "id": "c4508-1",
+     "other": "author",
+     "focus_text": "chore(project-template): Add LDPLUSPLUS variable",
+     "other_text": "fix(project-template): Add LDPLUSPLUS variable",
+     "auto_tie": false
+    },
+    {
+     "id": "c4508-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(project-template): Add LDPLUSPLUS variable",
+     "other_text": "chore(project-template): Add LDPLUSPLUS variable",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c1971",
+   "line": 199,
+   "comparisons": [
+    {
+     "id": "c1971-1",
+     "other": "author",
+     "focus_text": "fix: fix disabled date in calendar",
+     "other_text": "fix: rename `hasProp` to `isControlled` & fix",
+     "auto_tie": false
+    },
+    {
+     "id": "c1971-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix disabled date in calendar",
+     "other_text": "fix: fix calendar disabled state",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7867",
+   "line": 200,
+   "comparisons": [
+    {
+     "id": "c7867-1",
+     "other": "author",
+     "focus_text": "chore(webpack_config): remove unused server config file",
+     "other_text": "fix(webpack_config): import ANALYZE_BUNDLE from config",
+     "auto_tie": false
+    },
+    {
+     "id": "c7867-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(webpack_config): remove unused server config file",
+     "other_text": "chore(webpack_config): remove prod babel config",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4457",
+   "line": 201,
+   "comparisons": [
+    {
+     "id": "c4457-1",
+     "other": "author",
+     "focus_text": "chore: add nvd3 css to NVD3Vis",
+     "other_text": "fix: add back nvd3 missing css",
+     "auto_tie": false
+    },
+    {
+     "id": "c4457-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: add nvd3 css to NVD3Vis",
+     "other_text": "chore: add nvd3 fork css",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1608",
+   "line": 202,
+   "comparisons": [
+    {
+     "id": "c1608-1",
+     "other": "author",
+     "focus_text": "Refactor: use switch instead of if-else",
+     "other_text": "chore: Fixes linter issues",
+     "auto_tie": false
+    },
+    {
+     "id": "c1608-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Refactor: use switch instead of if-else",
+     "other_text": "Fixes for trait and knative apis",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6850",
+   "line": 203,
+   "comparisons": [
+    {
+     "id": "c6850-1",
+     "other": "author",
+     "focus_text": "docs: update readme for superset-ui-plugin-demo",
+     "other_text": "docs: update documentation for starting storybook",
+     "auto_tie": false
+    },
+    {
+     "id": "c6850-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: update readme for superset-ui-plugin-demo",
+     "other_text": "docs: add instructions for demo",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7599",
+   "line": 204,
+   "comparisons": [
+    {
+     "id": "c7599-1",
+     "other": "author",
+     "focus_text": "feat: Add license to browser and node",
+     "other_text": "feat: Release scripts",
+     "auto_tie": false
+    },
+    {
+     "id": "c7599-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Add license to browser and node",
+     "other_text": "build: Add rollup build script",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9114",
+   "line": 205,
+   "comparisons": [
+    {
+     "id": "c9114-1",
+     "other": "author",
+     "focus_text": "fix: sort certificate list in ascending order",
+     "other_text": "chore(issuer-api): sort certificates by id by default",
+     "auto_tie": false
+    },
+    {
+     "id": "c9114-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: sort certificate list in ascending order",
+     "other_text": "chore: add certificate order to get handlers",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1523",
+   "line": 206,
+   "comparisons": [
+    {
+     "id": "c1523-1",
+     "other": "author",
+     "focus_text": "chore(origin-ui-device-view): update 8 files",
+     "other_text": "chore(origin-ui-device-view): add pages lazy load",
+     "auto_tie": false
+    },
+    {
+     "id": "c1523-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(origin-ui-device-view): update 8 files",
+     "other_text": "chore(origin-ui-device-view): add pages",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7683",
+   "line": 207,
+   "comparisons": [
+    {
+     "id": "c7683-1",
+     "other": "author",
+     "focus_text": "docs: fix typo in install.md",
+     "other_text": "docs: install.md port typo",
+     "auto_tie": false
+    },
+    {
+     "id": "c7683-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: fix typo in install.md",
+     "other_text": "docs: fix docker logs port",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1241",
+   "line": 208,
+   "comparisons": [
+    {
+     "id": "c1241-1",
+     "other": "author",
+     "focus_text": "fix(cli): validate run command arguments",
+     "other_text": "fix(cli): check run sources exists",
+     "auto_tie": false
+    },
+    {
+     "id": "c1241-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(cli): validate run command arguments",
+     "other_text": "fix(cli): validate args for run command",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3909",
+   "line": 209,
+   "comparisons": [
+    {
+     "id": "c3909-1",
+     "other": "author",
+     "focus_text": "chore(origin-backend): remove unused organization module",
+     "other_text": "chore(origin-backend): cleanup",
+     "auto_tie": false
+    },
+    {
+     "id": "c3909-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(origin-backend): remove unused organization module",
+     "other_text": "feat(origin-backend): add organization endpoint",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0736",
+   "line": 210,
+   "comparisons": [
+    {
+     "id": "c0736-1",
+     "other": "author",
+     "focus_text": "chore(issuer-api): fix certification request controller",
+     "other_text": "chore(issuer-api): undo change to validation check",
+     "auto_tie": false
+    },
+    {
+     "id": "c0736-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(issuer-api): fix certification request controller",
+     "other_text": "chore(issuer-api): fix validation check",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9190",
+   "line": 211,
+   "comparisons": [
+    {
+     "id": "c9190-1",
+     "other": "author",
+     "focus_text": "feat: add baked model to client",
+     "other_text": "feat: add BakedModel",
+     "auto_tie": false
+    },
+    {
+     "id": "c9190-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add baked model to client",
+     "other_text": "feat: add BakedModel",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7420",
+   "line": 212,
+   "comparisons": [
+    {
+     "id": "c7420-1",
+     "other": "author",
+     "focus_text": "refactor(game-engine): remove RenderScheduler",
+     "other_text": "feat(game-engine): remove unused class RenderScheduler",
+     "auto_tie": false
+    },
+    {
+     "id": "c7420-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "refactor(game-engine): remove RenderScheduler",
+     "other_text": "refactor(game-engine): remove RenderScheduler",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c3407",
+   "line": 213,
+   "comparisons": [
+    {
+     "id": "c3407-1",
+     "other": "author",
+     "focus_text": "docs(README.md): remove jest and enzyme from readme",
+     "other_text": "docs(Readme.md): remove mention about Enzyme",
+     "auto_tie": false
+    },
+    {
+     "id": "c3407-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs(README.md): remove jest and enzyme from readme",
+     "other_text": "docs: update README.md",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9641",
+   "line": 214,
+   "comparisons": [
+    {
+     "id": "c9641-1",
+     "other": "author",
+     "focus_text": "feat(graphics): add service loader for backend factory",
+     "other_text": "feat(graphics): add GraphicsBackendFactory",
+     "auto_tie": false
+    },
+    {
+     "id": "c9641-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(graphics): add service loader for backend factory",
+     "other_text": "feat(graphics): add backend factory",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0001",
+   "line": 215,
+   "comparisons": [
+    {
+     "id": "c0001-1",
+     "other": "author",
+     "focus_text": "fix: fix omg_api and omg_watcher tasks",
+     "other_text": "fix: child_chain and watcher tasks to use Application.ensure_all_started",
+     "auto_tie": false
+    },
+    {
+     "id": "c0001-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: fix omg_api and omg_watcher tasks",
+     "other_text": "fix: fix child chain and watcher tasks",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2237",
+   "line": 216,
+   "comparisons": [
+    {
+     "id": "c2237-1",
+     "other": "author",
+     "focus_text": "chore: remove unused command from issuer api",
+     "other_text": "chore(issuer-api): add missing commands and dto imports",
+     "auto_tie": false
+    },
+    {
+     "id": "c2237-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: remove unused command from issuer api",
+     "other_text": "chore: add certificate command to issuer api",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1865",
+   "line": 217,
+   "comparisons": [
+    {
+     "id": "c1865-1",
+     "other": "author",
+     "focus_text": "chore: update release workflow and docs",
+     "other_text": "chore: enable latest LTS nightly",
+     "auto_tie": false
+    },
+    {
+     "id": "c1865-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update release workflow and docs",
+     "other_text": "chore: update release workflow for 1.8 LTS",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7882",
+   "line": 218,
+   "comparisons": [
+    {
+     "id": "c7882-1",
+     "other": "author",
+     "focus_text": "test(exchange): add test for active user guard",
+     "other_text": "fix(exchange): remove role checking",
+     "auto_tie": false
+    },
+    {
+     "id": "c7882-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test(exchange): add test for active user guard",
+     "other_text": "fix: fix active user guard for bundle buy",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4201",
+   "line": 219,
+   "comparisons": [
+    {
+     "id": "c4201-1",
+     "other": "author",
+     "focus_text": "chore(build): Fix bundle Dockerfile on macOS",
+     "other_text": "fix(OLM): Fix OLM bundle Dockerfile post-processing on Mac OS",
+     "auto_tie": false
+    },
+    {
+     "id": "c4201-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(build): Fix bundle Dockerfile on macOS",
+     "other_text": "chore: fix Dockerfile for Darwin",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0287",
+   "line": 220,
+   "comparisons": [
+    {
+     "id": "c0287-1",
+     "other": "author",
+     "focus_text": "feat(GUI): move `GUIMainMenu` to `BorderPane`",
+     "other_text": "style(GUI): make GUIMainMenu more readable",
+     "auto_tie": false
+    },
+    {
+     "id": "c0287-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(GUI): move `GUIMainMenu` to `BorderPane`",
+     "other_text": "feat(GUI): add `GuiGameSelectSP`",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9080",
+   "line": 221,
+   "comparisons": [
+    {
+     "id": "c9080-1",
+     "other": "author",
+     "focus_text": "chore: update package.json",
+     "other_text": "chore: copy README before pack",
+     "auto_tie": false
+    },
+    {
+     "id": "c9080-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update package.json",
+     "other_text": "chore: update package.json",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c1204",
+   "line": 222,
+   "comparisons": [
+    {
+     "id": "c1204-1",
+     "other": "author",
+     "focus_text": "docs: update README.md to use ecto.reset instead of ecto.drop",
+     "other_text": "docs: simplify db re-creation",
+     "auto_tie": false
+    },
+    {
+     "id": "c1204-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: update README.md to use ecto.reset instead of ecto.drop",
+     "other_text": "docs: fix ecto reset in README",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5744",
+   "line": 223,
+   "comparisons": [
+    {
+     "id": "c5744-1",
+     "other": "author",
+     "focus_text": "feat(webpack): add support for font types in nitro",
+     "other_text": "feat(webpack): add font loader (eot, ttf, woff, woff2, svg)",
+     "auto_tie": false
+    },
+    {
+     "id": "c5744-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(webpack): add support for font types in nitro",
+     "other_text": "feat(webpack): add font rules to webpack config",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3003",
+   "line": 224,
+   "comparisons": [
+    {
+     "id": "c3003-1",
+     "other": "author",
+     "focus_text": "fix(toFloat): add support for ISO 8601 timestamps",
+     "other_text": "fix(toFloat): verify the string can be safely converted to a float",
+     "auto_tie": false
+    },
+    {
+     "id": "c3003-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(toFloat): add support for ISO 8601 timestamps",
+     "other_text": "fix(isFloat): add support for 2020-01-06T14:31:00.135Z",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8414",
+   "line": 225,
+   "comparisons": [
+    {
+     "id": "c8414-1",
+     "other": "author",
+     "focus_text": "fix: rename SDK_S to SDK_DEVELOPMENT",
+     "other_text": "refactor: remove SDK name from development sdk version",
+     "auto_tie": false
+    },
+    {
+     "id": "c8414-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: rename SDK_S to SDK_DEVELOPMENT",
+     "other_text": "fix: fix SDK_DEVELOPMENT flag",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7231",
+   "line": 226,
+   "comparisons": [
+    {
+     "id": "c7231-1",
+     "other": "author",
+     "focus_text": "feat: add piggybacking to exit processor",
+     "other_text": "feat: add piggybacks tracking",
+     "auto_tie": false
+    },
+    {
+     "id": "c7231-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add piggybacking to exit processor",
+     "other_text": "feat: add piggyback feature to exit processor",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5262",
+   "line": 227,
+   "comparisons": [
+    {
+     "id": "c5262-1",
+     "other": "author",
+     "focus_text": "feat: Add integration metadata to events",
+     "other_text": "fix(integrations): Report `BaseClient` integrations added after init",
+     "auto_tie": false
+    },
+    {
+     "id": "c5262-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Add integration metadata to events",
+     "other_text": "feat(core): Add _integrations to client",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7924",
+   "line": 228,
+   "comparisons": [
+    {
+     "id": "c7924-1",
+     "other": "author",
+     "focus_text": "test(e2e): fix health test for readiness check",
+     "other_text": "fix(e2e): fix TestHealthTrait for upgraded Camel 3.18.x",
+     "auto_tie": false
+    },
+    {
+     "id": "c7924-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test(e2e): fix health test for readiness check",
+     "other_text": "test(e2e): fix health test for camel readiness check",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7401",
+   "line": 229,
+   "comparisons": [
+    {
+     "id": "c7401-1",
+     "other": "author",
+     "focus_text": "fix: Watch integration until it is running or error",
+     "other_text": "fix: Dev mode does not show if the build failed",
+     "auto_tie": false
+    },
+    {
+     "id": "c7401-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Watch integration until it is running or error",
+     "other_text": "fix: Handle integration state changes in watch",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6668",
+   "line": 230,
+   "comparisons": [
+    {
+     "id": "c6668-1",
+     "other": "author",
+     "focus_text": "build: add jmod support for apktool-cli",
+     "other_text": "build: support for jdk9+ build",
+     "auto_tie": false
+    },
+    {
+     "id": "c6668-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "build: add jmod support for apktool-cli",
+     "other_text": "build: add java 9 jmod to apktool output",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1031",
+   "line": 231,
+   "comparisons": [
+    {
+     "id": "c1031-1",
+     "other": "author",
+     "focus_text": "Update performance tests to use new py-solc version",
+     "other_text": "docs: improve docs for performance",
+     "auto_tie": false
+    },
+    {
+     "id": "c1031-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update performance tests to use new py-solc version",
+     "other_text": "fix performance tests",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3132",
+   "line": 232,
+   "comparisons": [
+    {
+     "id": "c3132-1",
+     "other": "author",
+     "focus_text": "fix: loader should not throw when no module is found",
+     "other_text": "feat: allow for multiple onLoad callbacks in loader",
+     "auto_tie": false
+    },
+    {
+     "id": "c3132-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: loader should not throw when no module is found",
+     "other_text": "fix: browser loader: remove unused import",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1090",
+   "line": 233,
+   "comparisons": [
+    {
+     "id": "c1090-1",
+     "other": "author",
+     "focus_text": "fix: remove CullMode from EngineGraphicsManager",
+     "other_text": "fix(gui): set gui cull mode is disabled",
+     "auto_tie": false
+    },
+    {
+     "id": "c1090-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: remove CullMode from EngineGraphicsManager",
+     "other_text": "fix(gui): remove CullMode.CULL_BACK from GUI pass",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2841",
+   "line": 234,
+   "comparisons": [
+    {
+     "id": "c2841-1",
+     "other": "author",
+     "focus_text": "ci: add prerelease script",
+     "other_text": "chore: remove GH_TOKEN check",
+     "auto_tie": false
+    },
+    {
+     "id": "c2841-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "ci: add prerelease script",
+     "other_text": "ci: add prerelease script",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c0393",
+   "line": 235,
+   "comparisons": [
+    {
+     "id": "c0393-1",
+     "other": "author",
+     "focus_text": "feat(base): add index count to VertexFormat",
+     "other_text": "feat(graphics): support divisor vertex element",
+     "auto_tie": false
+    },
+    {
+     "id": "c0393-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(base): add index count to VertexFormat",
+     "other_text": "feat(graphics): add index count to VertexFormat",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9897",
+   "line": 236,
+   "comparisons": [
+    {
+     "id": "c9897-1",
+     "other": "author",
+     "focus_text": "docs: fix js sdk import",
+     "other_text": "docs: replace `oryd` in examples with `ory`",
+     "auto_tie": false
+    },
+    {
+     "id": "c9897-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: fix js sdk import",
+     "other_text": "docs: fix sdk js import",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0083",
+   "line": 237,
+   "comparisons": [
+    {
+     "id": "c0083-1",
+     "other": "author",
+     "focus_text": "chore: update package version",
+     "other_text": "chore: lock less dep version",
+     "auto_tie": false
+    },
+    {
+     "id": "c0083-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update package version",
+     "other_text": "chore: update package lock",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1187",
+   "line": 238,
+   "comparisons": [
+    {
+     "id": "c1187-1",
+     "other": "author",
+     "focus_text": "fix(react): Fix react router v6 navigation transactions",
+     "other_text": "fix(tracing): Don't finish React Router 6 `pageload` transactions early",
+     "auto_tie": false
+    },
+    {
+     "id": "c1187-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(react): Fix react router v6 navigation transactions",
+     "other_text": "ref(replay): Use `useEffect` to avoid re-running routing effect",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1771",
+   "line": 239,
+   "comparisons": [
+    {
+     "id": "c1771-1",
+     "other": "author",
+     "focus_text": "chore: add (Deprecated) to chart names",
+     "other_text": "chore: remove V2 and add Deprecated",
+     "auto_tie": false
+    },
+    {
+     "id": "c1771-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: add (Deprecated) to chart names",
+     "other_text": "chore: rename pivot table to treemap",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2856",
+   "line": 240,
+   "comparisons": [
+    {
+     "id": "c2856-1",
+     "other": "author",
+     "focus_text": "chore(package.json): fix package name",
+     "other_text": "fix(package.json): remove uglify-js",
+     "auto_tie": false
+    },
+    {
+     "id": "c2856-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(package.json): fix package name",
+     "other_text": "chore(package.json): update package.json",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4643",
+   "line": 241,
+   "comparisons": [
+    {
+     "id": "c4643-1",
+     "other": "author",
+     "focus_text": "test: add test cases for utils/lang",
+     "other_text": "test: add test cases for utils/lang",
+     "auto_tie": true
+    },
+    {
+     "id": "c4643-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: add test cases for utils/lang",
+     "other_text": "test: add test case for lang",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0475",
+   "line": 242,
+   "comparisons": [
+    {
+     "id": "c0475-1",
+     "other": "author",
+     "focus_text": "chore(project): update package.json for nitro-twig",
+     "other_text": "chore(project): disable some tests in second project",
+     "auto_tie": false
+    },
+    {
+     "id": "c0475-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(project): update package.json for nitro-twig",
+     "other_text": "chore(project): add nitro twig package to project",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9767",
+   "line": 243,
+   "comparisons": [
+    {
+     "id": "c9767-1",
+     "other": "author",
+     "focus_text": "fix: Add measure event to leveldb and rocksdb server",
+     "other_text": "fix: decorate measure event for consistency",
+     "auto_tie": false
+    },
+    {
+     "id": "c9767-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Add measure event to leveldb and rocksdb server",
+     "other_text": "fix: Add measure_event decorator to server",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7350",
+   "line": 244,
+   "comparisons": [
+    {
+     "id": "c7350-1",
+     "other": "author",
+     "focus_text": "fix: Use window.XMLHttpRequest when available",
+     "other_text": "fix: defend against undefined XMLHttpRequest in _makeRequest",
+     "auto_tie": false
+    },
+    {
+     "id": "c7350-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Use window.XMLHttpRequest when available",
+     "other_text": "fix(raven): use correct XMLHttpRequest for Raven",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5804",
+   "line": 245,
+   "comparisons": [
+    {
+     "id": "c5804-1",
+     "other": "author",
+     "focus_text": "feat: Add custom request configuration to http client",
+     "other_text": "feat: custom axios options",
+     "auto_tie": false
+    },
+    {
+     "id": "c5804-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Add custom request configuration to http client",
+     "other_text": "feat: Add request configuration to http client",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8743",
+   "line": 246,
+   "comparisons": [
+    {
+     "id": "c8743-1",
+     "other": "author",
+     "focus_text": "feat(plugin-chart-echarts): add xAxisLabelRotation prop",
+     "other_text": "feat(plugin-chart-echarts): subject Add option to rotate label defaul 45",
+     "auto_tie": false
+    },
+    {
+     "id": "c8743-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(plugin-chart-echarts): add xAxisLabelRotation prop",
+     "other_text": "feat(plugin-chart-echarts): add xAxisLabelRotation",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6382",
+   "line": 247,
+   "comparisons": [
+    {
+     "id": "c6382-1",
+     "other": "author",
+     "focus_text": "chore: remove unused color scheme option from area chart",
+     "other_text": "fix(legacy-preset-chart-nvd3): remove unnecessary control override",
+     "auto_tie": false
+    },
+    {
+     "id": "c6382-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: remove unused color scheme option from area chart",
+     "other_text": "chore: remove controlOverrides from Area control panel",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c3122",
+   "line": 248,
+   "comparisons": [
+    {
+     "id": "c3122-1",
+     "other": "author",
+     "focus_text": "feat: add `size` prop to Calendar and DatePicker",
+     "other_text": "fix: fix style and add Calendar ui size",
+     "auto_tie": false
+    },
+    {
+     "id": "c3122-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add `size` prop to Calendar and DatePicker",
+     "other_text": "feat: add calendar and date-picker styles",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0716",
+   "line": 249,
+   "comparisons": [
+    {
+     "id": "c0716-1",
+     "other": "author",
+     "focus_text": "feat: add Tag",
+     "other_text": "feat: Switch Tag to DLS",
+     "auto_tie": false
+    },
+    {
+     "id": "c0716-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: add Tag",
+     "other_text": "feat: add Tag",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c8949",
+   "line": 250,
+   "comparisons": [
+    {
+     "id": "c8949-1",
+     "other": "author",
+     "focus_text": "feat: Add Angular integration",
+     "other_text": "feat: AngularJS integration",
+     "auto_tie": false
+    },
+    {
+     "id": "c8949-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Add Angular integration",
+     "other_text": "build: Add integration package",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8694",
+   "line": 251,
+   "comparisons": [
+    {
+     "id": "c8694-1",
+     "other": "author",
+     "focus_text": "docs: remove deprecated databaseURL config option",
+     "other_text": "fix(config): made \"databaseUrl\" config value optional",
+     "auto_tie": false
+    },
+    {
+     "id": "c8694-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: remove deprecated databaseURL config option",
+     "other_text": "fix(docs): remove databaseURL from docs",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0180",
+   "line": 252,
+   "comparisons": [
+    {
+     "id": "c0180-1",
+     "other": "author",
+     "focus_text": "fix(generator): fix gulp tasks",
+     "other_text": "chore: base gulp update to version 4",
+     "auto_tie": false
+    },
+    {
+     "id": "c0180-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(generator): fix gulp tasks",
+     "other_text": "chore: remove gulp tasks from nitro-gulp",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1823",
+   "line": 253,
+   "comparisons": [
+    {
+     "id": "c1823-1",
+     "other": "author",
+     "focus_text": "fix(generator): fix example code option in generator",
+     "other_text": "refactor(generator): enhance config for ignored files on updates",
+     "auto_tie": false
+    },
+    {
+     "id": "c1823-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(generator): fix example code option in generator",
+     "other_text": "fix(generator): fix exampleCode option in app generator",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7065",
+   "line": 254,
+   "comparisons": [
+    {
+     "id": "c7065-1",
+     "other": "author",
+     "focus_text": "feat(config): Add sass builder",
+     "other_text": "refactor: Hack around serde",
+     "auto_tie": false
+    },
+    {
+     "id": "c7065-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(config): Add sass builder",
+     "other_text": "refactor(config): Use SassBuilder",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4851",
+   "line": 255,
+   "comparisons": [
+    {
+     "id": "c4851-1",
+     "other": "author",
+     "focus_text": "test(watcher): fix utxo test and transaction db tests",
+     "other_text": "test(watcher): fix tests after db changes",
+     "auto_tie": false
+    },
+    {
+     "id": "c4851-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test(watcher): fix utxo test and transaction db tests",
+     "other_text": "test(watcher): fix utxo test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4533",
+   "line": 256,
+   "comparisons": [
+    {
+     "id": "c4533-1",
+     "other": "author",
+     "focus_text": "feat(isMobilePhone): added new locales for mobile phone validation",
+     "other_text": "feat(isMobilePhone): add support for lebanon,georgia and peru locales",
+     "auto_tie": false
+    },
+    {
+     "id": "c4533-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(isMobilePhone): added new locales for mobile phone validation",
+     "other_text": "feat(isMobilePhone): added es-PE and ar-LB locales",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1849",
+   "line": 257,
+   "comparisons": [
+    {
+     "id": "c1849-1",
+     "other": "author",
+     "focus_text": "chore: Add core action to get changelog",
+     "other_text": "fix: the missing node_module",
+     "auto_tie": false
+    },
+    {
+     "id": "c1849-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: Add core action to get changelog",
+     "other_text": "chore: add core package to github actions",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6456",
+   "line": 258,
+   "comparisons": [
+    {
+     "id": "c6456-1",
+     "other": "author",
+     "focus_text": "fix(Login): add language to login auth request",
+     "other_text": "feat(Login): use navigator language as lang in auth request",
+     "auto_tie": false
+    },
+    {
+     "id": "c6456-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(Login): add language to login auth request",
+     "other_text": "fix(login): fix login language",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2939",
+   "line": 259,
+   "comparisons": [
+    {
+     "id": "c2939-1",
+     "other": "author",
+     "focus_text": "test: added lazy mode tests",
+     "other_text": "test: fixed tests",
+     "auto_tie": false
+    },
+    {
+     "id": "c2939-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: added lazy mode tests",
+     "other_text": "test: added lazy tests for app config",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4360",
+   "line": 260,
+   "comparisons": [
+    {
+     "id": "c4360-1",
+     "other": "author",
+     "focus_text": "feat(server/ssr): use getTags function to generate html",
+     "other_text": "feat(server/ssr): use `template` func from rapscallion in HtmlComponen",
+     "auto_tie": false
+    },
+    {
+     "id": "c4360-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(server/ssr): use getTags function to generate html",
+     "other_text": "feat(server/ssr): use getTagsFromAssets to render html",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1149",
+   "line": 261,
+   "comparisons": [
+    {
+     "id": "c1149-1",
+     "other": "author",
+     "focus_text": "fix(actions): fix routing wrapper",
+     "other_text": "fix(components): fix rendering of Redirects in RoutingWrapper",
+     "auto_tie": false
+    },
+    {
+     "id": "c1149-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(actions): fix routing wrapper",
+     "other_text": "fix(actions/routing): use lodash pick",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1858",
+   "line": 262,
+   "comparisons": [
+    {
+     "id": "c1858-1",
+     "other": "author",
+     "focus_text": "test: fix tree test case",
+     "other_text": "test: adjust assertion and variable name",
+     "auto_tie": false
+    },
+    {
+     "id": "c1858-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: fix tree test case",
+     "other_text": "test: fix Tree test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6357",
+   "line": 263,
+   "comparisons": [
+    {
+     "id": "c6357-1",
+     "other": "author",
+     "focus_text": "Update isMobilePhone tests to use fixtures",
+     "other_text": "feat: refactor isMobilePhone tests",
+     "auto_tie": false
+    },
+    {
+     "id": "c6357-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "Update isMobilePhone tests to use fixtures",
+     "other_text": "Update validators tests to use fixtures",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6960",
+   "line": 264,
+   "comparisons": [
+    {
+     "id": "c6960-1",
+     "other": "author",
+     "focus_text": "chore: update lerna version to 3.15.2",
+     "other_text": "chore: publish v0.17.51",
+     "auto_tie": false
+    },
+    {
+     "id": "c6960-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update lerna version to 3.15.2",
+     "other_text": "chore: update lerna version",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2094",
+   "line": 265,
+   "comparisons": [
+    {
+     "id": "c2094-1",
+     "other": "author",
+     "focus_text": "docs: Add 5.2.0 to CHANGELOG.md",
+     "other_text": "chore: Update CHANGELOG for v5.2.0",
+     "auto_tie": false
+    },
+    {
+     "id": "c2094-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: Add 5.2.0 to CHANGELOG.md",
+     "other_text": "chore: Add iOS changelog",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8565",
+   "line": 266,
+   "comparisons": [
+    {
+     "id": "c8565-1",
+     "other": "author",
+     "focus_text": "docs: add sample repo link to readme",
+     "other_text": "chore: add sample repo links",
+     "auto_tie": false
+    },
+    {
+     "id": "c8565-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: add sample repo link to readme",
+     "other_text": "chore: add sample repo link to readme",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9284",
+   "line": 267,
+   "comparisons": [
+    {
+     "id": "c9284-1",
+     "other": "author",
+     "focus_text": "fix: remove uuid helper from client migration test",
+     "other_text": "refactor: generated UUID variant & version test",
+     "auto_tie": false
+    },
+    {
+     "id": "c9284-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: remove uuid helper from client migration test",
+     "other_text": "test: add uuid test helper",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5995",
+   "line": 268,
+   "comparisons": [
+    {
+     "id": "c5995-1",
+     "other": "author",
+     "focus_text": "chore: Add IDEWorkspaceChecks.plist to project workspace",
+     "other_text": "chore(Inspector): Commit xcshareddata",
+     "auto_tie": false
+    },
+    {
+     "id": "c5995-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: Add IDEWorkspaceChecks.plist to project workspace",
+     "other_text": "chore: Add IDEWorkspaceChecks.plist to workspace",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5843",
+   "line": 269,
+   "comparisons": [
+    {
+     "id": "c5843-1",
+     "other": "author",
+     "focus_text": "chore: add cli doc command",
+     "other_text": "feat: add clidoc task and program",
+     "auto_tie": false
+    },
+    {
+     "id": "c5843-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: add cli doc command",
+     "other_text": "ci: add cli to makefile",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6723",
+   "line": 270,
+   "comparisons": [
+    {
+     "id": "c6723-1",
+     "other": "author",
+     "focus_text": "test: update test cases to use strict equality assertion",
+     "other_text": "chore: update assert.equal() to assert.strictEqual()",
+     "auto_tie": false
+    },
+    {
+     "id": "c6723-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: update test cases to use strict equality assertion",
+     "other_text": "chore: update test validators to use strict isEqual",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1277",
+   "line": 271,
+   "comparisons": [
+    {
+     "id": "c1277-1",
+     "other": "author",
+     "focus_text": "fix: Fix config and main",
+     "other_text": "style: Fix a clippy issue",
+     "auto_tie": false
+    },
+    {
+     "id": "c1277-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Fix config and main",
+     "other_text": "fix: Fix link in main",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0729",
+   "line": 272,
+   "comparisons": [
+    {
+     "id": "c0729-1",
+     "other": "author",
+     "focus_text": "fix(generator): fix backstopjs docker command template",
+     "other_text": "style(generator): prettify backstop config",
+     "auto_tie": false
+    },
+    {
+     "id": "c0729-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(generator): fix backstopjs docker command template",
+     "other_text": "test(app): fix docker command template in basic test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2982",
+   "line": 273,
+   "comparisons": [
+    {
+     "id": "c2982-1",
+     "other": "author",
+     "focus_text": "fix: exclude android classes from gradle build",
+     "other_text": "build: add exclude for license checks on android.** files",
+     "auto_tie": false
+    },
+    {
+     "id": "c2982-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: exclude android classes from gradle build",
+     "other_text": "build: exclude java files in android",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7855",
+   "line": 274,
+   "comparisons": [
+    {
+     "id": "c7855-1",
+     "other": "author",
+     "focus_text": "chore(graphql_flutter): remove generated plugin registrant",
+     "other_text": "ci: remove the spec dependences",
+     "auto_tie": false
+    },
+    {
+     "id": "c7855-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(graphql_flutter): remove generated plugin registrant",
+     "other_text": "feat(graphql_flutter): add example plugin registrar",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0081",
+   "line": 275,
+   "comparisons": [
+    {
+     "id": "c0081-1",
+     "other": "author",
+     "focus_text": "feat: remove src plugin",
+     "other_text": "fix: more windows paths",
+     "auto_tie": false
+    },
+    {
+     "id": "c0081-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: remove src plugin",
+     "other_text": "fix: remove src plugin",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6109",
+   "line": 276,
+   "comparisons": [
+    {
+     "id": "c6109-1",
+     "other": "author",
+     "focus_text": "fix(examples): fix examples for flutter client",
+     "other_text": "fix(docs): use ast for examples",
+     "auto_tie": false
+    },
+    {
+     "id": "c6109-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(examples): fix examples for flutter client",
+     "other_text": "fix: fix starwars example",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2615",
+   "line": 277,
+   "comparisons": [
+    {
+     "id": "c2615-1",
+     "other": "author",
+     "focus_text": "chore: Use GH Cloud SDK JS admin write token for bump workflow",
+     "other_text": "chore: fix permission in the bump workflow",
+     "auto_tie": false
+    },
+    {
+     "id": "c2615-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: Use GH Cloud SDK JS admin write token for bump workflow",
+     "other_text": "chore: Use GH_CLOUD_SDK_JS_ADMIN_WRITE_TOKEN in bump.yml",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c7654",
+   "line": 278,
+   "comparisons": [
+    {
+     "id": "c7654-1",
+     "other": "author",
+     "focus_text": "docs: update nitro readme to include 10.x",
+     "other_text": "test: add info about new node LTS version 10.x",
+     "auto_tie": false
+    },
+    {
+     "id": "c7654-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: update nitro readme to include 10.x",
+     "other_text": "chore: update release schedule for node.js versions",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5617",
+   "line": 279,
+   "comparisons": [
+    {
+     "id": "c5617-1",
+     "other": "author",
+     "focus_text": "docs: Fix typo in CHANGELOG.md",
+     "other_text": "chore: Fix spelling issues",
+     "auto_tie": false
+    },
+    {
+     "id": "c5617-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs: Fix typo in CHANGELOG.md",
+     "other_text": "chore: Update typo in CHANGELOG.md",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6428",
+   "line": 280,
+   "comparisons": [
+    {
+     "id": "c6428-1",
+     "other": "author",
+     "focus_text": "docs(graphql): add connect parameter to websocket link",
+     "other_text": "docs(client): document websocket connect option",
+     "auto_tie": false
+    },
+    {
+     "id": "c6428-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs(graphql): add connect parameter to websocket link",
+     "other_text": "docs(graphql): add websocket connect docs",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2965",
+   "line": 281,
+   "comparisons": [
+    {
+     "id": "c2965-1",
+     "other": "author",
+     "focus_text": "chore: Add tests for auth flows",
+     "other_text": "chore: Local token tests",
+     "auto_tie": false
+    },
+    {
+     "id": "c2965-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: Add tests for auth flows",
+     "other_text": "chore: add auth flow tests",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8452",
+   "line": 282,
+   "comparisons": [
+    {
+     "id": "c8452-1",
+     "other": "author",
+     "focus_text": "add circleci and codecov to graphql package",
+     "other_text": "chore: implement ci and cd",
+     "auto_tie": false
+    },
+    {
+     "id": "c8452-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "add circleci and codecov to graphql package",
+     "other_text": "update cirrus and release config",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2922",
+   "line": 283,
+   "comparisons": [
+    {
+     "id": "c2922-1",
+     "other": "author",
+     "focus_text": "test: remove network id from migration test",
+     "other_text": "test: remove unused fixture",
+     "auto_tie": false
+    },
+    {
+     "id": "c2922-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: remove network id from migration test",
+     "other_text": "test: remove network migration test",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8440",
+   "line": 284,
+   "comparisons": [
+    {
+     "id": "c8440-1",
+     "other": "author",
+     "focus_text": "chore(main): rename firebase realtime db to performance",
+     "other_text": "style(main): adjust comment for firebase performance",
+     "auto_tie": false
+    },
+    {
+     "id": "c8440-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore(main): rename firebase realtime db to performance",
+     "other_text": "docs(main): update firebase performance comment",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c6124",
+   "line": 285,
+   "comparisons": [
+    {
+     "id": "c6124-1",
+     "other": "author",
+     "focus_text": "test: fix oauth2 tests",
+     "other_text": "test: resolve e2e test failures",
+     "auto_tie": false
+    },
+    {
+     "id": "c6124-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: fix oauth2 tests",
+     "other_text": "test: fix oauth2 tests",
+     "auto_tie": true
+    }
+   ]
+  },
+  {
+   "id": "c3827",
+   "line": 286,
+   "comparisons": [
+    {
+     "id": "c3827-1",
+     "other": "author",
+     "focus_text": "test: add test to ensure aapt1/aapt2 xsd file is generated",
+     "other_text": "test: add test for aapt1/aapt2",
+     "auto_tie": false
+    },
+    {
+     "id": "c3827-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: add test to ensure aapt1/aapt2 xsd file is generated",
+     "other_text": "test: add test for xml xsd file",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5474",
+   "line": 287,
+   "comparisons": [
+    {
+     "id": "c5474-1",
+     "other": "author",
+     "focus_text": "fix(isBIC): fixed `isBIC`'s `XK` check",
+     "other_text": "fix(isBIC): add `XK` to accepted BIC country codes",
+     "auto_tie": false
+    },
+    {
+     "id": "c5474-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(isBIC): fixed `isBIC`'s `XK` check",
+     "other_text": "fix(isBIC): fixed `isBIC`'s `ignore_max_length` check",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4154",
+   "line": 288,
+   "comparisons": [
+    {
+     "id": "c4154-1",
+     "other": "author",
+     "focus_text": "docs(faq): added new faq entry for array-contains",
+     "other_text": "docs(faq): added FAQ for \"array-contains\" or \"array-contains-any\" error",
+     "auto_tie": false
+    },
+    {
+     "id": "c4154-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "docs(faq): added new faq entry for array-contains",
+     "other_text": "docs(faq): added array-contains error message",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0318",
+   "line": 289,
+   "comparisons": [
+    {
+     "id": "c0318-1",
+     "other": "author",
+     "focus_text": "fix: remove unused import from aapt resource parser",
+     "other_text": "style: remove unused import",
+     "auto_tie": false
+    },
+    {
+     "id": "c0318-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: remove unused import from aapt resource parser",
+     "other_text": "fix: remove BrutException from AXmlResourceParser",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0342",
+   "line": 290,
+   "comparisons": [
+    {
+     "id": "c0342-1",
+     "other": "author",
+     "focus_text": "fix(cache): fix normalization of nested objects in InMemoryCache",
+     "other_text": "style: remove some unneeded typings",
+     "auto_tie": false
+    },
+    {
+     "id": "c0342-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(cache): fix normalization of nested objects in InMemoryCache",
+     "other_text": "fix(cache): fix merge logic in normalized_in_memory",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c1490",
+   "line": 291,
+   "comparisons": [
+    {
+     "id": "c1490-1",
+     "other": "author",
+     "focus_text": "feat: Add support for resolving object values to their keys",
+     "other_text": "feat(resolve): resolve Object.values() in PropType.oneOf()",
+     "auto_tie": false
+    },
+    {
+     "id": "c1490-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat: Add support for resolving object values to their keys",
+     "other_text": "feat: Add support for resolveObjectValuesToArray",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2365",
+   "line": 292,
+   "comparisons": [
+    {
+     "id": "c2365-1",
+     "other": "author",
+     "focus_text": "fix: remove unused query options class",
+     "other_text": "feat(graphql-client): re-export parseString as gql",
+     "auto_tie": false
+    },
+    {
+     "id": "c2365-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: remove unused query options class",
+     "other_text": "fix: remove query options",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c0358",
+   "line": 293,
+   "comparisons": [
+    {
+     "id": "c0358-1",
+     "other": "author",
+     "focus_text": "feat(isCurrency): add support for pt_BR currency format",
+     "other_text": "fix: isCurrency symbol validator regex",
+     "auto_tie": false
+    },
+    {
+     "id": "c0358-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "feat(isCurrency): add support for pt_BR currency format",
+     "other_text": "fix(isCurrency): fix currency symbol validation",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8210",
+   "line": 294,
+   "comparisons": [
+    {
+     "id": "c8210-1",
+     "other": "author",
+     "focus_text": "build: update dependencies for snakeyaml and commons-text",
+     "other_text": "build: update to non-vulnerable commons_text/snakeyaml",
+     "auto_tie": false
+    },
+    {
+     "id": "c8210-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "build: update dependencies for snakeyaml and commons-text",
+     "other_text": "build: update commons-text dependency",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c5175",
+   "line": 295,
+   "comparisons": [
+    {
+     "id": "c5175-1",
+     "other": "author",
+     "focus_text": "chore: update build workflow to use node 12",
+     "other_text": "chore: disable node 10",
+     "auto_tie": false
+    },
+    {
+     "id": "c5175-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: update build workflow to use node 12",
+     "other_text": "chore: Update github action for node version",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c8057",
+   "line": 296,
+   "comparisons": [
+    {
+     "id": "c8057-1",
+     "other": "author",
+     "focus_text": "fix(main): fix firebase messaging plugin",
+     "other_text": "fix(main): move messaging support check below import statement",
+     "auto_tie": false
+    },
+    {
+     "id": "c8057-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix(main): fix firebase messaging plugin",
+     "other_text": "fix(main): fix client check in messaging plugin",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c4072",
+   "line": 297,
+   "comparisons": [
+    {
+     "id": "c4072-1",
+     "other": "author",
+     "focus_text": "chore: Add project template to Xcode project",
+     "other_text": "fix(project-template): Set IPHONEOS_DEPLOYMENT_TARGET to 9.0",
+     "auto_tie": false
+    },
+    {
+     "id": "c4072-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "chore: Add project template to Xcode project",
+     "other_text": "chore: Update project template for Xcode",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c9992",
+   "line": 298,
+   "comparisons": [
+    {
+     "id": "c9992-1",
+     "other": "author",
+     "focus_text": "fix: Handle serve errors",
+     "other_text": "fix(serve): Ctrl-c works",
+     "auto_tie": false
+    },
+    {
+     "id": "c9992-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "fix: Handle serve errors",
+     "other_text": "chore: Print error when serving",
+     "auto_tie": false
+    }
+   ]
+  },
+  {
+   "id": "c2162",
+   "line": 299,
+   "comparisons": [
+    {
+     "id": "c2162-1",
+     "other": "author",
+     "focus_text": "test: Add benchmarks for react-docgen6",
+     "other_text": "chore: Do a benchmark for new version vs old",
+     "auto_tie": false
+    },
+    {
+     "id": "c2162-2",
+     "other": "0.5b-v0.3",
+     "focus_text": "test: Add benchmarks for react-docgen6",
+     "other_text": "chore: Add benchmark for v6.0.0-alpha.3",
+     "auto_tie": false
+    }
+   ]
+  }
+ ]
+}

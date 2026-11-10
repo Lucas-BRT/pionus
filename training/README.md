@@ -144,6 +144,27 @@ the validation set's `f6350a3c5cb71b58` (b2's).
 (`meta.jsonl` sha256 starts `2fb1dedba6e20939`; `val1-h4` is the same with
 the history paths, as `pionus-training select` writes it today).
 
+`data/judge1` (H19, the set the blind judge reads: 300 commits of 84
+repositories, at most 6 of each) is three selections joined in this order,
+`inputs.jsonl` then `meta.jsonl` (sha256 start `89228be577152543` and
+`d2dd18b5e888c411`):
+
+```bash
+EX="--exclude-repos-of data/val1 data/eval-v1 data/eval-short"
+G=~/.local/share/pionus/models      # the registry's GGUFs, as `pionus model` installs them
+$SCT select data/val1 data/judge1-free --conventional 0 --free 150 --per-repo 6
+$SCT select data/val1 data/judge1-conv-val1 --conventional 48 --free 0 --per-repo 6
+$SCT select data/test2to5h data/judge1-conv-test --conventional 102 --free 0 --per-repo 6 $EX
+mkdir -p data/judge1
+for f in inputs meta; do
+  cat data/judge1-free/$f.jsonl data/judge1-conv-val1/$f.jsonl data/judge1-conv-test/$f.jsonl > data/judge1/$f.jsonl
+done
+$SCT compare runs/judge1 $SC --sets data/judge1 --diff annotated \
+  --baseline 1.5b-v0.3=$G/pionus-1.5b-v0.3-q4_k_m.gguf 0.5b-v0.3=$G/pionus-0.5b-v0.3-q4_k_m.gguf
+python -I pair_judge.py build - data/judge1 runs/judge1/pairs --batches 12 \
+  1.5b-v0.3=runs/judge1/judge1/1.5b-v0.3.jsonl 0.5b-v0.3=runs/judge1/judge1/0.5b-v0.3.jsonl
+```
+
 ## Preference pairs (DPO)
 
 What SFT never shows the model is what not to write: a history subject copied,

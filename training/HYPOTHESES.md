@@ -1490,10 +1490,39 @@ with `pair_judge.py`, two passes with the sides drawn apart, the annotators Clau
 repository name, hash or origin. The author of this project rates 30 of the comparisons blind, drawn at random among
 those the two passes decided alike.
 
+*The set, as built (changed before any judgment was read).* `data/val1` cannot give it: its 250 Conventional commits
+come from 8 repositories, and at most 5 per repository leaves 189 of its 500. `data/judge1` is 300 commits of 84
+repositories, at most 6 of each, chosen by `pionus-training select` (the hash of the commit, no seed): 150 free of 54
+repositories of `val1`, and 150 Conventional of 30 repositories, 48 of `val1` and 102 of `data/test2to5h` outside the
+repositories of `val1`, eval-v1 and eval-short (19 repositories: the test split has few Conventional ones). The
+commands are in [README.md](README.md). The messages are the 1.5B v0.3's (the focus), the author's and the 0.5B
+v0.3's, from `pionus-training compare --diff annotated` with pionus 0.15.0 on `vulkan`: 579 comparisons a pass after
+the 21 identical pairs, in 12 batches a pass (`pair_judge.py build - ... --batches 12`), with the instructions of H18
+unchanged. Stage 1 draws its Conventional commits elsewhere for the same reason, written there when it is built.
+
 *Fixed before the numbers.* The judge is used to choose arms if its two passes agree in at least 85% of the comparisons
 (H18: 90%), the side wins between 45% and 55% of the decided ones, and it agrees with the person in at least 23 of the
 30 (the count is written here whatever it is). If it is, H14's and H16's arms are put before it, as H18 asked. If it is
 not, the stages below are not run on its word.
+
+**Stage 0, the two passes (the person's 30 ratings are still to come).** 24 Claude Fable subagents, one a batch
+(`pair-judgments-h19.json`, the messages in `pair-candidates-h19.json`); six batches stopped on the account's usage
+limit before writing anything and were given to fresh agents, and every batch returned as many answers as it was
+asked.
+
+| 1.5B v0.3 against | wins / ties / losses | net [95%] | score, its and the other's | states what the diff lacks, its and the other's |
+|---|---|---|---|---|
+| the author | 245 / 34 / 321 | −0.13 [−0.20, −0.05] | 3.23 and 3.44 | 0.17 and 0.24 |
+| the 0.5B v0.3 | 301 / 102 / 197 | +0.17 [+0.10, +0.24] | 3.25 and 2.90 | 0.18 and 0.25 |
+
+- **Two of the three criteria are met:** the passes give the same outcome in 89% of the 579 comparisons asked (94% of
+  the 517 both decided), and `X` wins 532 of the 1,064 decided (0.50). The third is the person's.
+- **The author is preferred, as in H18**, in 57% of the decided (321 of 566; H18: 57%), on both halves: Conventional
+  129 wins to 155 losses (scores 3.08 and 3.25), free 116 to 166 (3.38 and 3.63). The interval is now clear of 0.
+- **The authors' subjects score higher here than in H18** (3.44 against 3.15), and 22% of them get 1 or 2 (128 of
+  594; in H18 29%). Another judge model and other repositories: the two are not told apart by this.
+- **The 1.5B is preferred to the 0.5B** (60% of the decided, score 3.25 against 2.90), which H18 did not see on 100
+  commits (net −0.02): the larger model does buy something in the descriptions.
 
 **Stage 1, the teacher, on 200 commits.** 100 Conventional and 100 free commits of `data/test2to5h`, outside the
 repositories of the evaluation and validation sets, at most 2 per repository. Two forms, on the same commits:
