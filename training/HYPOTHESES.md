@@ -1472,6 +1472,64 @@ rubric typical commit messages, the authors' too, are "acceptable but vague".
 tried to give; H14 and H16 were judged only by `word_f1`, which does not see it. The next test is to put those arms
 before this judge.
 
+### H19. A stronger model as judge and teacher moves the descriptions — planned
+
+**Where the room is.** The type is at the labels' ceiling: every arm since H1 left `type_match` between 0.62 and 0.70,
+the seed alone moves it by 2 points (H13), and the 1.5B v0.3's type is accepted more often than the repositories' own
+(0.85 against 0.79, H17). The descriptions are not: the blind judge of H18 scores the models and the authors 3 of 5 and
+prefers the author in 57% of the decided comparisons, because the author names the mechanism where the model is
+generic, and DPO halved the words that are in nothing the model was given (`novel` 0.147 → 0.078 at 0.5B, H12). No
+metric in `pionus-training score` sees that, and H14 and H16 were read with `word_f1` only.
+
+**What was never tried.** A teacher stronger than the fine-tunes (H10's 7B base was weaker than them), and training
+targets chosen or written for their quality: every set so far takes the author's subject as it is, "fix typo" included.
+
+**Stage 0, the judge.** H18's judge on a set large enough to choose arms with: 300 commits of `data/val1` (150
+Conventional, 150 free, at most 5 per repository, a fixed seed; the 100 commits of H17 come from 8 repositories), built
+with `pair_judge.py`, two passes with the sides drawn apart, the annotators Claude Fable subagents that see no
+repository name, hash or origin. The author of this project rates 30 of the comparisons blind, drawn at random among
+those the two passes decided alike.
+
+*Fixed before the numbers.* The judge is used to choose arms if its two passes agree in at least 85% of the comparisons
+(H18: 90%), the side wins between 45% and 55% of the decided ones, and it agrees with the person in at least 23 of the
+30 (the count is written here whatever it is). If it is, H14's and H16's arms are put before it, as H18 asked. If it is
+not, the stages below are not run on its word.
+
+**Stage 1, the teacher, on 200 commits.** 100 Conventional and 100 free commits of `data/test2to5h`, outside the
+repositories of the evaluation and validation sets, at most 2 per repository. Two forms, on the same commits:
+
+- *Rewrite.* The teacher (Claude Fable) gets the 12 latest subjects, the changed files and the whole diff (up to 20,000
+  characters, where the prompt of the product keeps what fits 1024 tokens), and writes the subject in the repository's
+  style, at most 72 columns, stating only what the diff shows. It does not see the author's subject.
+- *Score.* The judge of stage 0 gives the author's subject 1 to 5 by the same rubric.
+
+The rewrites are compared with the authors' subjects by the judge, blind, and by `pionus-training score`'s `unsupported`
+and `ungrounded` against the prompt the product builds: a target that names what the 1024 tokens do not show teaches
+the small model to invent.
+
+*Fixed before the numbers.* Rewriting is carried to training if the judge prefers the teacher in at least 65% of the
+decided comparisons with the 95% interval of the net above 0, the teacher states what the diff lacks no more often than
+the authors, `unsupported` and `ungrounded` of its subjects against the product's prompt are not above the authors', and
+the person's 30 ratings (10 of them on these pairs) do not prefer the authors. Scoring is carried to training if at
+least 20% of the authors' subjects get 1 or 2 (in H18 they were 58 of 200), so that a filter has something to drop. If
+both pass, the first training arms are both; if neither, the result goes here as it is and no GPU time is spent.
+
+**Limits known before starting.** The judge and the teacher are one model, which may prefer its own writing: the
+person's ratings and the cheap checks are the guard, and a second judge of another model (Opus, as in H18) is the next
+one if they disagree. A model trained on rewritten targets writes less like the repositories' authors, so `word_f1`
+against them is expected to fall and is not a criterion from stage 2 on.
+
+**After the pilot, not fixed yet.** Stage 2: the form that passed at scale on the 0.5B against S0 (H13), one arm on
+each T4: for scoring, a judge that runs on Kaggle, checked against the teacher's scores of 1,000 to 2,000 commits,
+filters the 40,000; for rewriting, the teacher writes the targets of a subset whose size the pilot's cost decides.
+Stage 3: the best recipe on the 1.5B, one arm on another base model of at most 2B parameters, and DPO last with pairs
+that set a specific grounded reply against a generic one (the pairs of H12 only reject failures). Each stage gets its
+criteria here before it is read, the arms are chosen on the judge's set and never on eval-v1, and the guards are the
+ones of H13 (`first_try`, `first_copied`, `ungrounded`, `scope_known`, the type by `lenient` and `agreed` of H17).
+
+**Not part of it.** The default model is still the untrained Qwen2.5-Coder-1.5B; making a fine-tune the default is
+row 3 of the [roadmap](../docs/roadmap.md) and needs no training.
+
 ## Ideas not tried yet
 
 - An LLM judge for faithfulness, validated against a sample rated by

@@ -334,6 +334,10 @@ What is published is one model per size pionus offers, named
    type or the scope, but does not improve the type significantly. The six
    runs are in a private repository on Hugging Face as experiments; the 1.5B
    is next. Nothing is in the registry.
-8. The next version: H4b, and more data for the 1.5B, which leans on the
-   rules more than the 0.5B. What to publish, register and make the default
+8. ~~The next version: H4b, and more data for the 1.5B.~~ Tried on the 0.5B
+   (H13: the annotated list and the scope map): the type did not move, and
+   it is at the labels' ceiling (H17).
+9. The descriptions ([H19](../training/HYPOTHESES.md)): a blind judge on a
+   larger set, a stronger model as teacher on 200 commits, and training
+   only if the pilot passes. What to publish, register and make the default
    is in the [roadmap](roadmap.md).
