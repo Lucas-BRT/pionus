@@ -2,7 +2,8 @@
 
 use anyhow::Result;
 use pionus::backend::device::{self, Target};
-use pionus::backend::genai::{Device, GenaiBackend};
+use pionus::backend::genai::Device;
+use pionus::backend::isolated::IsolatedBackend;
 use pionus::backend::llamacpp::{self, LlamaCppBackend, LlamaCppOptions};
 use pionus::backend::server::{self, ConnectError};
 use pionus::backend::{Backend, BackendError};
@@ -83,7 +84,12 @@ pub(super) fn load_with(
     let options = settings
         .genai_options(device)
         .map_err(BackendError::Unavailable)?;
-    Ok(Box::new(GenaiBackend::load(&options)?))
+    let exe = pionus::backend::isolated::current_exe()?;
+    Ok(Box::new(IsolatedBackend::start(&options, move || {
+        let mut worker = std::process::Command::new(&exe);
+        worker.arg(pionus::backend::isolated::SUBCOMMAND);
+        worker
+    })?))
 }
 
 /// The server kept loaded for `options`, when `model.keep_loaded` asks for

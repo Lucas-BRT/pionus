@@ -9,6 +9,9 @@
 - A retry when the reply repeats a history subject, and lockfile-only
   changes written from the file list without loading the model.
 - `prepare-commit-msg` hook for any git client.
+- OpenVINO GenAI in a child process (`pionus genai-worker`): a driver crash
+  or a hang is an error, with one reload and a new request, instead of a
+  core dump.
 - OpenVINO GenAI backend on the NPU, the Intel GPU and the CPU, with NPU
   tuning (chunked prefill, `BEST_PERF`).
 - llama.cpp backend with Vulkan for AMD, NVIDIA and Intel GPUs, and on the

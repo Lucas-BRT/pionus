@@ -4,6 +4,7 @@
 pub mod choices;
 pub mod device;
 pub mod genai;
+pub mod isolated;
 pub mod llamacpp;
 pub mod server;
 
@@ -35,7 +36,7 @@ impl Default for GenerationConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, Serialize, Deserialize)]
 pub enum BackendError {
     #[error("backend unavailable: {0}")]
     Unavailable(String),
