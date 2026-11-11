@@ -81,7 +81,7 @@ How long each takes is in [measurements](measurements.md#per-message-by-model).
   commits) they pick the Conventional type of the real commit much more
   often than `qwen2.5-coder-1.5b`, which answers `fix` to most changes, and
   the 0.5B falls back to the file list more often on young repositories; the
-  numbers are in [training/HYPOTHESES.md](../training/HYPOTHESES.md).
+  numbers are in the research log (ai-memory, `research/*`).
   Their model cards on Hugging Face list
   the evaluation, the training and the limitations. Versions are new ids
   (`-v0.2`), never replaced files.

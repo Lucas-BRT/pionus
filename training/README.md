@@ -2,7 +2,7 @@
 
 Exploratory work toward pionus's own models; see
 [docs/training.md](../docs/training.md) for the goal and the decisions, and
-[HYPOTHESES.md](HYPOTHESES.md) for what was tried and measured.
+the research log (ai-memory, `research/*`) for what was tried and measured.
 
 Everything runs on the training machine (RTX 3050 8 GB). Large files live
 outside the repository, in `~/.cache/pionus-training/`, and in
@@ -121,7 +121,7 @@ uv run --locked python -I $O/select.py data/test0-v1 data/eval-v1 --conventional
 sha256sum data/eval-v1/*.jsonl
 ```
 
-`data/eval-short` (young repositories, see H5 in HYPOTHESES.md):
+`data/eval-short` (young repositories, see H5, ai-memory `research/h5`):
 `pionus-training select data/test2to5h data/eval-short --conventional 100 --free 150
 --min-history 1 --max-history 5 --per-repo 5`, from `pionus-training build-inputs` over
 `test-00002`…`test-00005`; `inputs.jsonl` sha256 starts `42d212c0d2687dad`,

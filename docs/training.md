@@ -15,7 +15,7 @@ Two expected gains:
 
 - **Quality.** The current default, Qwen2.5-Coder-1.5B-Instruct, labels
   86.8% of the conventional commits of eval-v1 `fix`, where 41% really are
-  ([HYPOTHESES.md](../training/HYPOTHESES.md)), sometimes uses a file path
+  (the research log, in ai-memory as `research/*`), sometimes uses a file path
   as the scope, and needs a retry when the reply does not follow the
   convention.
 - **Speed, indirectly.** A model trained on the format does not need the
@@ -151,7 +151,7 @@ time.
 - Drop merges, reverts, `fixup!`/`squash!`, WIP, release bumps, bot authors,
   and messages that only reference an issue. Dropping release bumps means
   the models never see one: v0.1 answered the 0.5.0 bump with `feat(model)`
-  (fixture `conventional-en-release`, H7 in HYPOTHESES.md).
+  (fixture `conventional-en-release`, H7 in the research log (ai-memory, `research/*`)).
 - Balance the `type` distribution, or the model learns the dataset's bias
   instead of the base model's.
 - Split by **repository**, never by commit, so the evaluation measures
@@ -185,7 +185,7 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   reads `type_group` (a `build` for a `chore` counts) and `type_behaviour`
   (and `feat` for `fix`); `training/type_review.py` adds a plain classifier's
   plausibility, intervals and a sheet of mistakes to rate by hand
-  ([H13](../training/HYPOTHESES.md)).
+  (H13, ai-memory `research/h13`).
 - Always report the base model's scores on the same set and binary.
 - Two versions of a model or a prompt answer the same cases: compare them
   case by case with `pionus-training score EVAL_DIR NEW.jsonl --against OLD.jsonl`,
@@ -271,7 +271,7 @@ did), `kaggle kernels status`, `kaggle kernels output` for the archives.
 What is published is one model per size pionus offers, named
 `pionus-<size>-v<version>` (`pionus-1.5b-v0.1`,
 `pionus-0.5b-v0.1`), not the experiment runs: those stay in
-`training/runs/` and their numbers in HYPOTHESES.md. A later training is a new version, never a replaced file.
+`training/runs/` and their numbers in the research log (ai-memory, `research/*`). A later training is a new version, never a replaced file.
 
 1. Merge the adapter and quantize to Q4_K_M with `export_gguf.py` (the
    llama.cpp tag pionus pins, b11381), and judge it against the
@@ -310,9 +310,9 @@ What is published is one model per size pionus offers, named
    targets, split by repository.~~ Done: [training/](../training/README.md).
 3. ~~Evaluation, and the base 1.5B and 0.5B scores.~~ Done: `pionus
    eval` and `training/pionus-training score`; scores in
-   [training/HYPOTHESES.md](../training/HYPOTHESES.md).
+   the research log (ai-memory, `research/*`).
 4. ~~LoRA on the 1.5B; compare; then the 0.5B.~~ Done: H1 to H3 in
-   HYPOTHESES.md.
+   the research log (ai-memory, `research/*`).
 5. ~~Export, publish, add to the registry.~~ Done for v0.1: the c40k runs
    of H3, published as
    [pionus-1.5b-v0.1](https://huggingface.co/LucasBRT/pionus-1.5b-v0.1)
@@ -322,9 +322,9 @@ What is published is one model per size pionus offers, named
    release bumps and no type cap (H8) in one bundle of about 20k examples
    (b3).~~ Done: `pionus-0.5b-v0.2` and `pionus-1.5b-v0.2`,
    trained and evaluated, on Hugging Face and private (results in
-   [HYPOTHESES.md](../training/HYPOTHESES.md), v0.2). The scope map (H4b)
+   the research log (ai-memory, `research/*`), v0.2). The scope map (H4b)
    was not in the bundle.
-7. DPO on the models' own samples ([H12](../training/HYPOTHESES.md)): the
+7. DPO on the models' own samples (H12, ai-memory `research/h12`): the
    pipeline is built (`mine_pairs.py`, `pionus-training pairs` and `balance`,
    `train_dpo.py`, the Kaggle bundles and notebooks, `pionus-training compare`). The
    first run removed the failures its pairs showed and cost the scope; the
@@ -337,7 +337,7 @@ What is published is one model per size pionus offers, named
 8. ~~The next version: H4b, and more data for the 1.5B.~~ Tried on the 0.5B
    (H13: the annotated list and the scope map): the type did not move, and
    it is at the labels' ceiling (H17).
-9. The descriptions ([H19](../training/HYPOTHESES.md)): a blind judge on a
+9. The descriptions (H19, ai-memory `research/h19`): a blind judge on a
    larger set, a stronger model as teacher on 200 commits, and training
    only if the pilot passes. What to publish, register and make the default
    is in the [roadmap](roadmap.md).
