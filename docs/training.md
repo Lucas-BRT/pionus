@@ -194,6 +194,54 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
 - Not covered yet: gitmoji, and an LLM
   judge for faithfulness validated against a sample rated by hand.
 
+## Results
+
+Every number comes from `pionus-training score` on eval-v1 (above), run with
+`pionus eval --device vulkan` on the RTX 3050. With n = 250, a rate near 0.5
+has a standard error of about 0.03: differences under ~0.06 are noise.
+
+**v0.1 against v0.2** (0.5B and 1.5B, one binary, `94ababd`; v0.2 scored
+with `--rules omitted`, v0.1 with the full rules in the prompt):
+
+| eval-v1, Conventional | type_match | type_macro_f1 | first_try | fallback | word_f1 | ungrounded |
+|---|---|---|---|---|---|---|
+| v0.1 0.5B | 0.636 | 0.542 | 0.976 | 0.016 | 0.340 | 0.104 |
+| v0.2 0.5B | 0.632 | 0.526 | 0.972 | 0.012 | 0.337 | 0.104 |
+| v0.1 1.5B | 0.656 | 0.545 | 0.944 | 0.012 | 0.367 | 0.084 |
+| v0.2 1.5B | 0.628 | 0.498 | 0.956 | 0.020 | 0.352 | 0.084 |
+
+| eval-short | first_try | first reply copied | fallback | word_f1 | ungrounded |
+|---|---|---|---|---|---|
+| v0.1 0.5B | 0.863 | 0.137 | 0.086 | 0.244 | 0.132 |
+| v0.2 0.5B | 0.924 | 0.076 | 0.046 | 0.233 | 0.102 |
+| v0.1 1.5B | 0.878 | 0.112 | 0.030 | 0.294 | 0.102 |
+| v0.2 1.5B | 0.939 | 0.056 | 0.020 | 0.274 | 0.142 |
+
+v0.2 reads a prompt without the fixed rules, which on the CPU is about 15%
+faster: 0.5B 1.150 → 0.976 s per message, 1.5B 2.532 → 2.156 s (Ryzen 5 5500,
+the first 50 commits of eval-v1, load counted once). The 0.5B keeps its
+quality on eval-v1; the 1.5B loses a little on the type (−0.028, about one
+standard error) and v0.1 stays the better 1.5B on it.
+
+**v0.3, the DPO on the model's own samples,** against the SFT model it
+started from (0.5B, the run chosen on `val1`, read once on the evaluation
+sets and paired):
+
+| | SFT → m-b01-lr2-s02 | paired |
+|---|---|---|
+| eval-v1 Conventional, `type_match` | 0.628 → 0.664 | +15/−6, p = 0.078 |
+| eval-v1 Conventional, `type_macro_f1` | 0.531 → 0.557 | |
+| eval-v1 Conventional, `scope_known`; replies with a scope | 0.844 → 0.840; 0.396 → 0.380 | +4/−5 |
+| eval-v1 Conventional, `ungrounded`; `first_copied`; `first_try`; `fallback` | 0.104 → 0.008; 0.040 → 0.004; 0.960 → 0.996; 0.028 → 0.004 | all p < 0.05 |
+| eval-v1 free, `ungrounded`; `first_copied`; `first_try`; `fallback` | 0.108 → 0.008; 0.084 → 0.004; 0.916 → 0.996; 0.076 → 0.004 | all p < 0.001 |
+| eval-v1, `word_f1` Conventional, free; `novel` Conventional | 0.333 → 0.347, 0.230 → 0.247; 0.147 → 0.078 | |
+| eval-short Conventional (47), `type_match`; `type_macro_f1`; `scope_known` | 0.617 → 0.617; 0.669 → 0.609; 0.681 → 0.617 | +3/−3; ; +0/−3 |
+| eval-short free (150), `first_try`; `first_copied` | 0.840 → 1.000; 0.160 → 0.000 | p < 0.001 |
+
+DPO removes what the SFT model's replies got wrong (invented specifics,
+copied history subjects, falling back to the file list) at no cost to the
+scope, and does not improve the type significantly.
+
 ## Training
 
 - LoRA with `transformers` and `peft`, in a Python environment with every
@@ -270,7 +318,7 @@ did), `kaggle kernels status`, `kaggle kernels output` for the archives.
 What is published is one model per size pionus offers, named
 `pionus-<size>-v<version>` (`pionus-1.5b-v0.1`,
 `pionus-0.5b-v0.1`), not the experiment runs: those stay in
-`training/runs/` and their numbers in the research log (ai-memory, `research/*`). A later training is a new version, never a replaced file.
+`training/runs/` and their numbers in [Results](#results). A later training is a new version, never a replaced file.
 
 1. Merge the adapter and quantize to Q4_K_M with `export_gguf.py` (the
    llama.cpp tag pionus pins, b11381), and judge it against the
@@ -321,7 +369,7 @@ What is published is one model per size pionus offers, named
    release bumps and no type cap (H8) in one bundle of about 20k examples
    (b3).~~ Done: `pionus-0.5b-v0.2` and `pionus-1.5b-v0.2`,
    trained and evaluated, on Hugging Face and private (results in
-   the research log (ai-memory, `research/*`), v0.2). The scope map (H4b)
+   [Results](#results)). The scope map (H4b)
    was not in the bundle.
 7. DPO on the models' own samples (H12, ai-memory `research/h12`): the
    pipeline is built (`mine_pairs.py`, `pionus-training pairs` and `balance`,

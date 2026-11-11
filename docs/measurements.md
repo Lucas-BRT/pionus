@@ -3,7 +3,7 @@
 Every timing in the documentation comes from this page; the other pages link
 here instead of repeating numbers. How well the fine-tuned models write
 (type match, copies, fallbacks) is measured differently, with `pionus-training score` on
-eval-v1, and lives in the research log (ai-memory, `research/*`).
+eval-v1, and lives in [training](training.md#results).
 Console output shown in other pages is a run recorded here.
 
 `pionus bench` measures every device of a machine on four prompts
