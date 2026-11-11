@@ -5,17 +5,17 @@ level = 0
 
 [[case]]
 id = "typo-in-string"
-title = "typo numa mensagem de erro"
-repo = "cafeteria"
+title = "typo in an error message"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "replace", path = "src/cafeteria/estoque.py", old = "insuficente", new = "insuficiente" }]
-target = "corrige typo na mensagem de estoque insuficiente"
-expect = ["typo|digita|ortograf|corrig", "estoque|insuficiente"]
+ops = [{ op = "replace", path = "src/coffeeshop/stock.py", old = "insufficent", new = "insufficient" }]
+target = "fix typo in the insufficient stock message"
+expect = ["typo|spell|fix", "stock|insufficient"]
 tags = ["typo"]
 
 [[case]]
 id = "typo-in-comment"
-title = "typo num comentário de documentação"
+title = "typo in a doc comment"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "replace", path = "src/report.ts", old = "per acount", new = "per account" }]
@@ -25,17 +25,17 @@ tags = ["typo", "comments"]
 
 [[case]]
 id = "trailing-whitespace"
-title = "remove espaços no fim das linhas"
-repo = "cafeteria"
+title = "trailing whitespace removed"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "regex", path = "src/cafeteria/cli.py", pattern = "[ \\t]+$", repl = "" }]
-target = "remove espaços no fim das linhas do cli"
-expect = ["espaco|whitespace|branco"]
+ops = [{ op = "regex", path = "src/coffeeshop/cli.py", pattern = "[ \\t]+$", repl = "" }]
+target = "remove trailing whitespace from the cli"
+expect = ["whitespace|trailing"]
 tags = ["whitespace"]
 
 [[case]]
 id = "wrap-long-line"
-title = "só quebra uma linha longa"
+title = "only wraps a long line"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "replace", path = "src/report.ts", old = "  return [`${\"account\".padEnd(width)}  ${\"balance\".padStart(12)}`, ...accounts.map((a) => line(a, width))].join(\"\\n\");", new = """  const header = `${"account".padEnd(width)}  ${"balance".padStart(12)}`;
@@ -46,27 +46,27 @@ tags = ["formatting"]
 
 [[case]]
 id = "make-executable"
-title = "só chmod +x"
-repo = "cafeteria"
+title = "only chmod +x"
+repo = "coffeeshop"
 split = "eval"
 ops = [{ op = "chmod", path = "scripts/backup.sh", mode = "755" }]
-target = "torna o script de backup executável"
-expect = ["execut|permiss|chmod", "backup|script"]
+target = "make the backup script executable"
+expect = ["executable|permission|chmod", "backup|script"]
 tags = ["file-mode"]
 
 [[case]]
 id = "final-newline"
-title = "adiciona a quebra de linha final"
-repo = "cafeteria"
+title = "adds the final newline"
+repo = "coffeeshop"
 split = "train"
 ops = [{ op = "append", path = "requirements.txt", text = "\n" }]
-target = "adiciona quebra de linha no fim do requirements.txt"
-expect = ["quebra|newline|linha", "requirements"]
+target = "add a final newline to requirements.txt"
+expect = ["newline|line", "requirements"]
 tags = ["whitespace"]
 
 [[case]]
 id = "normalize-line-endings"
-title = "CRLF para LF"
+title = "CRLF to LF"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "regex", path = "tsconfig.json", pattern = "\\r$", repl = "" }]
@@ -76,17 +76,17 @@ tags = ["whitespace"]
 
 [[case]]
 id = "empty-marker-file"
-title = "arquivo vazio novo"
-repo = "cafeteria"
+title = "new empty file"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "write", path = "src/cafeteria/py.typed", text = "" }]
-target = "marca o pacote como tipado com py.typed"
-expect = ["py.?typed|tipad"]
+ops = [{ op = "write", path = "src/coffeeshop/py.typed", text = "" }]
+target = "mark the package as typed with py.typed"
+expect = ["py.?typed|typed"]
 tags = ["new-file"]
 
 [[case]]
 id = "symlink"
-title = "symlink novo"
+title = "new symlink"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "symlink", path = "ledger", target = "dist/index.js" }]
@@ -96,10 +96,10 @@ tags = ["file-mode", "new-file"]
 
 [[case]]
 id = "nothing-staged"
-title = "nada staged"
-repo = "cafeteria"
+title = "nothing staged"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
-ops = [{ op = "replace", path = "src/cafeteria/config.py", old = "0.30", new = "0.25" }]
+ops = [{ op = "replace", path = "src/coffeeshop/config.py", old = "0.30", new = "0.25" }]
 outcome = "error"
 target = ""

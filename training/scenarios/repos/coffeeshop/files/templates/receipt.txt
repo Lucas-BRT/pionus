@@ -1,6 +1,6 @@
-{loja}
-mesa {mesa}
+{shop}
+table {table}
 --------------------------------------
-{linhas}
+{lines}
 --------------------------------------
-total com serviço: {total}
+total with service: {total}

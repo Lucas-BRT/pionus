@@ -168,9 +168,8 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   **eval-short**: 197 commits of young repositories (1–5 history subjects).
   How to rebuild both is in [training/README.md](../training/README.md).
 - **Scenarios**: hand-written cases of git operations on two synthetic
-  repositories (Python in Portuguese with free style, TypeScript with
-  Conventional Commits; the Portuguese cases no longer test a goal of the
-  product, they show what a model does by itself), by level of complexity from a typo to a merge in
+  repositories (Python with free style, TypeScript with
+  Conventional Commits), by level of complexity from a typo to a merge in
   progress, each with its target; `pionus-training score` reports them per level and
   checks the words a right subject must have (`expected`). Each case is in
   the train or the eval split, never both; those whose target depends on

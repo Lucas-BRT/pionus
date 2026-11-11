@@ -5,18 +5,18 @@ level = 5
 
 [[case]]
 id = "revert"
-title = "git revert do último commit"
-repo = "cafeteria"
+title = "git revert of the last commit"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [{ op = "git", args = ["revert", "--no-commit", "HEAD"] }]
-target = "Revert \"taxa de serviço configurável e outros ajustes menores\""
-expect = ["revert|desfaz|revers"]
+target = "Revert \"configurable service fee and other minor tweaks\""
+expect = ["revert"]
 tags = ["git-state"]
 
 [[case]]
 id = "revert-conventional"
-title = "git revert num repo Conventional"
+title = "git revert in a Conventional repo"
 repo = "ledger"
 split = "eval"
 stage = "none"
@@ -27,66 +27,66 @@ tags = ["git-state"]
 
 [[case]]
 id = "cherry-pick"
-title = "cherry-pick de outra branch"
-repo = "cafeteria"
+title = "cherry-pick from another branch"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [
-  { op = "git", args = ["checkout", "-q", "-b", "sazonal", "HEAD~2"] },
-  { op = "replace", path = "src/cafeteria/cardapio.py", old = "    \"bolo\":", new = "    \"cha-gelado\": Item(\"cha-gelado\", \"Chá gelado de hibisco\", 7.00, \"bebida\"),\n    \"bolo\":" },
-  { op = "git", args = ["commit", "-q", "-am", "chá gelado no cardápio de verão"] },
+  { op = "git", args = ["checkout", "-q", "-b", "seasonal", "HEAD~2"] },
+  { op = "replace", path = "src/coffeeshop/menu.py", old = "    \"cake\":", new = "    \"iced-tea\": Item(\"iced-tea\", \"Iced hibiscus tea\", 7.00, \"drink\"),\n    \"cake\":" },
+  { op = "git", args = ["commit", "-q", "-am", "iced tea on the summer menu"] },
   { op = "git", args = ["checkout", "-q", "main"] },
-  { op = "git", args = ["cherry-pick", "-n", "{{commit:chá gelado no cardápio de verão}}"] },
+  { op = "git", args = ["cherry-pick", "-n", "{{commit:iced tea on the summer menu}}"] },
 ]
-target = "chá gelado no cardápio de verão"
-expect = ["cha|hibisco", "cardapio"]
+target = "iced tea on the summer menu"
+expect = ["tea|hibiscus", "menu"]
 tags = ["cherry-pick", "git-state"]
 
 [[case]]
 id = "merge-kept-ours"
-title = "merge com conflito resolvido pelo nosso lado"
-repo = "cafeteria"
+title = "merge with a conflict resolved with our side"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [
-  { op = "git", args = ["checkout", "-q", "-b", "desconto"] },
-  { op = "replace", path = "src/cafeteria/config.py", old = "desconto_maximo: float = 0.30", new = "desconto_maximo: float = 0.50" },
-  { op = "git", args = ["commit", "-q", "-am", "desconto de até 50%"] },
+  { op = "git", args = ["checkout", "-q", "-b", "discount"] },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "max_discount: float = 0.30", new = "max_discount: float = 0.50" },
+  { op = "git", args = ["commit", "-q", "-am", "discount of up to 50%"] },
   { op = "git", args = ["checkout", "-q", "main"] },
-  { op = "replace", path = "src/cafeteria/config.py", old = "desconto_maximo: float = 0.30", new = "desconto_maximo: float = 0.20" },
-  { op = "git", args = ["commit", "-q", "-am", "desconto de até 20%"] },
-  { op = "git", args = ["merge", "-q", "desconto"], check = false },
-  { op = "git", args = ["checkout", "-q", "--ours", "src/cafeteria/config.py"] },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "max_discount: float = 0.30", new = "max_discount: float = 0.20" },
+  { op = "git", args = ["commit", "-q", "-am", "discount of up to 20%"] },
+  { op = "git", args = ["merge", "-q", "discount"], check = false },
+  { op = "git", args = ["checkout", "-q", "--ours", "src/coffeeshop/config.py"] },
   { op = "git", args = ["add", "-A"] },
 ]
-target = "Merge branch 'desconto'"
-expect = ["merge|mescla", "desconto"]
+target = "Merge branch 'discount'"
+expect = ["merge", "discount"]
 tags = ["git-state", "merge"]
 
 [[case]]
 id = "merge-took-theirs"
-title = "merge com conflito resolvido pelo lado deles"
-repo = "cafeteria"
+title = "merge with a conflict resolved with their side"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [
-  { op = "git", args = ["checkout", "-q", "-b", "desconto"] },
-  { op = "replace", path = "src/cafeteria/config.py", old = "desconto_maximo: float = 0.30", new = "desconto_maximo: float = 0.50" },
-  { op = "git", args = ["commit", "-q", "-am", "desconto de até 50%"] },
+  { op = "git", args = ["checkout", "-q", "-b", "discount"] },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "max_discount: float = 0.30", new = "max_discount: float = 0.50" },
+  { op = "git", args = ["commit", "-q", "-am", "discount of up to 50%"] },
   { op = "git", args = ["checkout", "-q", "main"] },
-  { op = "replace", path = "src/cafeteria/config.py", old = "desconto_maximo: float = 0.30", new = "desconto_maximo: float = 0.20" },
-  { op = "git", args = ["commit", "-q", "-am", "desconto de até 20%"] },
-  { op = "git", args = ["merge", "-q", "desconto"], check = false },
-  { op = "git", args = ["checkout", "-q", "--theirs", "src/cafeteria/config.py"] },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "max_discount: float = 0.30", new = "max_discount: float = 0.20" },
+  { op = "git", args = ["commit", "-q", "-am", "discount of up to 20%"] },
+  { op = "git", args = ["merge", "-q", "discount"], check = false },
+  { op = "git", args = ["checkout", "-q", "--theirs", "src/coffeeshop/config.py"] },
   { op = "git", args = ["add", "-A"] },
 ]
-target = "Merge branch 'desconto'"
-expect = ["merge|mescla", "desconto"]
+target = "Merge branch 'discount'"
+expect = ["merge", "discount"]
 tags = ["git-state", "merge"]
 
 [[case]]
 id = "merge-clean"
-title = "merge sem conflito com --no-commit"
+title = "merge without conflict with --no-commit"
 repo = "ledger"
 split = "eval"
 stage = "none"
@@ -105,18 +105,18 @@ tags = ["git-state", "merge"]
 
 [[case]]
 id = "first-commit"
-title = "primeiro commit de um repositório"
-repo = "cafeteria"
+title = "first commit of a repository"
+repo = "coffeeshop"
 split = "eval"
 history = false
 ops = []
-target = "commit inicial"
-expect = ["inicial|initial|primeiro"]
+target = "initial commit"
+expect = ["initial|first"]
 tags = ["first-commit"]
 
 [[case]]
 id = "first-commit-conventional"
-title = "primeiro commit, sem histórico para ditar o estilo"
+title = "first commit, no history to set the style"
 repo = "ledger"
 split = "train"
 history = false
@@ -127,84 +127,84 @@ tags = ["first-commit"]
 
 [[case]]
 id = "ticket-branch"
-title = "branch com ticket num repo que não usa tickets"
-repo = "cafeteria"
+title = "branch with a ticket in a repo that uses no tickets"
+repo = "coffeeshop"
 split = "train"
 ops = [
-  { op = "git", args = ["checkout", "-q", "-b", "feature/CAF-12-cupom"] },
-  { op = "replace", path = "src/cafeteria/pedido.py", old = "    desconto: float = 0.0\n", new = "    desconto: float = 0.0\n    cupom: str = \"\"\n" },
+  { op = "git", args = ["checkout", "-q", "-b", "feature/CAF-12-coupon"] },
+  { op = "replace", path = "src/coffeeshop/order.py", old = "    discount: float = 0.0\n", new = "    discount: float = 0.0\n    coupon: str = \"\"\n" },
 ]
-target = "campo de cupom no pedido"
-expect = ["cupom"]
+target = "coupon field on the order"
+expect = ["coupon"]
 tags = ["branch"]
 
 [[case]]
 id = "detached-head"
-title = "HEAD destacado"
-repo = "cafeteria"
+title = "detached HEAD"
+repo = "coffeeshop"
 split = "train"
 ops = [
   { op = "git", args = ["checkout", "-q", "--detach", "HEAD~1"] },
-  { op = "replace", path = "src/cafeteria/config.py", old = "moeda: str = \"R$\"", new = "moeda: str = \"BRL\"" },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "currency: str = \"$\"", new = "currency: str = \"BRL\"" },
 ]
-target = "moeda vira BRL em vez de R$"
-expect = ["moeda|brl"]
+target = "currency becomes USD instead of $"
+expect = ["currency|usd"]
 tags = ["branch"]
 
 [[case]]
 id = "partial-stage"
-title = "duas mudanças no arquivo, só uma staged"
-repo = "cafeteria"
+title = "two changes in the file, only one staged"
+repo = "coffeeshop"
 split = "train"
 stage = "none"
 ops = [
-  { op = "replace", path = "src/cafeteria/pedido.py", old = "            raise ValueError(\"quantidade deve ser positiva\")", new = "            raise ValueError(f\"quantidade deve ser positiva: {quantidade}\")" },
+  { op = "replace", path = "src/coffeeshop/order.py", old = "            raise ValueError(\"quantity must be positive\")", new = "            raise ValueError(f\"quantity must be positive: {quantity}\")" },
   { op = "git", args = ["add", "-A"] },
-  { op = "replace", path = "src/cafeteria/pedido.py", old = "    def subtotal(self) -> float:\n        return sum(", new = "    # TODO: guardar o subtotal em vez de recalcular\n    def subtotal(self) -> float:\n        return sum(" },
+  { op = "replace", path = "src/coffeeshop/order.py", old = "    def subtotal(self) -> float:\n        return sum(", new = "    # TODO: store the subtotal instead of recomputing\n    def subtotal(self) -> float:\n        return sum(" },
 ]
-target = "mostra a quantidade inválida no erro do pedido"
-expect = ["quantidade|erro|mensagem"]
+target = "show the invalid quantity in the order error"
+expect = ["quantity|error|message"]
 tags = ["partial"]
 
 [[case]]
 id = "half-rename"
-title = "mv sem git: só o arquivo novo staged"
-repo = "cafeteria"
+title = "mv without git: only the new file staged"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [
-  { op = "move", from = "src/cafeteria/cli.py", to = "src/cafeteria/__main__.py" },
-  { op = "git", args = ["add", "src/cafeteria/__main__.py"] },
+  { op = "move", from = "src/coffeeshop/cli.py", to = "src/coffeeshop/__main__.py" },
+  { op = "git", args = ["add", "src/coffeeshop/__main__.py"] },
 ]
-target = "renomeia cli.py para __main__.py"
-expect = ["renome|move", "main"]
+target = "rename cli.py to __main__.py"
+expect = ["renam|mov", "main"]
 tags = ["git-state", "rename"]
 
 [[case]]
 id = "deleted-then-recreated"
-title = "apagado staged, recriado fora do stage"
-repo = "cafeteria"
+title = "deletion staged, file recreated unstaged"
+repo = "coffeeshop"
 split = "train"
 stage = "none"
 ops = [
-  { op = "git", args = ["rm", "-q", "src/cafeteria/estoque.py"] },
-  { op = "write", path = "src/cafeteria/estoque.py", text = "class Estoque:\n    pass\n" },
+  { op = "git", args = ["rm", "-q", "src/coffeeshop/stock.py"] },
+  { op = "write", path = "src/coffeeshop/stock.py", text = "class Stock:\n    pass\n" },
 ]
-target = "remove o controle de estoque"
-expect = ["remov|apaga|tira", "estoque"]
+target = "remove stock control"
+expect = ["remov|delet|drop", "stock"]
 tags = ["partial", "delete"]
 
 [[case]]
 id = "linguist-generated"
-title = "arquivo marcado linguist-generated"
-repo = "cafeteria"
+title = "file marked linguist-generated"
+repo = "coffeeshop"
 split = "eval"
 ops = [
-  { op = "write", path = ".gitattributes", text = "src/cafeteria/precos_gerados.py linguist-generated\n" },
+  { op = "write", path = ".gitattributes", text = "src/coffeeshop/generated_prices.py linguist-generated\n" },
   { op = "git", args = ["add", ".gitattributes"] },
-  { op = "git", args = ["commit", "-q", "-m", "marca precos_gerados.py como gerado"] },
-  { op = "write", path = "src/cafeteria/precos_gerados.py", text = "PRECO_{{i}} = {{i}}.50\n", repeat = 200 },
+  { op = "git", args = ["commit", "-q", "-m", "mark generated_prices.py as generated"] },
+  { op = "write", path = "src/coffeeshop/generated_prices.py", text = "PRICE_{{i}} = {{i}}.50\n", repeat = 200 },
 ]
-target = "tabela de preços gerada"
-expect = ["preco|gerad|tabela"]
+target = "generated price table"
+expect = ["price|generat|table"]
 tags = ["generated"]

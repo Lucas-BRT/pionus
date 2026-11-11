@@ -4,136 +4,136 @@ level = 4
 
 [[case]]
 id = "quote-style"
-title = "formatação em massa"
-repo = "cafeteria"
+title = "bulk formatting"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "regex", paths = ["src/cafeteria/*.py", "tests/*.py"], pattern = "\"(?!\"\")([^\"\\n]*)\"", repl = "'\\1'", optional = true }]
-target = "troca aspas duplas por simples em todo o código"
-expect = ["aspas|quote|format|estilo"]
+ops = [{ op = "regex", paths = ["src/coffeeshop/*.py", "tests/*.py"], pattern = "\"(?!\"\")([^\"\\n]*)\"", repl = "'\\1'", optional = true }]
+target = "replace double quotes with single quotes across the code"
+expect = ["quote|format|style"]
 tags = ["formatting"]
 
 [[case]]
 id = "rename-package"
-title = "renomeia o pacote (diretório)"
-repo = "cafeteria"
+title = "renames the package (directory)"
+repo = "coffeeshop"
 split = "eval"
 ops = [
-  { op = "git", args = ["mv", "src/cafeteria", "src/loja"] },
-  { op = "regex", paths = ["src/loja/*.py", "tests/*.py", "README.md"], pattern = "\\bcafeteria\\.", repl = "loja.", optional = true },
+  { op = "git", args = ["mv", "src/coffeeshop", "src/shop"] },
+  { op = "regex", paths = ["src/shop/*.py", "tests/*.py", "README.md"], pattern = "\\bcoffeeshop\\.", repl = "shop.", optional = true },
 ]
-target = "renomeia o pacote cafeteria para loja"
-expect = ["renome|move", "loja"]
+target = "rename the package coffeeshop to shop"
+expect = ["renam|mov", "shop"]
 tags = ["rename"]
 
 [[case]]
 id = "license-header"
-title = "cabeçalho de licença em todos os arquivos"
-repo = "cafeteria"
+title = "license header on every file"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "prepend", paths = ["src/cafeteria/*.py", "tests/*.py"], text = "# SPDX-License-Identifier: MIT\n" }]
-target = "adiciona cabeçalho de licença MIT nos arquivos"
+ops = [{ op = "prepend", paths = ["src/coffeeshop/*.py", "tests/*.py"], text = "# SPDX-License-Identifier: MIT\n" }]
+target = "add an MIT license header to the files"
 expect = ["licen|spdx|mit"]
 tags = ["mechanical"]
 
 [[case]]
 id = "rename-symbol"
-title = "renomeia um símbolo usado em todo lugar"
-repo = "cafeteria"
+title = "renames a symbol used everywhere"
+repo = "coffeeshop"
 split = "eval"
-ops = [{ op = "regex", paths = ["src/cafeteria/*.py", "tests/*.py"], pattern = "\\bPedido\\b", repl = "Comanda", optional = true }]
-target = "renomeia Pedido para Comanda"
-expect = ["comanda", "renome|pedido"]
+ops = [{ op = "regex", paths = ["src/coffeeshop/*.py", "tests/*.py"], pattern = "\\bOrder\\b", repl = "Ticket", optional = true }]
+target = "rename Order to Ticket"
+expect = ["ticket", "renam|order"]
 tags = ["rename"]
 
 [[case]]
 id = "squash"
-title = "squash dos três últimos commits"
-repo = "cafeteria"
+title = "squash of the last three commits"
+repo = "coffeeshop"
 split = "eval"
 stage = "none"
 ops = [{ op = "git", args = ["reset", "-q", "--soft", "HEAD~3"] }]
-target = "corrige preço do capuccino, script de backup e taxa de serviço de 12%"
-expect = ["capuccino|backup|taxa"]
+target = "fix the cappuccino price, add the backup script and a 12% service fee"
+expect = ["cappuccino|backup|fee"]
 tags = ["squash"]
 
 [[case]]
 id = "mixed-purposes"
-title = "três propósitos misturados"
-repo = "cafeteria"
+title = "three purposes mixed"
+repo = "coffeeshop"
 split = "train"
 ops = [
-  { op = "replace", path = "src/cafeteria/estoque.py", old = "insuficente", new = "insuficiente" },
-  { op = "append", path = "src/cafeteria/pedido.py", text = """
-    def quantidade_itens(self) -> int:
-        return sum(linha.quantidade for linha in self.linhas)
+  { op = "replace", path = "src/coffeeshop/stock.py", old = "insufficent", new = "insufficient" },
+  { op = "append", path = "src/coffeeshop/order.py", text = """
+    def item_count(self) -> int:
+        return sum(line.quantity for line in self.lines)
 """ },
-  { op = "append", path = "README.md", text = "\n## Testes\n\nRode `pytest` na raiz do projeto.\n" },
+  { op = "append", path = "README.md", text = "\n## Tests\n\nRun `pytest` at the project root.\n" },
 ]
-target = "conta itens do pedido, corrige typo do estoque e documenta os testes"
-expect = ["itens|quantidade|conta", "typo|corrig|estoque", "test|readme|document"]
+target = "count order items, fix the stock typo and document the tests"
+expect = ["items|count|quantity", "typo|fix|stock", "test|readme|document"]
 tags = ["mixed"]
 
 [[case]]
 id = "big-new-module"
-title = "módulo novo grande"
-repo = "cafeteria"
+title = "big new module"
+repo = "coffeeshop"
 split = "train"
 ops = [
-  { op = "write", path = "src/cafeteria/cupons.py", text = "from dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Cupom:\n    codigo: str\n    desconto: float\n    minimo: float\n\n\nCUPONS = {\n" },
-  { op = "append", path = "src/cafeteria/cupons.py", text = "    \"CAFE{{i}}\": Cupom(\"CAFE{{i}}\", desconto=0.10, minimo={{i}}.0),\n", repeat = 120 },
-  { op = "append", path = "src/cafeteria/cupons.py", text = "}\n\n\ndef valido(codigo: str, subtotal: float) -> bool:\n    cupom = CUPONS.get(codigo)\n    return cupom is not None and subtotal >= cupom.minimo\n" },
+  { op = "write", path = "src/coffeeshop/coupons.py", text = "from dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Coupon:\n    code: str\n    discount: float\n    minimum: float\n\n\nCUPONS = {\n" },
+  { op = "append", path = "src/coffeeshop/coupons.py", text = "    \"CAFE{{i}}\": Coupon(\"CAFE{{i}}\", discount=0.10, minimum={{i}}.0),\n", repeat = 120 },
+  { op = "append", path = "src/coffeeshop/coupons.py", text = "}\n\n\ndef valid(code: str, subtotal: float) -> bool:\n    coupon = COUPONS.get(code)\n    return coupon is not None and subtotal >= coupon.minimum\n" },
 ]
-target = "adiciona cupons de desconto"
-expect = ["cupo|cupom|desconto"]
+target = "add discount coupons"
+expect = ["coupon|discount"]
 tags = ["new-file"]
 
 [[case]]
 id = "generated-plus-one-line"
-title = "arquivo minificado grande + uma linha"
-repo = "cafeteria"
+title = "big minified file + one line"
+repo = "coffeeshop"
 split = "eval"
 ops = [
-  { op = "write", path = "web/cardapio.min.js", text = "var c{{i}}=[{{i}},\"item{{i}}\"];", repeat = 4000 },
-  { op = "replace", path = "src/cafeteria/config.py", old = "Café da Esquina", new = "Café do Largo" },
+  { op = "write", path = "web/menu.min.js", text = "var c{{i}}=[{{i}},\"item{{i}}\"];", repeat = 4000 },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "Corner Coffee", new = "Plaza Coffee" },
 ]
-target = "muda o nome da loja para Café do Largo"
-expect = ["nome|loja", "largo"]
+target = "rename the shop to Plaza Coffee"
+expect = ["name|shop", "plaza"]
 tags = ["generated"]
 
 [[case]]
 id = "new-package"
-title = "pacote de arquivos novos"
-repo = "cafeteria"
+title = "package of new files"
+repo = "coffeeshop"
 split = "train"
 ops = [
-  { op = "write", path = "src/cafeteria/pagamento/__init__.py", text = "\"\"\"Formas de pagamento aceitas no caixa.\"\"\"\n" },
-  { op = "write", path = "src/cafeteria/pagamento/base.py", text = "class FormaDePagamento:\n    nome = \"\"\n    taxa = 0.0\n\n    def liquido(self, valor: float) -> float:\n        return round(valor * (1 - self.taxa), 2)\n" },
-  { op = "write", path = "src/cafeteria/pagamento/pix.py", text = "from cafeteria.pagamento.base import FormaDePagamento\n\n\nclass Pix(FormaDePagamento):\n    nome = \"pix\"\n" },
-  { op = "write", path = "src/cafeteria/pagamento/cartao.py", text = "from cafeteria.pagamento.base import FormaDePagamento\n\n\nclass Credito(FormaDePagamento):\n    nome = \"crédito\"\n    taxa = 0.035\n\n\nclass Debito(FormaDePagamento):\n    nome = \"débito\"\n    taxa = 0.015\n" },
-  { op = "write", path = "src/cafeteria/pagamento/dinheiro.py", text = "from cafeteria.pagamento.base import FormaDePagamento\n\n\nclass Dinheiro(FormaDePagamento):\n    nome = \"dinheiro\"\n\n    def troco(self, valor: float, pago: float) -> float:\n        if pago < valor:\n            raise ValueError(\"valor pago menor que o total\")\n        return round(pago - valor, 2)\n" },
-  { op = "write", path = "src/cafeteria/pagamento/vale.py", text = "from cafeteria.pagamento.base import FormaDePagamento\n\n\nclass ValeRefeicao(FormaDePagamento):\n    nome = \"vale-refeição\"\n    taxa = 0.06\n" },
+  { op = "write", path = "src/coffeeshop/payment/__init__.py", text = "\"\"\"Payment methods accepted at the counter.\"\"\"\n" },
+  { op = "write", path = "src/coffeeshop/payment/base.py", text = "class PaymentMethod:\n    name = \"\"\n    fee = 0.0\n\n    def net(self, amount: float) -> float:\n        return round(amount * (1 - self.fee), 2)\n" },
+  { op = "write", path = "src/coffeeshop/payment/pix.py", text = "from coffeeshop.payment.base import PaymentMethod\n\n\nclass Pix(PaymentMethod):\n    name = \"pix\"\n" },
+  { op = "write", path = "src/coffeeshop/payment/card.py", text = "from coffeeshop.payment.base import PaymentMethod\n\n\nclass Credit(PaymentMethod):\n    name = \"credit\"\n    fee = 0.035\n\n\nclass Debit(PaymentMethod):\n    name = \"debit\"\n    fee = 0.015\n" },
+  { op = "write", path = "src/coffeeshop/payment/cash.py", text = "from coffeeshop.payment.base import PaymentMethod\n\n\nclass Cash(PaymentMethod):\n    name = \"cash\"\n\n    def change(self, amount: float, paid: float) -> float:\n        if paid < amount:\n            raise ValueError(\"amount paid is less than the total\")\n        return round(paid - amount, 2)\n" },
+  { op = "write", path = "src/coffeeshop/payment/voucher.py", text = "from coffeeshop.payment.base import PaymentMethod\n\n\nclass MealVoucher(PaymentMethod):\n    name = \"meal-voucher\"\n    fee = 0.06\n" },
 ]
-target = "formas de pagamento: pix, cartão, dinheiro e vale-refeição"
-expect = ["pagamento|pix|cartao"]
+target = "payment methods: pix, card, cash and meal voucher"
+expect = ["payment|pix|card"]
 tags = ["new-file", "feature"]
 
 [[case]]
 id = "delete-many"
-title = "apaga vários arquivos"
-repo = "cafeteria"
+title = "deletes several files"
+repo = "coffeeshop"
 split = "eval"
 ops = [
-  { op = "git", args = ["rm", "-q", "src/cafeteria/estoque.py", "scripts/backup.sh"] },
+  { op = "git", args = ["rm", "-q", "src/coffeeshop/stock.py", "scripts/backup.sh"] },
   { op = "replace", path = ".gitignore", old = "*.sqlite\n", new = "" },
-  { op = "replace", path = "src/cafeteria/config.py", old = "    arquivo_estoque: str = \"estoque.sqlite\"\n", new = "" },
+  { op = "replace", path = "src/coffeeshop/config.py", old = "    stock_file: str = \"stock.sqlite\"\n", new = "" },
 ]
-target = "remove o controle de estoque e o backup do banco"
-expect = ["remov|apaga|tira", "estoque|backup"]
+target = "remove stock control and the database backup"
+expect = ["remov|delet|drop", "stock|backup"]
 tags = ["delete"]
 
 [[case]]
 id = "lockfile-only"
-title = "só o lockfile"
+title = "only the lockfile"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "regex", path = "package-lock.json", pattern = "\"version\": \"6\\.19\\.8\"", repl = "\"version\": \"6.20.0\"" }]
@@ -143,7 +143,7 @@ tags = ["lockfile"]
 
 [[case]]
 id = "feature-tests-docs"
-title = "feature + teste + docs"
+title = "feature + test + docs"
 repo = "ledger"
 split = "train"
 ops = [
@@ -176,7 +176,7 @@ tags = ["feature", "tests", "docs"]
 
 [[case]]
 id = "rename-type-everywhere"
-title = "renomeia um tipo em todo o projeto"
+title = "renames a type across the project"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "regex", paths = ["src/*.ts", "test/*.ts"], pattern = "\\bRegistry\\b", repl = "AccountBook", optional = true }]
