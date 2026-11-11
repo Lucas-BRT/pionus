@@ -8,6 +8,7 @@ mod costs;
 mod fast_load;
 mod first;
 mod method;
+mod quality;
 mod where_time;
 
 use topcoat::{
@@ -30,6 +31,7 @@ pub async fn page() -> Result<impl View> {
             where_time::section()
             fast_load::section()
             ask_type::section()
+            quality::section()
             method::section()
         )
     })
