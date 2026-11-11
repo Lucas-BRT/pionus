@@ -15,7 +15,7 @@ Two expected gains:
 
 - **Quality.** The current default, Qwen2.5-Coder-1.5B-Instruct, labels
   86.8% of the conventional commits of eval-v1 `fix`, where 41% really are
-  ([HYPOTHESES.md](../training/HYPOTHESES.md)), sometimes uses a file path
+  (the research log, in ai-memory as `research/*`), sometimes uses a file path
   as the scope, and needs a retry when the reply does not follow the
   convention.
 - **Speed, indirectly.** A model trained on the format does not need the
@@ -151,7 +151,7 @@ time.
 - Drop merges, reverts, `fixup!`/`squash!`, WIP, release bumps, bot authors,
   and messages that only reference an issue. Dropping release bumps means
   the models never see one: v0.1 answered the 0.5.0 bump with `feat(model)`
-  (fixture `conventional-en-release`, H7 in HYPOTHESES.md).
+  (fixture `conventional-en-release`, H7 in the research log (ai-memory, `research/*`)).
 - Balance the `type` distribution, or the model learns the dataset's bias
   instead of the base model's.
 - Split by **repository**, never by commit, so the evaluation measures
@@ -168,9 +168,8 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   **eval-short**: 197 commits of young repositories (1–5 history subjects).
   How to rebuild both is in [training/README.md](../training/README.md).
 - **Scenarios**: hand-written cases of git operations on two synthetic
-  repositories (Python in Portuguese with free style, TypeScript with
-  Conventional Commits; the Portuguese cases no longer test a goal of the
-  product, they show what a model does by itself), by level of complexity from a typo to a merge in
+  repositories (Python with free style, TypeScript with
+  Conventional Commits), by level of complexity from a typo to a merge in
   progress, each with its target; `pionus-training score` reports them per level and
   checks the words a right subject must have (`expected`). Each case is in
   the train or the eval split, never both; those whose target depends on
@@ -185,7 +184,7 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   reads `type_group` (a `build` for a `chore` counts) and `type_behaviour`
   (and `feat` for `fix`); `training/type_review.py` adds a plain classifier's
   plausibility, intervals and a sheet of mistakes to rate by hand
-  ([H13](../training/HYPOTHESES.md)).
+  (H13, ai-memory `research/h13`).
 - Always report the base model's scores on the same set and binary.
 - Two versions of a model or a prompt answer the same cases: compare them
   case by case with `pionus-training score EVAL_DIR NEW.jsonl --against OLD.jsonl`,
@@ -194,6 +193,54 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   of cases either way.
 - Not covered yet: gitmoji, and an LLM
   judge for faithfulness validated against a sample rated by hand.
+
+## Results
+
+Every number comes from `pionus-training score` on eval-v1 (above), run with
+`pionus eval --device vulkan` on the RTX 3050. With n = 250, a rate near 0.5
+has a standard error of about 0.03: differences under ~0.06 are noise.
+
+**v0.1 against v0.2** (0.5B and 1.5B, one binary, `94ababd`; v0.2 scored
+with `--rules omitted`, v0.1 with the full rules in the prompt):
+
+| eval-v1, Conventional | type_match | type_macro_f1 | first_try | fallback | word_f1 | ungrounded |
+|---|---|---|---|---|---|---|
+| v0.1 0.5B | 0.636 | 0.542 | 0.976 | 0.016 | 0.340 | 0.104 |
+| v0.2 0.5B | 0.632 | 0.526 | 0.972 | 0.012 | 0.337 | 0.104 |
+| v0.1 1.5B | 0.656 | 0.545 | 0.944 | 0.012 | 0.367 | 0.084 |
+| v0.2 1.5B | 0.628 | 0.498 | 0.956 | 0.020 | 0.352 | 0.084 |
+
+| eval-short | first_try | first reply copied | fallback | word_f1 | ungrounded |
+|---|---|---|---|---|---|
+| v0.1 0.5B | 0.863 | 0.137 | 0.086 | 0.244 | 0.132 |
+| v0.2 0.5B | 0.924 | 0.076 | 0.046 | 0.233 | 0.102 |
+| v0.1 1.5B | 0.878 | 0.112 | 0.030 | 0.294 | 0.102 |
+| v0.2 1.5B | 0.939 | 0.056 | 0.020 | 0.274 | 0.142 |
+
+v0.2 reads a prompt without the fixed rules, which on the CPU is about 15%
+faster: 0.5B 1.150 → 0.976 s per message, 1.5B 2.532 → 2.156 s (Ryzen 5 5500,
+the first 50 commits of eval-v1, load counted once). The 0.5B keeps its
+quality on eval-v1; the 1.5B loses a little on the type (−0.028, about one
+standard error) and v0.1 stays the better 1.5B on it.
+
+**v0.3, the DPO on the model's own samples,** against the SFT model it
+started from (0.5B, the run chosen on `val1`, read once on the evaluation
+sets and paired):
+
+| | SFT → m-b01-lr2-s02 | paired |
+|---|---|---|
+| eval-v1 Conventional, `type_match` | 0.628 → 0.664 | +15/−6, p = 0.078 |
+| eval-v1 Conventional, `type_macro_f1` | 0.531 → 0.557 | |
+| eval-v1 Conventional, `scope_known`; replies with a scope | 0.844 → 0.840; 0.396 → 0.380 | +4/−5 |
+| eval-v1 Conventional, `ungrounded`; `first_copied`; `first_try`; `fallback` | 0.104 → 0.008; 0.040 → 0.004; 0.960 → 0.996; 0.028 → 0.004 | all p < 0.05 |
+| eval-v1 free, `ungrounded`; `first_copied`; `first_try`; `fallback` | 0.108 → 0.008; 0.084 → 0.004; 0.916 → 0.996; 0.076 → 0.004 | all p < 0.001 |
+| eval-v1, `word_f1` Conventional, free; `novel` Conventional | 0.333 → 0.347, 0.230 → 0.247; 0.147 → 0.078 | |
+| eval-short Conventional (47), `type_match`; `type_macro_f1`; `scope_known` | 0.617 → 0.617; 0.669 → 0.609; 0.681 → 0.617 | +3/−3; ; +0/−3 |
+| eval-short free (150), `first_try`; `first_copied` | 0.840 → 1.000; 0.160 → 0.000 | p < 0.001 |
+
+DPO removes what the SFT model's replies got wrong (invented specifics,
+copied history subjects, falling back to the file list) at no cost to the
+scope, and does not improve the type significantly.
 
 ## Training
 
@@ -271,7 +318,7 @@ did), `kaggle kernels status`, `kaggle kernels output` for the archives.
 What is published is one model per size pionus offers, named
 `pionus-<size>-v<version>` (`pionus-1.5b-v0.1`,
 `pionus-0.5b-v0.1`), not the experiment runs: those stay in
-`training/runs/` and their numbers in HYPOTHESES.md. A later training is a new version, never a replaced file.
+`training/runs/` and their numbers in [Results](#results). A later training is a new version, never a replaced file.
 
 1. Merge the adapter and quantize to Q4_K_M with `export_gguf.py` (the
    llama.cpp tag pionus pins, b11381), and judge it against the
@@ -310,9 +357,9 @@ What is published is one model per size pionus offers, named
    targets, split by repository.~~ Done: [training/](../training/README.md).
 3. ~~Evaluation, and the base 1.5B and 0.5B scores.~~ Done: `pionus
    eval` and `training/pionus-training score`; scores in
-   [training/HYPOTHESES.md](../training/HYPOTHESES.md).
+   the research log (ai-memory, `research/*`).
 4. ~~LoRA on the 1.5B; compare; then the 0.5B.~~ Done: H1 to H3 in
-   HYPOTHESES.md.
+   the research log (ai-memory, `research/*`).
 5. ~~Export, publish, add to the registry.~~ Done for v0.1: the c40k runs
    of H3, published as
    [pionus-1.5b-v0.1](https://huggingface.co/LucasBRT/pionus-1.5b-v0.1)
@@ -322,9 +369,9 @@ What is published is one model per size pionus offers, named
    release bumps and no type cap (H8) in one bundle of about 20k examples
    (b3).~~ Done: `pionus-0.5b-v0.2` and `pionus-1.5b-v0.2`,
    trained and evaluated, on Hugging Face and private (results in
-   [HYPOTHESES.md](../training/HYPOTHESES.md), v0.2). The scope map (H4b)
+   [Results](#results)). The scope map (H4b)
    was not in the bundle.
-7. DPO on the models' own samples ([H12](../training/HYPOTHESES.md)): the
+7. DPO on the models' own samples (H12, ai-memory `research/h12`): the
    pipeline is built (`mine_pairs.py`, `pionus-training pairs` and `balance`,
    `train_dpo.py`, the Kaggle bundles and notebooks, `pionus-training compare`). The
    first run removed the failures its pairs showed and cost the scope; the
@@ -334,6 +381,10 @@ What is published is one model per size pionus offers, named
    type or the scope, but does not improve the type significantly. The six
    runs are in a private repository on Hugging Face as experiments; the 1.5B
    is next. Nothing is in the registry.
-8. The next version: H4b, and more data for the 1.5B, which leans on the
-   rules more than the 0.5B. What to publish, register and make the default
+8. ~~The next version: H4b, and more data for the 1.5B.~~ Tried on the 0.5B
+   (H13: the annotated list and the scope map): the type did not move, and
+   it is at the labels' ceiling (H17).
+9. The descriptions (H19, ai-memory `research/h19`): a blind judge on a
+   larger set, a stronger model as teacher on 200 commits, and training
+   only if the pilot passes. What to publish, register and make the default
    is in the [roadmap](roadmap.md).

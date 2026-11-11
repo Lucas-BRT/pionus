@@ -3,7 +3,7 @@
 Hand-written cases of git operations, from a one-character typo to a merge
 in progress, each with the message a good tool would write. They complement
 CommitChronicle, which has no merges, reverts, renames of directories,
-mode changes or Portuguese, and whose targets were written by whoever made
+mode changes, and whose targets were written by whoever made
 the commit.
 
 A case is data: a base repository, a list of operations, a target. Building
@@ -61,10 +61,10 @@ so the hashes are the same on every machine.
 
 | Repo | Language | Style |
 |---|---|---|
-| `cafeteria` | Python, Portuguese identifiers | free, Portuguese, informal |
+| `coffeeshop` | Python | free, English, informal |
 | `ledger` | TypeScript | Conventional Commits with scopes, English |
 
-`pionus-training scenarios show DIR --repo cafeteria` leaves a base repository in
+`pionus-training scenarios show DIR --repo coffeeshop` leaves a base repository in
 DIR, and `show DIR --case ID` a case applied on it, to look at while
 writing cases.
 
@@ -74,11 +74,11 @@ writing cases.
 [[case]]
 id = "rename-file"                    # unique; variants get id/name
 title = "rename puro"
-repo = "cafeteria"                    # or set once at the top of the file
+repo = "coffeeshop"                    # or set once at the top of the file
 split = "train"                       # train or eval
 ops = [
-  { op = "git", args = ["mv", "src/cafeteria/{{old}}.py", "src/cafeteria/{{new}}.py"] },
-  { op = "regex", paths = ["src/cafeteria/*.py"], pattern = "cafeteria\\.{{old}}\\b", repl = "cafeteria.{{new}}", optional = true },
+  { op = "git", args = ["mv", "src/coffeeshop/{{old}}.py", "src/coffeeshop/{{new}}.py"] },
+  { op = "regex", paths = ["src/coffeeshop/*.py"], pattern = "coffeeshop\\.{{old}}\\b", repl = "coffeeshop.{{new}}", optional = true },
 ]
 target = "renomeia {{old}}.py para {{new}}.py"   # in the repository's style
 expect = ["renome|move", "{{new}}"]   # every pattern must match a right subject

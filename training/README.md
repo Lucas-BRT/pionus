@@ -2,7 +2,7 @@
 
 Exploratory work toward pionus's own models; see
 [docs/training.md](../docs/training.md) for the goal and the decisions, and
-[HYPOTHESES.md](HYPOTHESES.md) for what was tried and measured.
+the research log (ai-memory, `research/*`) for what was tried and measured.
 
 Everything runs on the training machine (RTX 3050 8 GB). Large files live
 outside the repository, in `~/.cache/pionus-training/`, and in
@@ -26,6 +26,7 @@ python -I test_type_fusion.py                          # H15's prior, fusion and
 python -I test_cascade_bench.py                        # H15's timing of the cascade (the pure parts); see its docstring
 python -I test_audit_types.py                          # H17's audit set of acceptable types; see its docstring
 python -I test_pair_judge.py                           # H18's blind pairwise judge of the messages; see its docstring
+python -I test_teacher_pilot.py                        # H19's teacher that writes subjects blind to the author's; see its docstring
 python -I test_common.py                              # the bootstrap and the subject type the analysis scripts share
 cargo build --locked --release -p pionus-training   # pionus-training: the data tools, in Rust
 cargo test --locked -p pionus-training              # -U1 trimming against git, scoring, the scenarios
@@ -121,7 +122,7 @@ uv run --locked python -I $O/select.py data/test0-v1 data/eval-v1 --conventional
 sha256sum data/eval-v1/*.jsonl
 ```
 
-`data/eval-short` (young repositories, see H5 in HYPOTHESES.md):
+`data/eval-short` (young repositories, see H5, ai-memory `research/h5`):
 `pionus-training select data/test2to5h data/eval-short --conventional 100 --free 150
 --min-history 1 --max-history 5 --per-repo 5`, from `pionus-training build-inputs` over
 `test-00002`…`test-00005`; `inputs.jsonl` sha256 starts `42d212c0d2687dad`,
@@ -143,6 +144,42 @@ the validation set's `f6350a3c5cb71b58` (b2's).
 `pionus-training select data/test1 data/val1 --conventional 250 --free 250 --max-type-share 0.3 --supported-only`
 (`meta.jsonl` sha256 starts `2fb1dedba6e20939`; `val1-h4` is the same with
 the history paths, as `pionus-training select` writes it today).
+
+`data/judge1` (H19, the set the blind judge reads: 300 commits of 84
+repositories, at most 6 of each) is three selections joined in this order,
+`inputs.jsonl` then `meta.jsonl` (sha256 start `89228be577152543` and
+`d2dd18b5e888c411`):
+
+```bash
+EX="--exclude-repos-of data/val1 data/eval-v1 data/eval-short"
+G=~/.local/share/pionus/models      # the registry's GGUFs, as `pionus model` installs them
+$SCT select data/val1 data/judge1-free --conventional 0 --free 150 --per-repo 6
+$SCT select data/val1 data/judge1-conv-val1 --conventional 48 --free 0 --per-repo 6
+$SCT select data/test2to5h data/judge1-conv-test --conventional 102 --free 0 --per-repo 6 $EX
+mkdir -p data/judge1
+for f in inputs meta; do
+  cat data/judge1-free/$f.jsonl data/judge1-conv-val1/$f.jsonl data/judge1-conv-test/$f.jsonl > data/judge1/$f.jsonl
+done
+$SCT compare runs/judge1 $SC --sets data/judge1 --diff annotated \
+  --baseline 1.5b-v0.3=$G/pionus-1.5b-v0.3-q4_k_m.gguf 0.5b-v0.3=$G/pionus-0.5b-v0.3-q4_k_m.gguf
+python -I pair_judge.py build - data/judge1 runs/judge1/pairs --batches 12 \
+  1.5b-v0.3=runs/judge1/judge1/1.5b-v0.3.jsonl 0.5b-v0.3=runs/judge1/judge1/0.5b-v0.3.jsonl
+```
+
+`data/pilot1` (H19, stage 1: 200 commits of 143 repositories, at most 2 of each; `inputs.jsonl` sha256 starts
+`0152673799c25ff5`, `meta.jsonl` `c9843b80ec39f7ba`) is 100 Conventional commits of the shards of the DPO mining
+(`lucasbrt/smart-commit-training-dpo2-mine`, downloaded into `data/dpo2-mine`, its four shards joined into
+`data/dpo2-mine-all`) and 100 free ones of `data/test2to5h`, both outside the repositories of `val1`, eval-v1,
+eval-short and `data/judge1`:
+
+```bash
+for f in inputs meta; do cat data/dpo2-mine/shard-{0,1,2,3}/$f.jsonl > data/dpo2-mine-all/$f.jsonl; done
+EX="--exclude-repos-of data/val1 data/eval-v1 data/eval-short data/judge1"
+$SCT select data/dpo2-mine-all data/pilot1-conv --conventional 100 --free 0 --per-repo 2 --max-type-share 0.3 $EX
+$SCT select data/test2to5h data/pilot1-free --conventional 0 --free 100 --per-repo 2 $EX
+for f in inputs meta; do cat data/pilot1-conv/$f.jsonl data/pilot1-free/$f.jsonl > data/pilot1/$f.jsonl; done
+python -I teacher_pilot.py build data/pilot1 runs/pilot1/teacher --batches 10
+```
 
 ## Preference pairs (DPO)
 

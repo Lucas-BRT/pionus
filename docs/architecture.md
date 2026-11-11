@@ -25,6 +25,7 @@ Everything except the model is deterministic and tested without hardware.
 | `generate` | prompt → model → sanitize → retry → fallback, keeping every attempt; and which types to offer when the model is unsure of the type (`generate::ask`) |
 | `backend` | the `Backend` trait, `GenerationConfig`, `MockBackend` |
 | `backend::genai` | OpenVINO GenAI backend (`npu`, `intel-gpu`, `openvino-cpu`), loaded at run time |
+| `backend::isolated` | runs `backend::genai` in a child process (`pionus genai-worker`): an OpenVINO crash becomes an error, and the model is loaded again once |
 | `backend::llamacpp` | llama.cpp backend (`vulkan`, `cpu`): a private `llama-server` over a UNIX socket; the only one that tells how likely each type is (`backend::choices`) and can start a reply with a chosen one |
 | `backend::server` | the `llama-server` kept loaded between commits (`model.keep_loaded`) |
 | `backend::device` | candidate devices and loading the first that works |

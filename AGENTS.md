@@ -44,7 +44,7 @@ default member), `website/` (read [website/AGENTS.md](website/AGENTS.md)),
 - **Docs:** describe the current state, in English; update the affected pages
   and `docs/roadmap.md` in the same commit. Timings live only in
   `docs/measurements.md`. The site reads its facts from `cli/Cargo.toml`,
-  `cli/src/models/registry.rs` and `docs/{devices,usage,roadmap}.md`: change
+  `cli/src/models/registry.rs` and `docs/{devices,usage,roadmap,measurements,training}.md`: change
   those, not the site.
 
 ## Done

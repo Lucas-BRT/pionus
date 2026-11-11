@@ -52,7 +52,7 @@ impl fmt::Display for Device {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GenaiOptions {
     /// The OpenVINO model (`pionus setup` downloads it).
     pub model_dir: PathBuf,
@@ -70,7 +70,7 @@ pub struct GenaiOptions {
 
 /// How the NPU compiles the model. The defaults are what we measured to be
 /// fastest with identical replies (docs/devices.md).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NpuTuning {
     /// Prompt tokens processed per step. Below `max_prompt_tokens` the NPU
     /// only pays for the prompt's real length (TTFT 2.4 s -> 1.1 s with 512);

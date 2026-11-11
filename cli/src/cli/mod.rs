@@ -162,6 +162,9 @@ enum Command {
     /// Runs a model kept loaded until it is idle; started by pionus.
     #[command(name = "keep-server", hide = true)]
     KeepServer { dir: PathBuf },
+    /// Runs an OpenVINO model for one command; started by pionus.
+    #[command(name = "genai-worker", hide = true)]
+    GenaiWorker,
 }
 
 /// Parses the arguments. The options of the default command (`--commit`,
@@ -254,6 +257,10 @@ pub fn run() -> ExitCode {
         Some(Command::Uninstall { yes, system }) => install::uninstall(yes, system),
         Some(Command::KeepServer { dir }) => {
             pionus::backend::server::serve(&dir).map_err(Into::into)
+        }
+        Some(Command::GenaiWorker) => {
+            pionus::backend::isolated::work(std::io::stdin().lock(), std::io::stdout().lock())
+                .map_err(Into::into)
         }
         None => suggest::run(&cli.generate),
     };

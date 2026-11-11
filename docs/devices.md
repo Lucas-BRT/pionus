@@ -19,6 +19,13 @@ What each vendor needs:
 | AMD | `cpu` (llama.cpp) | `vulkan` (Mesa RADV) | not supported |
 | NVIDIA | — | `vulkan` (the proprietary driver's Vulkan ICD, or Mesa NVK) | — |
 
+On the OpenVINO devices the model runs in a child process, so a driver
+failure that aborts it (`CL_OUT_OF_RESOURCES` on an Intel GPU) does not take
+the command down. A worker that crashes or does not answer (3 minutes per
+request, 10 to load) is killed, and pionus loads the model again once and
+asks again; if that fails too, it reports the error (no core dump). A crash
+while loading is not retried: the next device is tried.
+
 OpenVINO is only needed for Intel's NPU and GPUs: its GPU plugin only drives
 Intel GPUs, which is why AMD and NVIDIA go through llama.cpp. The same
 llama.cpp build (b11381) runs on the CPU of any x86_64 machine, choosing the

@@ -3,140 +3,140 @@ level = 2
 
 [[case]]
 id = "new-methods"
-title = "métodos novos"
-repo = "cafeteria"
+title = "new methods"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "append", path = "src/cafeteria/pedido.py", text = """
-    def quantidade_itens(self) -> int:
-        return sum(linha.quantidade for linha in self.linhas)
+ops = [{ op = "append", path = "src/coffeeshop/order.py", text = """
+    def item_count(self) -> int:
+        return sum(line.quantity for line in self.lines)
 
-    def vazio(self) -> bool:
-        return not self.linhas
+    def empty(self) -> bool:
+        return not self.lines
 """ }]
-target = "adiciona contagem de itens ao pedido"
-expect = ["quantidade|contagem|conta|itens", "pedido|vazio"]
+target = "add an item count to the order"
+expect = ["count|quantity|items", "order|empty"]
 tags = ["feature"]
 
 [[case]]
 id = "delete-method"
-title = "apaga um método"
-repo = "cafeteria"
+title = "deletes a method"
+repo = "coffeeshop"
 split = "eval"
-ops = [{ op = "replace", path = "src/cafeteria/pedido.py", old = """    def remover(self, codigo: str) -> None:
-        self.linhas = [l for l in self.linhas if l.item.codigo != codigo]
+ops = [{ op = "replace", path = "src/coffeeshop/order.py", old = """    def remove(self, code: str) -> None:
+        self.lines = [l for l in self.lines if l.item.code != code]
 
 """, new = "" }]
-target = "remove o método remover do pedido"
-expect = ["remov|apaga|tira", "remover|metodo"]
+target = "remove the remove method from the order"
+expect = ["remov|delet|drop", "remove|method"]
 tags = ["cleanup"]
 
 [[case]]
 id = "new-query"
-title = "consulta nova"
-repo = "cafeteria"
+title = "new query"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "append", path = "src/cafeteria/estoque.py", text = """
-    def abaixo_do_minimo(self, minimo: int) -> list[tuple[str, int]]:
-        \"\"\"Itens com menos de `minimo` unidades, do mais escasso ao menos.\"\"\"
-        return self.conexao.execute(
-            "select codigo, quantidade from estoque where quantidade < ? order by quantidade",
-            (minimo,),
+ops = [{ op = "append", path = "src/coffeeshop/stock.py", text = """
+    def below_minimum(self, minimum: int) -> list[tuple[str, int]]:
+        \"\"\"Items with fewer than `minimum` units, scarcest first.\"\"\"
+        return self.connection.execute(
+            "select code, quantity from stock where quantity < ? order by quantity",
+            (minimum,),
         ).fetchall()
 """ }]
-target = "lista os itens abaixo do estoque mínimo"
-expect = ["minimo|abaixo|escass", "estoque|itens"]
+target = "list the items below the minimum stock"
+expect = ["minimum|below|low", "stock|items"]
 tags = ["feature"]
 
 [[case]]
 id = "extract-helper"
-title = "extrai uma função auxiliar"
-repo = "cafeteria"
+title = "extracts a helper function"
+repo = "coffeeshop"
 split = "eval"
-ops = [{ op = "replace", path = "src/cafeteria/relatorio.py", old = """    linhas = "\\n".join(
-        f"{l.quantidade}x {l.item.nome:<24} {config.moeda} {l.subtotal:>6.2f}" for l in pedido.linhas
-    )""", new = """    linhas = "\\n".join(_linha_do_recibo(l, config) for l in pedido.linhas)""" }, { op = "replace", path = "src/cafeteria/relatorio.py", old = "def recibo(", new = """def _linha_do_recibo(linha, config: Config) -> str:
-    return f"{linha.quantidade}x {linha.item.nome:<24} {config.moeda} {linha.subtotal:>6.2f}"
+ops = [{ op = "replace", path = "src/coffeeshop/report.py", old = """    lines = "\\n".join(
+        f"{l.quantity}x {l.item.name:<24} {config.currency} {l.subtotal:>6.2f}" for l in order.lines
+    )""", new = """    lines = "\\n".join(_receipt_line(l, config) for l in order.lines)""" }, { op = "replace", path = "src/coffeeshop/report.py", old = "def receipt(", new = """def _receipt_line(line, config: Config) -> str:
+    return f"{line.quantity}x {line.item.name:<24} {config.currency} {line.subtotal:>6.2f}"
 
 
-def recibo(""" }]
-target = "extrai a formatação da linha do recibo"
-expect = ["extrai|separa|refator", "linha|recibo"]
+def receipt(""" }]
+target = "extract the receipt line formatting"
+expect = ["extract|split|refactor", "line|receipt"]
 tags = ["refactor"]
 
 [[case]]
 id = "rename-locals"
-title = "renomeia variáveis locais"
-repo = "cafeteria"
+title = "renames local variables"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "regex", path = "src/cafeteria/relatorio.py", pattern = "\\bvendidos\\b", repl = "quantidades" }, { op = "regex", path = "src/cafeteria/relatorio.py", pattern = "\\btabela\\b", repl = "texto" }]
-target = "renomeia variáveis do resumo do dia"
-expect = ["renome|nome", "variav|resumo"]
+ops = [{ op = "regex", path = "src/coffeeshop/report.py", pattern = "\\bsold\\b", repl = "quantities" }, { op = "regex", path = "src/coffeeshop/report.py", pattern = "\\bgrid\\b", repl = "text" }]
+target = "rename variables in the day summary"
+expect = ["renam|name", "variab|summary"]
 tags = ["rename"]
 
 [[case]]
 id = "rewrite-function"
-title = "reescreve uma função"
-repo = "cafeteria"
+title = "rewrites a function"
+repo = "coffeeshop"
 split = "eval"
-ops = [{ op = "replace", path = "src/cafeteria/cardapio.py", old = """def buscar(codigo: str) -> Item:
+ops = [{ op = "replace", path = "src/coffeeshop/menu.py", old = """def find(code: str) -> Item:
     try:
-        return CARDAPIO[codigo]
+        return MENU[code]
     except KeyError:
-        raise ValueError(f"item desconhecido: {codigo}") from None""", new = """def buscar(codigo: str) -> Item:
-    chave = codigo.strip().lower().replace(" ", "-")
-    item = CARDAPIO.get(chave)
+        raise ValueError(f"unknown item: {code}") from None""", new = """def find(code: str) -> Item:
+    key = code.strip().lower().replace(" ", "-")
+    item = MENU.get(key)
     if item is None:
-        raise ValueError(f"item desconhecido: {codigo}")
+        raise ValueError(f"unknown item: {code}")
     return item""" }]
-target = "busca no cardápio ignora maiúsculas e espaços"
-expect = ["busca|codigo", "maiuscul|espac|normaliz"]
+target = "menu lookup ignores case and spaces"
+expect = ["lookup|find|code", "case|space|normaliz"]
 tags = ["feature"]
 
 [[case]]
 id = "new-test-file"
-title = "arquivo de teste novo"
-repo = "cafeteria"
+title = "new test file"
+repo = "coffeeshop"
 split = "train"
-ops = [{ op = "write", path = "tests/test_cardapio.py", text = """import pytest
+ops = [{ op = "write", path = "tests/test_menu.py", text = """import pytest
 
-from cafeteria.cardapio import buscar, por_categoria
-
-
-def test_busca_item_conhecido():
-    assert buscar("cafe").preco == 6.00
+from coffeeshop.menu import find, by_category
 
 
-def test_item_desconhecido_da_erro():
+def test_find_known_item():
+    assert find("coffee").price == 6.00
+
+
+def test_unknown_item_raises():
     with pytest.raises(ValueError):
-        buscar("pizza")
+        find("pizza")
 
 
-def test_bebidas():
-    assert {item.codigo for item in por_categoria("bebida")} == {
-        "cafe", "espresso", "capuccino", "cha",
+def test_drinks():
+    assert {item.code for item in by_category("drink")} == {
+        "coffee", "espresso", "cappuccino", "tea",
     }
 """ }]
-target = "testes do cardápio"
-expect = ["test", "cardapio"]
+target = "tests for the menu"
+expect = ["test", "menu"]
 tags = ["tests"]
 
 [[case]]
 id = "delete-file"
-title = "apaga um arquivo"
-repo = "cafeteria"
+title = "deletes a file"
+repo = "coffeeshop"
 split = "eval"
-ops = [{ op = "git", args = ["rm", "-q", "src/cafeteria/estoque.py"] }]
-target = "remove o controle de estoque"
-expect = ["remov|apaga|tira", "estoque"]
+ops = [{ op = "git", args = ["rm", "-q", "src/coffeeshop/stock.py"] }]
+target = "remove stock control"
+expect = ["remov|delet|drop", "stock"]
 tags = ["delete"]
 
 [[case]]
 id = "project-config"
-title = "configuração de projeto nova"
-repo = "cafeteria"
+title = "new project configuration"
+repo = "coffeeshop"
 split = "train"
 ops = [{ op = "write", path = "pyproject.toml", text = """[project]
-name = "cafeteria"
+name = "coffeeshop"
 version = "0.3.0"
 requires-python = ">=3.11"
 dependencies = ["tabulate==0.9.0", "python-dateutil==2.9.0"]
@@ -147,27 +147,27 @@ pythonpath = ["src"]
 [tool.ruff]
 line-length = 100
 """ }]
-target = "adiciona pyproject com pytest e ruff"
-expect = ["pyproject|projeto|config"]
+target = "add pyproject with pytest and ruff"
+expect = ["pyproject|project|config"]
 tags = ["config", "new-file"]
 
 [[case]]
 id = "docstrings-everywhere"
-title = "docstrings em todo o arquivo"
-repo = "cafeteria"
+title = "docstrings across the file"
+repo = "coffeeshop"
 split = "eval"
 ops = [
-  { op = "replace", path = "src/cafeteria/cardapio.py", old = "class Item:\n", new = "class Item:\n    \"\"\"Um item do cardápio, com o preço em reais.\"\"\"\n\n" },
-  { op = "replace", path = "src/cafeteria/cardapio.py", old = "def buscar(codigo: str) -> Item:\n", new = "def buscar(codigo: str) -> Item:\n    \"\"\"O item com esse código; ValueError se não existir.\"\"\"\n" },
-  { op = "replace", path = "src/cafeteria/cardapio.py", old = "def por_categoria(categoria: str) -> list[Item]:\n", new = "def por_categoria(categoria: str) -> list[Item]:\n    \"\"\"Os itens de uma categoria, na ordem do cardápio.\"\"\"\n" },
+  { op = "replace", path = "src/coffeeshop/menu.py", old = "class Item:\n", new = "class Item:\n    \"\"\"An item on the menu, with the price in dollars.\"\"\"\n\n" },
+  { op = "replace", path = "src/coffeeshop/menu.py", old = "def find(code: str) -> Item:\n", new = "def find(code: str) -> Item:\n    \"\"\"The item with this code; ValueError if it does not exist.\"\"\"\n" },
+  { op = "replace", path = "src/coffeeshop/menu.py", old = "def by_category(category: str) -> list[Item]:\n", new = "def by_category(category: str) -> list[Item]:\n    \"\"\"The items of a category, in menu order.\"\"\"\n" },
 ]
-target = "documenta o cardápio"
-expect = ["document|docstring|comenta", "cardapio"]
+target = "document the menu"
+expect = ["document|docstring|comment", "menu"]
 tags = ["comments"]
 
 [[case]]
 id = "report-totals"
-title = "função nova"
+title = "new function"
 repo = "ledger"
 split = "train"
 ops = [{ op = "append", path = "src/report.ts", text = """
@@ -186,7 +186,7 @@ tags = ["feature"]
 
 [[case]]
 id = "extract-format"
-title = "extrai uma função de formatação"
+title = "extracts a formatting function"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "replace", path = "src/money.ts", old = """  toString(): string {
@@ -208,7 +208,7 @@ tags = ["refactor"]
 
 [[case]]
 id = "more-tests"
-title = "testes novos num arquivo existente"
+title = "new tests in an existing file"
 repo = "ledger"
 split = "train"
 ops = [{ op = "append", path = "test/money.test.ts", text = """
@@ -230,7 +230,7 @@ tags = ["tests"]
 
 [[case]]
 id = "memo-search"
-title = "busca nova"
+title = "new search"
 repo = "ledger"
 split = "eval"
 ops = [{ op = "append", path = "src/transactions.ts", text = """

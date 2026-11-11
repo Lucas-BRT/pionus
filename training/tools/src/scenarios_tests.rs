@@ -62,7 +62,7 @@ fn the_shipped_cases_are_valid() {
     let repos = load_repos(&root()).unwrap();
     let cases = load_cases(&root(), &repos).unwrap();
     let names: Vec<&str> = repos.iter().map(|r| r.name.as_str()).collect();
-    assert!(names.contains(&"cafeteria") && names.contains(&"ledger"));
+    assert!(names.contains(&"coffeeshop") && names.contains(&"ledger"));
     assert!(cases.len() >= 80);
     for split in ["train", "eval"] {
         let levels: BTreeSet<i64> = cases

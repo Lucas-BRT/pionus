@@ -406,6 +406,14 @@ async fn measurements_draws_the_numbers_of_the_measurements_document() {
         expect(&row[0]);
         expect(&row[2]);
     }
+    let training = product("docs/training.md");
+    for n in 0..2 {
+        for row in table_rows(&training, "Results", n) {
+            for cell in &row {
+                expect(cell);
+            }
+        }
+    }
 }
 
 // What the pages show must hold against the product: its files, its sources

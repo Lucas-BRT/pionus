@@ -13,9 +13,12 @@ with one bronze accent. Run: `cargo run -p pionus-website` (or
 
 - **Facts** (version, repo, installer, models, devices, benchmark, roadmap)
   are read by `build.rs` into `src/facts.rs`. Never type one into a page.
-- **Measurements** are copied from `../docs/measurements.md` into
-  `src/measures.rs`; `tests/routes.rs` fails until they match. Charts are
-  HTML/CSS: the bar decorates, the number is text.
+- **Measurements** (`../docs/measurements.md`) and the quality tables
+  (Results of `../docs/training.md`) are read by `build.rs` into
+  `measures.rs`, which `src/measures.rs` includes; never type one into a
+  page. `tests/routes.rs` reads the documents again and looks for each
+  number on the page. Charts are HTML/CSS: the bar decorates, the number is
+  text.
 - **Other copy** is handwritten: check it against `../docs/` and the CLI;
   never invent a number or command.
 - Only `/` may sell; other pages are developer docs: plain titles, no

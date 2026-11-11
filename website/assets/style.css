@@ -12,6 +12,9 @@
 
 html { -webkit-text-size-adjust: 100%; }
 
+/* A table wider than its column scrolls sideways; its bar follows the dark theme. */
+[data-slot="table"] { scrollbar-color: var(--border) transparent; }
+
 body { font: 1rem/1.7 var(--font-sans); min-height: 100vh; display: flex; flex-direction: column; }
 main { flex: 1; }
 
