@@ -1,0 +1,101 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of the fix",
+      "Browser checks in CI, the social card from the 3D scene, accessibility pass",
+      "Lab: stone and carrot look, drawer and tabs, and a 3D view of the floor",
+      "Leaf chamber and 404: one room, one torch",
+      "Landing: a torchlit three.js walk along the floor, driven by scroll",
+      "Walk: vendored three.js subset and the pure geometry of the floor",
+      "Landing: seven rooms along one real floor, without scripts"
+    ],
+    "history_files": [
+      [
+        "src/generate/rooms.rs",
+        "src/params.rs",
+        "tests/model.rs"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "src/generate/rooms.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "src/params.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "tests/model.rs",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "src/generate/rooms.rs",
+        "old_path": null,
+        "lines": [
+          2,
+          2
+        ],
+        "hunks": "@@ -1,5 +1,5 @@\n-let caps = classes.map(|c| p.max_of.get(c) as usize);\n+let caps = classes.map(|c| (p.max_of.get(c) as usize).min(live.len()));\n if ws.sum() <= 0.0 {\n     for oi in 0..ws.len() {\n-        if oi != ci && counts[oi] < caps[oi] {\n+        if oi != ci && counts[oi] < caps[oi] && p.weights.get(oi) > 0.0 {\n             ws[oi] = 1.0;\n"
+      },
+      {
+        "path": "src/params.rs",
+        "old_path": null,
+        "lines": [
+          1,
+          1
+        ],
+        "hunks": "@@ -1 +1 @@\n-max_of: ByClass::new(99.0, 99.0, 99.0, 99.0, 99.0),\n+max_of: ByClass::new(10000.0, 10000.0, 10000.0, 10000.0, 10000.0),\n"
+      },
+      {
+        "path": "tests/model.rs",
+        "old_path": null,
+        "lines": [
+          9,
+          0
+        ],
+        "hunks": "@@ -2 +2,10 @@\n fn every_level_gives_only_valid_stages() {}\n+\n+#[test]\n+fn zero_weight_classes_never_appear_when_caps_are_exceeded() {\n+    let f = generate(146343314, &p);\n+    assert!(f.rooms.iter().all(|r| r.cls == Rect));\n+}\n+\n+#[test]\n+fn default_quotas_do_not_bind_on_a_big_grid() {}\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "Tapiti: fix room weight limits",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nparent of the fix\nBrowser checks in CI, the social card from the 3D scene, accessibility pass\nLab: stone and carrot look, drawer and tabs, and a 3D view of the floor\nLeaf chamber and 404: one room, one torch\nLanding: a torchlit three.js walk along the floor, driven by scroll\n",
+          "user": "Files changed:\nsrc/generate/rooms.rs | +2 -2\nsrc/params.rs | +1 -1\ntests/model.rs | +9 -0\n\nDiff:\n--- src/generate/rooms.rs\n@@ -1,5 +1,5 @@\n-let caps = classes.map(|c| p.max_of.get(c) as usize);\n+let caps = classes.map(|c| (p.max_of.get(c) as usize).min(live.len()));\n if ws.sum() <= 0.0 {\n     for oi in 0..ws.len() {\n-        if oi != ci && counts[oi] < caps[oi] {\n+        if oi != ci && counts[oi] < caps[oi] && p.weights.get(oi) > 0.0 {\n             ws[oi] = 1.0;\n--- src/params.rs\n@@ -1 +1 @@\n-max_of: ByClass::new(99.0, 99.0, 99.0, 99.0, 99.0),\n+max_of: ByClass::new(10000.0, 10000.0, 10000.0, 10000.0, 10000.0),\n--- tests/model.rs\n@@ -2 +2,10 @@\n fn every_level_gives_only_valid_stages() {}\n+\n+#[test]\n+fn zero_weight_classes_never_appear_when_caps_are_exceeded() {\n+    let f = generate(146343314, &p);\n+    assert!(f.rooms.iter().all(|r| r.cls == Rect));\n+}\n+\n+#[test]\n+fn default_quotas_do_not_bind_on_a_big_grid() {}\n"
+        },
+        "raw": "Tapiti: fix room weight limits",
+        "rejected": null
+      }
+    ]
+  }
+}

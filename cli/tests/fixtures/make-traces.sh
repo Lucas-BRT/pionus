@@ -465,3 +465,28 @@ real_change conventional-en-check-script-as-ci df3e74c 'ci: add a check script t
 # Contributing details moved from AGENTS.md to docs pages: the reply said a guide was added "to docs and website",
 # reading website/AGENTS.md as the website.
 real_change conventional-en-agents-docs-as-website bc0f7f9 'docs: add contributing guide to docs and website'
+
+# A fix to a generator's shape quotas (a fallback that ignored a weight of 0, a
+# default quota, a cap at the number of rooms) with its tests, in a repository
+# whose subjects are `Area: sentence`, not Conventional Commits: the reply was
+# `Tapiti: fix room weight limits`, the name of the repository as the area and
+# nothing of what changed (`Core: a weight of 0 means never, and shape quotas
+# follow the grid`).
+fresh area-prefix-fix
+mkdir -p src/generate tests
+for s in "Landing: seven rooms along one real floor, without scripts" \
+         "Walk: vendored three.js subset and the pure geometry of the floor" \
+         "Landing: a torchlit three.js walk along the floor, driven by scroll" \
+         "Leaf chamber and 404: one room, one torch" \
+         "Lab: stone and carrot look, drawer and tabs, and a 3D view of the floor" \
+         "Browser checks in CI, the social card from the 3D scene, accessibility pass"; do commit "$s"; done
+printf 'let caps = classes.map(|c| p.max_of.get(c) as usize);\nif ws.sum() <= 0.0 {\n    for oi in 0..ws.len() {\n        if oi != ci && counts[oi] < caps[oi] {\n            ws[oi] = 1.0;\n        }\n    }\n}\n' > src/generate/rooms.rs
+printf 'max_of: ByClass::new(99.0, 99.0, 99.0, 99.0, 99.0),\n' > src/params.rs
+printf '#[test]\nfn every_level_gives_only_valid_stages() {}\n' > tests/model.rs
+git add .; commit "parent of the fix"
+printf 'let caps = classes.map(|c| (p.max_of.get(c) as usize).min(live.len()));\nif ws.sum() <= 0.0 {\n    for oi in 0..ws.len() {\n        if oi != ci && counts[oi] < caps[oi] && p.weights.get(oi) > 0.0 {\n            ws[oi] = 1.0;\n        }\n    }\n}\n' > src/generate/rooms.rs
+printf 'max_of: ByClass::new(10000.0, 10000.0, 10000.0, 10000.0, 10000.0),\n' > src/params.rs
+printf '#[test]\nfn every_level_gives_only_valid_stages() {}\n\n#[test]\nfn zero_weight_classes_never_appear_when_caps_are_exceeded() {\n    let f = generate(146343314, &p);\n    assert!(f.rooms.iter().all(|r| r.cls == Rect));\n}\n\n#[test]\nfn default_quotas_do_not_bind_on_a_big_grid() {}\n' > tests/model.rs
+git add .
+"$BIN" --backend mock --mock-response "Tapiti: fix room weight limits" \
+  --trace "$OUT/area-prefix-fix-as-repository-name.json" >/dev/null
