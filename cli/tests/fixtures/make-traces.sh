@@ -350,6 +350,12 @@ real_change conventional-en-invented-backend 87533ac "feat: add a device backend
 # A limit on the turned-down subjects the prompt names, answered with the
 # training scope and a command that does not exist.
 real_change conventional-en-note-limit-as-training-command b99d667 "feat(training): add avoid-note command"
+# Three more changes that pionus answered by what their tests do, or with a
+# scope and a name that is not the change's: the new metrics of the scorer,
+# the cut by hunks, and the check on numbers.
+real_change conventional-en-prompt-metrics-as-test 6350569 "feat(training): add a test for the prompt the model saw"
+real_change conventional-en-hunk-cut-as-test d79ae67 "test(cli): add a test for a cut that keeps the last one"
+real_change conventional-en-number-check-as-score 37c9602 "feat(generate): add facts to the score"
 
 # Prompts the size of real ones, for `pionus bench`: a change of one of
 # this repository's files, from a pinned commit, sized like the 25th, 50th,

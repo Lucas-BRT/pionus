@@ -1,0 +1,101 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of 6350569",
+      "style(training): collapse a nested if that clippy rejects",
+      "feat(training): score replies whose numbers move the wrong way",
+      "chore(fixtures): regenerate the traces for 0.15.0",
+      "test(fixtures): trace a fix answered with the repository name as its area",
+      "Merge branch 'plan/model-quality'",
+      "feat(website): draw the measurements from the documents at build time"
+    ],
+    "history_files": [
+      [
+        "docs/training.md",
+        "training/tools/src/score.rs",
+        "training/tools/src/score_tests.rs"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "docs/training.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/score.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/score_tests.rs",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "docs/training.md",
+        "old_path": null,
+        "lines": [
+          4,
+          1
+        ],
+        "hunks": "@@ -182,3 +182,6 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with\n   way: `to 30` where 30 was the old value, `decrease` where it grew; false\n-  means no contradiction found, not that the message is right);\n+  means no contradiction found, not that the message is right). `truncated`\n+  and `unsupported_visible` read the prompt the model saw (the last attempt in\n+  the trace): the first says files were cut, the second checks the specifics\n+  against that prompt, not the whole diff;\n   `pionus-training score`'s docstring defines them.\n"
+      },
+      {
+        "path": "training/tools/src/score.rs",
+        "old_path": null,
+        "lines": [
+          21,
+          0
+        ],
+        "hunks": "@@ -32,2 +32,7 @@\n //!   level a human reaches with the same diff\n+//! - truncated: the prompt the model saw says some files are only partly shown\n+//!   (the last attempt's prompt, as recorded in the trace)\n+//! - unsupported_visible: like unsupported, but against the history and what\n+//!   the model's prompt showed, not the whole diff: a specific only the cut\n+//!   part held counts. Without an attempt (rules), the whole inputs\n //! - contradicted: says a number moved the wrong way against the diff (`to 30`\n@@ -87,2 +92,5 @@ static DOWN: LazyLock<Regex> = LazyLock::new(|| {\n \n+/// What the user message says when files are cut (`prompt/user.rs`).\n+const PARTLY_SHOWN: &str = \"files are only partly shown\";\n+\n const STOP: &str = \"a an the and or of to in on for with from by into onto when then\n@@ -425,3 +433,16 @@ pub fn row_of(m: &Value, t: &Value) -> Vec<(&'static str, Metric)> {\n         .join(\"\\n\");\n+    let shown = g[\"attempts\"]\n+        .as_array()\n+        .and_then(|a| a.last())\n+        .and_then(|a| a[\"prompt\"][\"user\"].as_str());\n+    let visible = shown.map_or_else(\n+        || known.clone(),\n+        |user| format!(\"{}\\n{}\", history.join(\"\\n\"), user.to_lowercase()),\n+    );\n     let mut row = vec![\n+        (\n+            \"truncated\",\n+            Yes(shown.is_some_and(|u| u.contains(PARTLY_SHOWN))),\n+        ),\n+        (\"unsupported_visible\", Yes(unsupported(subject, &visible))),\n         (\"contradicted\", Yes(contradicted(subject, &hunks))),\n"
+      },
+      {
+        "path": "training/tools/src/score_tests.rs",
+        "old_path": null,
+        "lines": [
+          38,
+          0
+        ],
+        "hunks": "@@ -264 +264,39 @@ fn a_type_of_the_same_group_counts_for_the_group_and_not_for_the_match() {\n }\n+\n+#[test]\n+fn the_prompt_the_model_saw_decides_what_was_visible() {\n+    let meta = json!({\"set\": \"free\", \"target\": \"chore: bump to 2.0.1\"});\n+    let trace = |user: &str, subject: &str| {\n+        json!({\n+            \"inputs\": {\n+                \"subjects\": [],\n+                \"files\": [{\"path\": \"v\", \"hunks\": \"@@ -1 +1 @@\\n-1.0.0\\n+2.0.1\\n\"}],\n+            },\n+            \"generation\": {\n+                \"message\": {\"subject\": subject},\n+                \"source\": \"model\",\n+                \"attempts\": [{\"prompt\": {\"user\": user}, \"rejected\": null}],\n+            },\n+        })\n+    };\n+    let flag = |trace: &serde_json::Value, name: &str| {\n+        row_of(&meta, trace)\n+            .into_iter()\n+            .find(|(n, _)| *n == name)\n+            .map(|(_, v)| v)\n+    };\n+    // The version is in the diff, but the prompt cut it.\n+    let cut = trace(\n+        \"Files changed:\\nv\\n(1 files are only partly shown; rely on the file list.)\\n\",\n+        \"chore: bump to 2.0.1\",\n+    );\n+    assert_eq!(flag(&cut, \"truncated\"), Some(Metric::Yes(true)));\n+    assert_eq!(flag(&cut, \"unsupported\"), Some(Metric::Yes(false)));\n+    assert_eq!(flag(&cut, \"unsupported_visible\"), Some(Metric::Yes(true)));\n+    let whole = trace(\"Files changed:\\nv\\nDiff:\\n+2.0.1\\n\", \"chore: bump to 2.0.1\");\n+    assert_eq!(flag(&whole, \"truncated\"), Some(Metric::Yes(false)));\n+    assert_eq!(\n+        flag(&whole, \"unsupported_visible\"),\n+        Some(Metric::Yes(false))\n+    );\n+}\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(training): add a test for the prompt the model saw",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, chore, style, test, refactor.\n- Scopes used here: fixtures, training, website. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nstyle(training): collapse a nested if that clippy rejects\nfeat(training): score replies whose numbers move the wrong way\nchore(fixtures): regenerate the traces for 0.15.0\ntest(fixtures): trace a fix answered with the repository name as its area\nfeat(website): draw the measurements from the documents at build time\n",
+          "user": "Files changed:\ndocs/training.md | +4 -1\ntraining/tools/src/score.rs | +21 -0\ntraining/tools/src/score_tests.rs | +38 -0\n\nDiff:\n--- training/tools/src/score.rs\n@@ -32,2 +32,7 @@\n //!   level a human reaches with the same diff\n+//! - truncated: the prompt the model saw says some files are only partly shown\n+//!   (the last attempt's prompt, as recorded in the trace)\n+//! - unsupported_visible: like unsupported, but against the history and what\n+//!   the model's prompt showed, not the whole diff: a specific only the cut\n+//!   part held counts. Without an attempt (rules), the whole inputs\n //! - contradicted: says a number moved the wrong way against the diff (`to 30`\n@@ -87,2 +92,5 @@ static DOWN: LazyLock<Regex> = LazyLock::new(|| {\n \n+/// What the user message says when files are cut (`prompt/user.rs`).\n+const PARTLY_SHOWN: &str = \"files are only partly shown\";\n+\n const STOP: &str = \"a an the and or of to in on for with from by into onto when then\n[... 1 more hunks]\n--- training/tools/src/score_tests.rs\n@@ -264 +264,39 @@ fn a_type_of_the_same_group_counts_for_the_group_and_not_for_the_match() {\n }\n+\n+#[test]\n+fn the_prompt_the_model_saw_decides_what_was_visible() {\n+    let meta = json!({\"set\": \"free\", \"target\": \"chore: bump to 2.0.1\"});\n+    let trace = |user: &str, subject: &str| {\n+        json!({\n+            \"inputs\": {\n+                \"subjects\": [],\n+                \"files\": [{\"path\": \"v\", \"hunks\": \"@@ -1 +1 @@\\n-1.0.0\\n+2.0.1\\n\"}],\n+            },\n+            \"generation\": {\n+                \"message\": {\"subject\": subject},\n+                \"source\": \"model\",\n+                \"attempts\": [{\"prompt\": {\"user\": user}, \"rejected\": null}],\n+            },\n+        })\n+    };\n[... 21 more lines]\n\n(3 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(training): add a test for the prompt the model saw",
+        "rejected": null
+      }
+    ]
+  }
+}
