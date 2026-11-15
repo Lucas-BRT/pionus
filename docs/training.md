@@ -176,9 +176,12 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   what the inputs do not record (merge, revert, file modes) are eval only.
   See [training/scenarios/README.md](../training/scenarios/README.md).
 - Metrics: first_try, fallback, copied, type_match, scope_known,
-  scope_fits, word_f1, and two cheap faithfulness checks, `unsupported`
-  (specifics found nowhere in the input) and `ungrounded` (a description
-  with no word from the diff); `pionus-training score`'s docstring defines them.
+  scope_fits, word_f1, and three cheap faithfulness checks, `unsupported`
+  (specifics found nowhere in the input), `ungrounded` (a description
+  with no word from the diff) and `contradicted` (a number moved the wrong
+  way: `to 30` where 30 was the old value, `decrease` where it grew; false
+  means no contradiction found, not that the message is right);
+  `pionus-training score`'s docstring defines them.
   `type_match` counts only the repository's own type as right, and its noise
   (labels, seeds) is larger than the gains tried so far, so a comparison also
   reads `type_group` (a `build` for a `chore` counts) and `type_behaviour`

@@ -31,6 +31,27 @@ fn support_and_grounding_are_read_from_the_evidence() {
 }
 
 #[test]
+fn a_number_moved_the_wrong_way_is_a_contradiction() {
+    let timeout = "@@ -1 +1 @@\n-const TIMEOUT: u64 = 30;\n+const TIMEOUT: u64 = 60;\n";
+    // The case the unsupported/ungrounded metrics accepted.
+    assert!(contradicted("fix: decrease timeout to 30", timeout));
+    assert!(contradicted("fix: lower the timeout", timeout));
+    assert!(contradicted("fix: raise timeout from 60", timeout));
+    assert!(!contradicted("fix: increase timeout to 60", timeout));
+    assert!(!contradicted(
+        "fix: double the timeout from 30 to 60",
+        timeout
+    ));
+    // Nothing comparable: unknown, never a contradiction.
+    assert!(!contradicted("fix: decrease timeout to 30", ""));
+    let renamed = "@@ -1 +1 @@\n-let a = 30;\n+let b = 60;\n";
+    assert!(!contradicted("fix: decrease a to 30", renamed));
+    // A mixed change has no single direction.
+    let mixed = "@@ -1,2 +1,2 @@\n-a = 1\n-b = 9\n+a = 5\n+b = 2\n";
+    assert!(!contradicted("fix: lower the limits", mixed));
+}
+
+#[test]
 fn a_scope_fits_where_the_history_used_it() {
     assert_eq!(area("src/diff.rs"), "src/");
     assert_eq!(area("mise.toml"), "");
