@@ -448,7 +448,13 @@ const TOP_LOGPROBS: usize = 12;
 /// A request for the first token of the reply and the likeliest others,
 /// which is where the model picks the type.
 pub fn type_request(prompt: &Prompt) -> Value {
-    let mut request = chat_request(prompt, &GenerationConfig { max_new_tokens: 1 });
+    let mut request = chat_request(
+        prompt,
+        &GenerationConfig {
+            max_new_tokens: 1,
+            ..GenerationConfig::default()
+        },
+    );
     request["logprobs"] = json!(true);
     request["top_logprobs"] = json!(TOP_LOGPROBS);
     request

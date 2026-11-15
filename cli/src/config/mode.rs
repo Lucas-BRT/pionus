@@ -38,6 +38,16 @@ pub const PRESETS: &[Preset] = &[
     },
 ];
 
+/// How many replies a mode asks for before the fallback: `fast` takes the
+/// first one, as the cheapest way to a message.
+pub fn max_attempts(mode: &str) -> usize {
+    if mode == "fast" {
+        1
+    } else {
+        crate::backend::DEFAULT_MAX_ATTEMPTS
+    }
+}
+
 /// The names of every mode, `off` (no preset) first.
 pub const NAMES: &[&str] = &["off", "fast", "balanced", "quality"];
 

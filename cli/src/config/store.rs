@@ -282,6 +282,7 @@ impl Resolved {
                 Some((_, origin)) if *origin != Origin::Default
             ),
             max_new_tokens: self.count("model.max_new_tokens"),
+            max_attempts: super::mode::max_attempts(choice("model.mode")),
             convention: convention(choice("style.convention")),
             default_convention: convention(choice("style.default_convention")).expect("not auto"),
             history_depth: self.count("style.history_depth"),
@@ -429,6 +430,8 @@ pub struct Settings {
     /// unset one gives way to the device's default.
     pub max_prompt_tokens_set: bool,
     pub max_new_tokens: usize,
+    /// Replies asked for before the fallback: 1 in `fast` mode, else 2.
+    pub max_attempts: usize,
     pub convention: Option<Convention>,
     pub default_convention: Convention,
     pub history_depth: usize,
@@ -480,6 +483,7 @@ impl Settings {
     pub fn generation_config(&self) -> GenerationConfig {
         GenerationConfig {
             max_new_tokens: self.max_new_tokens,
+            max_attempts: self.max_attempts,
         }
     }
 

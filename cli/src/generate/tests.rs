@@ -636,6 +636,46 @@ mod tests {
     }
 
     #[test]
+    fn one_attempt_goes_straight_to_the_fallback_and_the_default_is_two() {
+        let config = GenerationConfig {
+            max_attempts: 1,
+            ..GenerationConfig::default()
+        };
+        let mock = MockBackend::new(["feat: add login", "feat: add retry"]);
+        let generation = crate::generate::generate(
+            &context(&["feat: add login"]),
+            &files(),
+            &mock,
+            &PromptOptions::default(),
+            &config,
+        )
+        .unwrap();
+        // The copy of the history is not asked again.
+        assert_eq!(generation.attempts.len(), 1);
+        assert_eq!(generation.source, Source::Fallback);
+        let again = run(
+            &["feat: add login"],
+            &MockBackend::new(["feat: add login", "feat: add retry"]),
+        );
+        assert_eq!(again.attempts.len(), 2);
+        assert_eq!(again.message.subject, "feat: add retry");
+        // Zero is read as one: a reply is always asked for.
+        let zero = GenerationConfig {
+            max_attempts: 0,
+            ..GenerationConfig::default()
+        };
+        let generation = crate::generate::generate(
+            &context(&["feat: add login"]),
+            &files(),
+            &MockBackend::new(["feat: add retry"]),
+            &PromptOptions::default(),
+            &zero,
+        )
+        .unwrap();
+        assert_eq!(generation.source, Source::Model);
+    }
+
+    #[test]
     fn only_the_latest_turned_down_subjects_are_named_but_all_are_refused() {
         let turned_down: Vec<String> = ["feat: a", "fix: b", "feat: a", "docs: c", "chore: d"]
             .map(str::to_owned)

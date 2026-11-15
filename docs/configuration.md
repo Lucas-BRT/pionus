@@ -84,6 +84,11 @@ value, for example when an environment variable is set.
   | `balanced` | `pionus-1.5b-v0.3` | the device's default |
   | `quality` | `pionus-1.5b-v0.3` | 4096 |
 
+  `fast` also asks for one reply instead of two: a reply that copies the
+  history, contradicts the diff or is cut off is not asked again, and the
+  message is built from the file list at once (`max_attempts` in a trace, left
+  out when 2).
+
   `off`, the default, changes nothing: an existing configuration behaves as
   before. The presets are starting points: what they cost
   ([measurements](measurements.md#by-mode)) and what they score

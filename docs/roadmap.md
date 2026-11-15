@@ -26,8 +26,10 @@
   `pionus-0.5b-v0.3` and `pionus-1.5b-v0.3`, the v0.1 models trained
   further on their own samples, as experimental models.
 - Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the
-  model, and the prompt size of `quality` (4096), where nothing else set them.
-  The attempt limit of `fast` is not done.
+  model, and the prompt size of `quality` (4096), where nothing else set them;
+  `fast` also asks for one reply, not two. The extra context of `quality`, the
+  mode in traces and the choice in the setup and the review screen are not
+  done.
 - A prompt budget by device: unset, `model.max_prompt_tokens` is 2048 on
   `vulkan` and `cpu` and 1024 on the NPU, whose length is fixed when it
   compiles; a value written applies everywhere. `intel-gpu` and `openvino-cpu`

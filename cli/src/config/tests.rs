@@ -821,3 +821,33 @@ fn a_mode_is_a_machine_setting_and_an_unknown_one_is_an_error() {
         "{unknown:?}"
     );
 }
+
+#[test]
+fn only_fast_asks_for_a_single_reply_and_a_default_trace_does_not_say_so() {
+    for (mode, attempts) in [("off", 2), ("balanced", 2), ("quality", 2), ("fast", 1)] {
+        let resolved = resolve(None, None, HOME, vec![("model.mode", mode.into())]).unwrap();
+        assert_eq!(
+            resolved.settings().generation_config().max_attempts,
+            attempts,
+            "{mode}"
+        );
+    }
+    let json = serde_json::to_string(&GenerationConfig::default()).unwrap();
+    assert_eq!(json, r#"{"max_new_tokens":128}"#);
+    let one = GenerationConfig {
+        max_attempts: 1,
+        ..GenerationConfig::default()
+    };
+    let json = serde_json::to_string(&one).unwrap();
+    assert!(json.contains("\"max_attempts\":1"), "{json}");
+    assert_eq!(
+        serde_json::from_str::<GenerationConfig>(&json).unwrap(),
+        one
+    );
+    assert_eq!(
+        serde_json::from_str::<GenerationConfig>(r#"{"max_new_tokens":64}"#)
+            .unwrap()
+            .max_attempts,
+        2
+    );
+}

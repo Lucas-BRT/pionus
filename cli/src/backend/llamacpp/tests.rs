@@ -119,7 +119,13 @@ fn a_failed_fast_load_is_retried_normally() {
 
 #[test]
 fn requests_are_greedy_and_seeded() {
-    let request = chat_request(&prompt(), &GenerationConfig { max_new_tokens: 96 });
+    let request = chat_request(
+        &prompt(),
+        &GenerationConfig {
+            max_new_tokens: 96,
+            ..GenerationConfig::default()
+        },
+    );
     assert_eq!(request["temperature"], 0);
     assert_eq!(request["top_k"], 1);
     assert_eq!(request["seed"], 0);
@@ -366,8 +372,14 @@ fn socket_dirs_are_private_and_short() {
 
 #[test]
 fn a_reply_can_be_begun_for_the_model() {
-    let request =
-        chat_request_starting_with(&prompt(), &GenerationConfig { max_new_tokens: 96 }, "fix");
+    let request = chat_request_starting_with(
+        &prompt(),
+        &GenerationConfig {
+            max_new_tokens: 96,
+            ..GenerationConfig::default()
+        },
+        "fix",
+    );
     let messages = request["messages"].as_array().unwrap();
     assert_eq!(messages.len(), 3);
     assert_eq!(messages[2]["role"], "assistant");

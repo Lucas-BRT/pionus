@@ -236,7 +236,10 @@ fn token_estimate_is_at_most_a_quarter_short() {
     // generation. Dense text (hashes, base64) can be up to 1.25 times
     // longer than estimated; the fixtures include a diff of checksums.
     let backend = backend();
-    let config = GenerationConfig { max_new_tokens: 1 };
+    let config = GenerationConfig {
+        max_new_tokens: 1,
+        ..GenerationConfig::default()
+    };
     for (name, prompt) in fixture_prompts() {
         backend.generate(&prompt, &config).unwrap();
         let real = backend.last_metrics().unwrap().input_tokens;

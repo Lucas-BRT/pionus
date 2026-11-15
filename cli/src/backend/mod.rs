@@ -26,12 +26,32 @@ pub use choices::TypeChoice;
 pub struct GenerationConfig {
     /// Enough for a 72-column subject and a short body.
     pub max_new_tokens: usize,
+    /// How many replies to ask for before the message is built from the file
+    /// list: the first, and a retry that says what was wrong. Left out of
+    /// traces when 2, so older traces read, and replay, the same.
+    #[serde(
+        default = "default_max_attempts",
+        skip_serializing_if = "is_default_max_attempts"
+    )]
+    pub max_attempts: usize,
+}
+
+/// The first reply and one retry.
+pub const DEFAULT_MAX_ATTEMPTS: usize = 2;
+
+fn default_max_attempts() -> usize {
+    DEFAULT_MAX_ATTEMPTS
+}
+
+fn is_default_max_attempts(n: &usize) -> bool {
+    *n == DEFAULT_MAX_ATTEMPTS
 }
 
 impl Default for GenerationConfig {
     fn default() -> Self {
         Self {
             max_new_tokens: 128,
+            max_attempts: DEFAULT_MAX_ATTEMPTS,
         }
     }
 }

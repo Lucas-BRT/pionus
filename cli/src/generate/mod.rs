@@ -23,8 +23,9 @@ pub use notes::{avoid_note, retry_note};
 pub use retry::{copied_from, cut_off, prepared_message};
 pub use rules::by_rules;
 
-/// The first try plus one retry that says what was wrong.
-pub const MAX_ATTEMPTS: usize = 2;
+/// The first try plus one retry that says what was wrong, unless the config
+/// asks for fewer or more (`fast` asks for one).
+pub const MAX_ATTEMPTS: usize = crate::backend::DEFAULT_MAX_ATTEMPTS;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Attempt {
@@ -133,7 +134,7 @@ pub fn generate_asked(
         .collect();
     let avoid_note_val = notes::avoid_note(avoid);
     let mut attempts: Vec<Attempt> = Vec::new();
-    while attempts.len() < MAX_ATTEMPTS {
+    while attempts.len() < config.max_attempts.max(1) {
         let retry = attempts
             .last()
             .and_then(|a| a.rejected.as_ref())
