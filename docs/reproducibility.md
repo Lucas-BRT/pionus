@@ -199,7 +199,9 @@ files).
   answer.
 - Each device gives the same reply to the same prompt every time. Across
   devices, the NPU and the CPU agree, while the GPU (f16) and Vulkan (another
-  quantisation) do not; see [devices](devices.md#same-prompt-same-reply).
+  quantisation) do not; see [devices](devices.md#same-prompt-same-reply). On
+  the three modes, `cpu` and `vulkan` write the same subject for 78 to 83 of
+  100 commits ([measurements](measurements.md#the-modes-on-the-cpu)).
 
 ## Traces
 

@@ -100,6 +100,30 @@ run's peak of `nvidia-smi` minus its reading before the run, and the desktop
 was using about 1 GiB of the GPU's memory then, so it is rough. What the modes
 score is in [training](training.md#the-three-modes).
 
+### The modes on the CPU
+
+The same 100 inputs of eval-v1, once on `vulkan` and once on `cpu` (llama.cpp,
+12 threads on the Ryzen 5 5500), release build of commit `06665e8`, the prompts
+of today (the device's default budget, 4096 for `quality`). A run is the total of
+`pionus eval`, with one load of the model; one run each, so the times of
+`balanced` and `quality` on `vulkan` (40 s and 34 s) are inside the noise of one
+another.
+
+| Mode | 100 inputs on `vulkan` | 100 inputs on `cpu` | `cpu` per message | Same subject on both |
+|---|---|---|---|---|
+| `fast` | 17 s | 140 s | about 1.4 s | 83 of 100 |
+| `balanced` | 40 s | 343 s | about 3.4 s | 80 of 100 |
+| `quality` | 34 s | 347 s | about 3.4 s | 78 of 100 |
+
+- `quality` costs the same as `balanced` on the CPU because few prompts are
+  longer than 2048 tokens: prefill follows the prompt's real length, not the
+  budget.
+- Greedy decoding gives the same subject on a device every time, but not across
+  devices: the CPU and `vulkan` differ on one commit in five (78 to 83 of 100
+  agree), with messages that mean the same (`chore: add eslint cache file to
+  git ignore` and `chore: add eslint cache to gitignore`). What they score is
+  alike (`balanced` `type_match` 0.68 on `vulkan`, 0.67 on `cpu`).
+
 ```bash
 for mode in fast balanced quality; do
   XDG_CONFIG_HOME=$(mktemp -d) PIONUS_MODE=$mode time \
