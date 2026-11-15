@@ -59,6 +59,10 @@ pub enum SanitizeError {
     /// preposition or a conjunction: a reply cut off by the token limit.
     #[error("subject ends in the middle of a sentence: {0:?}")]
     CutOff(String),
+    /// The subject says a number moved the other way than the diff shows:
+    /// the subject and what the diff says.
+    #[error("subject contradicts the diff: {0:?} ({1})")]
+    Contradicted(String, String),
 }
 
 pub fn sanitize(raw: &str, convention: Convention) -> Result<CommitMessage, SanitizeError> {

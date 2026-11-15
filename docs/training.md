@@ -188,7 +188,11 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   (specifics found nowhere in the input), `ungrounded` (a description
   with no word from the diff) and `contradicted` (a number moved the wrong
   way: `to 30` where 30 was the old value, `decrease` where it grew; false
-  means no contradiction found, not that the message is right). `truncated`
+  means no contradiction found, not that the message is right; pionus rejects
+  such a reply and retries, so `first_contradicted` reads the first reply and
+  `contradicted_real` the human's subject, a false positive of the check when
+  it is above 0: it is 0 on the 6,700 subjects of eval-v1, eval-short,
+  judge1, pilot1 and dpo2-mine-all). `truncated`
   and `unsupported_visible` read the prompt the model saw (the last attempt in
   the trace): the first says files were cut, the second checks the specifics
   against that prompt, not the whole diff. `evidence_kept` (the share of the

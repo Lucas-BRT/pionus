@@ -43,6 +43,11 @@
 //! - unsupported_visible: like unsupported, but against the history and what
 //!   the model's prompt showed, not the whole diff: a specific only the cut
 //!   part held counts. Without an attempt (rules), the whole inputs
+//! - first_contradicted: the first reply's first line says a number moved the
+//!   wrong way (pionus rejects that and retries, so contradicted alone hides
+//!   the model's own rate)
+//! - contradicted_real: the same for the real subject: a human's message the
+//!   check would reject is a false positive of it
 //! - contradicted: says a number moved the wrong way against the diff (`to 30`
 //!   where 30 was the old value, `decrease` where the value grew). Only a
 //!   changed number with the same line around it counts; anything else is
@@ -81,21 +86,6 @@ static SPECIFIC: LazyLock<Regex> = LazyLock::new(|| {
         r"|\b(\w+_\w+)\b",                               // snake_case
     ))
     .expect("a valid pattern")
-});
-
-static NUMBER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"-?\d+(?:\.\d+)?").expect("a valid pattern"));
-static TO: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\bto (-?\d+(?:\.\d+)?)\b").expect("a valid pattern"));
-static FROM: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\bfrom (-?\d+(?:\.\d+)?)\b").expect("a valid pattern"));
-static UP: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\b(increase[sd]?|rais(?:e|es|ed)|bump(?:s|ed)?|grow|higher)\b")
-        .expect("a valid pattern")
-});
-static DOWN: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\b(decrease[sd]?|lower(?:s|ed)?|reduc(?:e|es|ed)|shrink|drop(?:s|ped)?)\b")
-        .expect("a valid pattern")
 });
 
 /// Lockfiles, which the prompt keeps out of the diff whatever their size.
@@ -223,69 +213,22 @@ pub fn evidence(inputs: &Value) -> String {
     parts.join("\n").to_lowercase()
 }
 
-/// The numbers that changed in place: a removed line and the added line at the
-/// same position, equal once their numbers are blanked, as (old, new).
-fn changed_numbers(hunks: &str) -> Vec<(f64, f64)> {
-    let (mut old, mut new, mut found) = (Vec::new(), Vec::new(), Vec::new());
-    let mut pair_up = |old: &mut Vec<&str>, new: &mut Vec<&str>| {
-        for (a, b) in old.iter().zip(new.iter()) {
-            let (x, y): (Vec<_>, Vec<_>) = (
-                NUMBER.find_iter(a).map(|m| m.as_str()).collect(),
-                NUMBER.find_iter(b).map(|m| m.as_str()).collect(),
-            );
-            if x.len() == y.len() && NUMBER.replace_all(a, "#") == NUMBER.replace_all(b, "#") {
-                for (p, q) in x.iter().zip(&y) {
-                    if let (Ok(p), Ok(q)) = (p.parse::<f64>(), q.parse::<f64>())
-                        && p != q
-                    {
-                        found.push((p, q));
-                    }
-                }
-            }
-        }
-        old.clear();
-        new.clear();
-    };
-    for line in hunks.lines() {
-        if line.starts_with("---") || line.starts_with("+++") {
-            continue;
-        }
-        if let Some(rest) = line.strip_prefix('-') {
-            if !new.is_empty() {
-                pair_up(&mut old, &mut new);
-            }
-            old.push(rest);
-        } else if let Some(rest) = line.strip_prefix('+') {
-            new.push(rest);
-        } else {
-            pair_up(&mut old, &mut new);
-        }
-    }
-    pair_up(&mut old, &mut new);
-    found
+/// The subject says a number moved the wrong way: the check pionus makes of
+/// a reply before it accepts it (`pionus::diff::contradiction_in`). The
+/// metric on the first reply is the model's own rate, since a retry hides it.
+pub fn contradicted(subject: &str, hunks: &str) -> bool {
+    pionus::diff::contradiction_in(subject, hunks).is_some()
 }
 
-/// The subject says a number moved the wrong way: `to N` where N was the old
-/// value, `from N` where N is the new one, or a rise/fall word against changes
-/// that all go the other way. No changed number to compare is not a
-/// contradiction.
-pub fn contradicted(subject: &str, hunks: &str) -> bool {
-    let changes = changed_numbers(hunks);
-    let text = description(subject).to_lowercase();
-    let named = |re: &Regex| -> Vec<f64> {
-        re.captures_iter(&text)
-            .filter_map(|c| c[1].parse().ok())
-            .collect()
-    };
-    let wrong_to = named(&TO)
-        .into_iter()
-        .any(|n| changes.iter().any(|c| c.0 == n) && !changes.iter().any(|c| c.1 == n));
-    let wrong_from = named(&FROM)
-        .into_iter()
-        .any(|n| changes.iter().any(|c| c.1 == n) && !changes.iter().any(|c| c.0 == n));
-    let all = |up: bool| !changes.is_empty() && changes.iter().all(|c| (c.1 > c.0) == up);
-    let wrong_way = (UP.is_match(&text) && all(false)) || (DOWN.is_match(&text) && all(true));
-    wrong_to || wrong_from || wrong_way
+/// The first non-empty line of the first attempt's raw reply.
+fn first_line(generation: &Value) -> Option<&str> {
+    generation["attempts"]
+        .get(0)?
+        .get("raw")?
+        .as_str()?
+        .lines()
+        .map(str::trim)
+        .find(|l| !l.is_empty())
 }
 
 /// The directory a file is in, with a trailing slash; "" at the root.
@@ -533,6 +476,11 @@ pub fn row_of(m: &Value, t: &Value) -> Vec<(&'static str, Metric)> {
         ),
         ("unsupported_visible", Yes(unsupported(subject, &visible))),
         ("contradicted", Yes(contradicted(subject, &hunks))),
+        ("contradicted_real", Yes(contradicted(target, &hunks))),
+        (
+            "first_contradicted",
+            Yes(first_line(g).is_some_and(|line| contradicted(line, &hunks))),
+        ),
         ("unsupported", Yes(unsupported(subject, &known))),
         ("unsupported_real", Yes(unsupported(target, &known))),
         ("ungrounded", Yes(ungrounded(subject, &diff))),

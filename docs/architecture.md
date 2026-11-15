@@ -194,12 +194,16 @@ covers 60% of it; a reply with words of its own is kept), the same for a
 message the user turned down in the review, or cut off: its
 last word is an article, a preposition or a conjunction (`the`, `of`, `to`,
 `for`, `and`), as when the model stops mid-sentence; `in`, `off` and a word in backticks end real subjects and are
-not counted. With greedy
+not counted. The same for a reply that contradicts a number the diff changes
+in place (`to 30` where 30 was the old value, `from 60` where 60 is the new
+one, or a rise or fall word against a diff that is that one change): the
+retry note says what the diff changes. A percentage, a number in a name, or a
+change that is not alone is unknown and never rejects a reply. With greedy
 decoding, repeating the same prompt would give the same reply. If the retry
 is rejected too, the message is built from the file list (for example
 `chore: update 3 files in src/`, with the files in the body), in the
 repository's convention, and a warning says so. When the last
-reply was rejected for what it said (a copy, a cut-off) rather than
+reply was rejected for what it said (a copy, a cut-off, a contradiction) rather than
 its form, the fallback keeps its scope, and its type unless the files tell
 one (all docs, tests or config): models often pick the right type even
 when they copy, and the file list's guess for code is `chore`. Backend errors

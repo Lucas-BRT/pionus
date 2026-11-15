@@ -65,6 +65,10 @@ pub fn retry_note(error: &SanitizeError, convention: Convention) -> String {
             let subject: String = subject.chars().take(message::SUBJECT_MAX).collect();
             format!("\"{subject}\" is a message the user turned down; write a different one")
         }
+        SanitizeError::Contradicted(subject, reason) => {
+            let subject: String = subject.chars().take(message::SUBJECT_MAX).collect();
+            format!("\"{subject}\" contradicts the diff: {reason}; describe what it changes")
+        }
         SanitizeError::CutOff(subject) => {
             let subject: String = subject.chars().take(message::SUBJECT_MAX).collect();
             format!("\"{subject}\" stops in the middle of a sentence; finish it")

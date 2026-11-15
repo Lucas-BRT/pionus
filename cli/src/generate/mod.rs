@@ -157,6 +157,9 @@ pub fn generate_asked(
                 if retry::cut_off(&message.subject) {
                     return Err(SanitizeError::CutOff(message.subject));
                 }
+                if let Some(reason) = crate::diff::contradiction(&message.subject, files) {
+                    return Err(SanitizeError::Contradicted(message.subject, reason));
+                }
                 Ok(message)
             });
         match checked {
@@ -193,7 +196,8 @@ pub fn generate_asked(
         Some(
             SanitizeError::CopiedHistory(_)
             | SanitizeError::TurnedDown(_)
-            | SanitizeError::CutOff(_),
+            | SanitizeError::CutOff(_)
+            | SanitizeError::Contradicted(..),
         ) => message::sanitize_within(&a.raw, convention, options.subject_max)
             .ok()
             .map(|m| m.subject),

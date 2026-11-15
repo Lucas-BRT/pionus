@@ -7,6 +7,7 @@
 pub mod annotate;
 mod classify;
 mod compact;
+mod facts;
 mod parse;
 #[cfg(test)]
 mod tests;
@@ -15,6 +16,7 @@ use serde::{Deserialize, Serialize};
 
 pub use classify::machine_written;
 pub use compact::{compact, compact_annotated};
+pub use facts::{contradiction, contradiction_in};
 pub use parse::parse;
 
 /// Rough characters per token for code and pt/en prose with Qwen-style

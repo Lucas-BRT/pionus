@@ -551,6 +551,54 @@ mod tests {
         assert_eq!(result, Err(BackendError::Generation("device lost".into())));
     }
 
+    fn timeout_files() -> Vec<FileDiff> {
+        vec![FileDiff {
+            path: "src/git.rs".into(),
+            old_path: None,
+            lines: Some((1, 1)),
+            hunks: "@@ -1 +1 @@\n-const TIMEOUT: u64 = 30;\n+const TIMEOUT: u64 = 60;\n".into(),
+        }]
+    }
+
+    fn run_on(files: &[FileDiff], mock: &MockBackend) -> Generation {
+        crate::generate::generate(
+            &context(&["feat: add login"]),
+            files,
+            mock,
+            &PromptOptions::default(),
+            &GenerationConfig::default(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn a_reply_that_moves_a_number_the_wrong_way_is_asked_again_with_the_reason() {
+        let mock = MockBackend::new(["fix: decrease timeout to 30", "fix: raise timeout to 60"]);
+        let generation = run_on(&timeout_files(), &mock);
+        assert_eq!(generation.message.subject, "fix: raise timeout to 60");
+        assert_eq!(generation.attempts.len(), 2);
+        assert!(matches!(
+            generation.attempts[0].rejected,
+            Some(SanitizeError::Contradicted(..))
+        ));
+        let retry = &generation.attempts[1].prompt.user;
+        assert!(
+            retry.contains("contradicts the diff: the diff changes 30 to 60, not to 30"),
+            "{retry}"
+        );
+    }
+
+    #[test]
+    fn two_contradicting_replies_fall_back_and_a_correct_one_is_not_touched() {
+        let wrong = MockBackend::new(["fix: decrease timeout to 30", "fix: lower timeout"]);
+        let generation = run_on(&timeout_files(), &wrong);
+        assert_eq!(generation.source, Source::Fallback);
+        // Nothing to compare in this diff: the same reply is accepted.
+        let generation = run_on(&files(), &MockBackend::new(["fix: decrease timeout to 30"]));
+        assert_eq!(generation.source, Source::Model);
+        assert_eq!(generation.attempts.len(), 1);
+    }
+
     #[test]
     fn only_the_latest_turned_down_subjects_are_named_but_all_are_refused() {
         let turned_down: Vec<String> = ["feat: a", "fix: b", "feat: a", "docs: c", "chore: d"]

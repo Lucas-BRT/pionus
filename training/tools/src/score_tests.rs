@@ -334,3 +334,27 @@ fn hunks_shown_counts_the_changes_the_prompt_has_a_line_of() {
     assert_eq!(hunks_shown(&inputs, "-a = 1\n-c = 1\n"), 2.0 / 3.0);
     assert_eq!(hunks_shown(&json!({"files": []}), ""), 1.0);
 }
+
+#[test]
+fn the_first_reply_is_scored_even_when_a_retry_fixed_it() {
+    let meta = json!({"set": "free", "target": "chore: x"});
+    let trace = json!({
+        "inputs": {"subjects": [], "files": [{"path": "c.rs", "hunks": "@@ -1 +1 @@\n-t = 30\n+t = 60\n"}]},
+        "generation": {
+            "message": {"subject": "fix: raise the timeout to 60"},
+            "source": "model",
+            "attempts": [
+                {"prompt": {"user": ""}, "raw": "fix: decrease timeout to 30", "rejected": {"contradicted": ["fix: decrease timeout to 30", "the diff changes 30 to 60, not to 30"]}},
+                {"prompt": {"user": ""}, "raw": "fix: raise the timeout to 60", "rejected": null},
+            ],
+        },
+    });
+    let flag = |name: &str| {
+        row_of(&meta, &trace)
+            .into_iter()
+            .find(|(n, _)| *n == name)
+            .map(|(_, v)| v)
+    };
+    assert_eq!(flag("first_contradicted"), Some(Metric::Yes(true)));
+    assert_eq!(flag("contradicted"), Some(Metric::Yes(false)));
+}
