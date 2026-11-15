@@ -158,7 +158,9 @@ tags = ["rename"]
 
 # The oracle of `contradicted` (score): the operation fixes which way each
 # number moves, and the same pair is cut both ways so a reply cannot be right
-# by always saying "raise".
+# by always saying "raise". The words of the direction are not asked for (a
+# model may say "update" or "set"): `contradicted` catches a wrong one, and
+# the entity and the new value, as `0.15` or `15%`, show it saw the change.
 [[case]]
 id = "number-direction"
 title = "moves a number up or down"
@@ -171,21 +173,21 @@ tags = ["config", "numbers"]
   [[case.variants]]
   name = "fee-up"
   vars = { old = "service_fee: float = 0.12", new = "service_fee: float = 0.15", target = "raise the service fee to 0.15" }
-  expect = ["raise|increase", "fee", "0\\.15"]
+  expect = ["fee", "0?\\.15|15"]
 
   [[case.variants]]
   name = "fee-down"
   vars = { old = "service_fee: float = 0.12", new = "service_fee: float = 0.05", target = "lower the service fee to 0.05" }
-  expect = ["lower|reduce|decrease", "fee", "0\\.05"]
+  expect = ["fee", "0?\\.05|5%"]
 
   [[case.variants]]
   name = "discount-up"
   split = "train"
   vars = { old = "max_discount: float = 0.30", new = "max_discount: float = 0.40", target = "raise the maximum discount to 0.40" }
-  expect = ["raise|increase", "discount", "0\\.40"]
+  expect = ["discount", "0?\\.4|40"]
 
   [[case.variants]]
   name = "discount-down"
   split = "train"
   vars = { old = "max_discount: float = 0.30", new = "max_discount: float = 0.20", target = "lower the maximum discount to 0.20" }
-  expect = ["lower|reduce|decrease", "discount", "0\\.20"]
+  expect = ["discount", "0?\\.2|20"]
