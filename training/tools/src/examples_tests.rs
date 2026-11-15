@@ -14,7 +14,7 @@ fn fake_prompt_binary() -> std::path::PathBuf {
 n=$(wc -l < "$3")
 i=0
 while [ "$i" -lt "$n" ]; do
-  echo "{\"system\": \"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] café\", \"user\": \"u$i\"}"
+  echo "{\"system\": \"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] cfg=[$(tr '\n' ' ' < "$XDG_CONFIG_HOME/pionus/config.toml" 2>/dev/null)] café\", \"user\": \"u$i\"}"
   i=$((i+1))
 done
 "#;
@@ -69,7 +69,16 @@ fn the_examples_carry_the_prompt_the_target_without_its_period_and_where_it_came
         &["feat: add x.", "fix: handle y...", "docs: z", "fix: w. "],
     );
     assert_eq!(
-        make_examples(dir.path(), &fake_prompt_binary(), "full", "plain", "list").unwrap(),
+        make_examples(
+            dir.path(),
+            &fake_prompt_binary(),
+            "full",
+            "plain",
+            "list",
+            "off",
+            1024
+        )
+        .unwrap(),
         4
     );
     let got = examples(dir.path());
@@ -109,7 +118,16 @@ fn rules_the_file_list_and_scopes_are_always_passed_and_nothing_of_the_environme
         ("omitted", "annotated", "list"),
         ("full", "annotated", "map"),
     ] {
-        make_examples(dir.path(), &fake_prompt_binary(), rules, diff, scopes).unwrap();
+        make_examples(
+            dir.path(),
+            &fake_prompt_binary(),
+            rules,
+            diff,
+            scopes,
+            "off",
+            1024,
+        )
+        .unwrap();
         let system = examples(dir.path())[0]["system"]
             .as_str()
             .unwrap()
@@ -135,9 +153,17 @@ fn a_prompt_for_every_case_or_an_error() {
     let dir = tempfile::TempDir::new().unwrap();
     write_set(dir.path(), &["feat: a", "feat: b"]);
     std::fs::write(dir.path().join("meta.jsonl"), "{}\n").unwrap();
-    let err = make_examples(dir.path(), &fake_prompt_binary(), "full", "plain", "list")
-        .unwrap_err()
-        .to_string();
+    let err = make_examples(
+        dir.path(),
+        &fake_prompt_binary(),
+        "full",
+        "plain",
+        "list",
+        "off",
+        1024,
+    )
+    .unwrap_err()
+    .to_string();
     assert!(err.contains("2 prompts for 1 cases"), "{err}");
     let err = make_examples(
         dir.path(),
@@ -145,6 +171,8 @@ fn a_prompt_for_every_case_or_an_error() {
         "full",
         "plain",
         "list",
+        "off",
+        1024,
     )
     .unwrap_err()
     .to_string();
@@ -244,4 +272,41 @@ fn the_ranking_is_by_the_salted_hash_not_the_plain_one_and_a_size_too_big_is_ref
     assert!(first.contains(&format!("\"{salted_first}\"")), "{first}");
     let err = nest(&src, &prefix, &[3]).unwrap_err().to_string();
     assert!(err.contains("3 examples asked of 2"), "{err}");
+}
+
+#[test]
+fn the_budget_and_the_facts_line_are_passed_only_when_they_are_not_the_defaults() {
+    let dir = tempfile::TempDir::new().unwrap();
+    write_set(dir.path(), &["feat: a"]);
+    let system = |facts: &str, tokens: usize| {
+        make_examples(
+            dir.path(),
+            &fake_prompt_binary(),
+            "full",
+            "plain",
+            "list",
+            facts,
+            tokens,
+        )
+        .unwrap();
+        examples(dir.path())[0]["system"]
+            .as_str()
+            .unwrap()
+            .to_owned()
+    };
+    // The defaults say nothing: the prompts are the ones of every set so far.
+    let plain = system("off", 1024);
+    assert!(
+        !plain.contains("--facts") && plain.contains("cfg=[]"),
+        "{plain}"
+    );
+    let on = system("on", 2048);
+    assert!(on.contains("--scopes list --facts on "), "{on}");
+    assert!(
+        on.contains("cfg=[[model] max_prompt_tokens = 2048 ]"),
+        "{on}"
+    );
+    // Only one of them at a time.
+    assert!(!system("off", 2048).contains("--facts"));
+    assert!(system("on", 1024).contains("cfg=[]"));
 }

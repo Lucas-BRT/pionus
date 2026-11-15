@@ -160,6 +160,13 @@ enum Command {
         /// inputs with the history's paths.
         #[arg(long, default_value = "list")]
         scopes: String,
+        /// `on` adds the line of the numbers that changed, for a binary that
+        /// has `--facts`.
+        #[arg(long, default_value = "off")]
+        facts: String,
+        /// The prompt budget the prompts are cut for (`model.max_prompt_tokens`).
+        #[arg(long, default_value_t = pionus::prompt::DEFAULT_MAX_PROMPT_TOKENS)]
+        max_prompt_tokens: usize,
     },
     /// Nested subsets of an examples file, for a learning curve:
     /// `PREFIX-N.jsonl` for each size.
@@ -393,8 +400,18 @@ fn run(cli: Cli) -> Result<()> {
             rules,
             diff,
             scopes,
+            facts,
+            max_prompt_tokens,
         } => {
-            let n = examples::make_examples(&dir, &binary, &rules, &diff, &scopes)?;
+            let n = examples::make_examples(
+                &dir,
+                &binary,
+                &rules,
+                &diff,
+                &scopes,
+                &facts,
+                max_prompt_tokens,
+            )?;
             eprintln!("{n} examples in {}", dir.join("examples.jsonl").display());
             Ok(())
         }

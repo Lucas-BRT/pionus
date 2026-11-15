@@ -80,6 +80,10 @@ $SCT filter-supported data/h1 data/h3a
 #    was trained on the plain one: make-examples passes `--rules` and `--diff`
 #    always, plain by default, and `--diff annotated` builds the other (the
 #    Python script it replaces had no `--diff`, and ran with the annotated one).
+#    `--max-prompt-tokens N` cuts the diff for another budget than 1024 (the
+#    binary is given a configuration with it; `train.py`'s `--max-length` must
+#    hold the longer prompts, or it skips them), and `--facts on` adds the line
+#    of the numbers that changed, for a binary that has it.
 $SCT make-examples data/h1 $SC
 
 #    Nested subsets for a learning curve (H3) or a smaller run (H8):

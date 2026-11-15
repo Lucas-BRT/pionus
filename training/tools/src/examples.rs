@@ -24,21 +24,42 @@ use crate::pytext::read_lines as lines_of;
 
 /// Writes `DIR/examples.jsonl` from `DIR/inputs.jsonl` and `DIR/meta.jsonl`;
 /// how many examples.
+///
+/// `facts` is `on` for the line of the numbers that changed, which only a
+/// binary that has the option takes (it is passed when on, never otherwise).
+/// `max_prompt_tokens` is written to the configuration directory the binary
+/// reads when it is not pionus's default of 1024, so the prompts are cut for
+/// the budget the model will be given.
 pub fn make_examples(
     dir: &Path,
     binary: &Path,
     rules: &str,
     diff: &str,
     scopes: &str,
+    facts: &str,
+    max_prompt_tokens: usize,
 ) -> Result<usize> {
     let config_home = tempfile::TempDir::new()?;
-    let done = Command::new(binary)
+    if max_prompt_tokens != pionus::prompt::DEFAULT_MAX_PROMPT_TOKENS {
+        let file = config_home.path().join("pionus/config.toml");
+        std::fs::create_dir_all(file.parent().expect("a directory"))?;
+        std::fs::write(
+            file,
+            format!("[model]\nmax_prompt_tokens = {max_prompt_tokens}\n"),
+        )?;
+    }
+    let mut command = Command::new(binary);
+    command
         .env_clear()
         .env("XDG_CONFIG_HOME", config_home.path())
         .env("PATH", "/usr/bin:/bin")
         .args(["prompt", "--inputs"])
         .arg(dir.join("inputs.jsonl"))
-        .args(["--rules", rules, "--diff", diff, "--scopes", scopes])
+        .args(["--rules", rules, "--diff", diff, "--scopes", scopes]);
+    if facts == "on" {
+        command.args(["--facts", "on"]);
+    }
+    let done = command
         .output()
         .with_context(|| format!("cannot run {}", binary.display()))?;
     if !done.status.success() {
