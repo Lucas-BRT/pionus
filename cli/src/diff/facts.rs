@@ -35,11 +35,18 @@ fn numbers(line: &str) -> Vec<(usize, usize)> {
         while end < bytes.len() && bytes[end].is_ascii_digit() {
             end += 1;
         }
-        if end + 1 < bytes.len() && bytes[end] == b'.' && bytes[end + 1].is_ascii_digit() {
+        let mut dots = 0;
+        while end + 1 < bytes.len() && bytes[end] == b'.' && bytes[end + 1].is_ascii_digit() {
+            dots += 1;
             end += 1;
             while end < bytes.len() && bytes[end].is_ascii_digit() {
                 end += 1;
             }
+        }
+        // `1.2.3` is a version, not a number that moved: it is left out.
+        if dots > 1 {
+            i = end;
+            continue;
         }
         if start > 0 && bytes[start - 1] == b'-' {
             let before = start.checked_sub(2).map(|p| bytes[p]);
@@ -195,6 +202,29 @@ pub fn contradiction_in(subject: &str, hunks: &str) -> Option<String> {
         }
     }
     None
+}
+
+/// Most numbers listed.
+const MAX_FACTS: usize = 4;
+
+/// The numbers that changed in place in `files`, as one line for the prompt,
+/// or `None` when none did: read from every source, config and test file, not
+/// only the hunks the prompt has room for.
+pub fn described(files: &[FileDiff]) -> Option<String> {
+    let mut facts: Vec<String> = Vec::new();
+    for file in files {
+        if file.hunks.is_empty() || super::FileKind::of(file).is_noise() {
+            continue;
+        }
+        for c in changes(&file.hunks) {
+            let fact = format!("{} -> {} ({})", c.old_text, c.new_text, file.path);
+            if !facts.contains(&fact) {
+                facts.push(fact);
+            }
+        }
+    }
+    facts.truncate(MAX_FACTS);
+    (!facts.is_empty()).then(|| format!("Numbers that changed: {}.\n", facts.join("; ")))
 }
 
 /// [`contradiction_in`] over the hunks of `files`.

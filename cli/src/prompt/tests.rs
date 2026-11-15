@@ -719,6 +719,88 @@ fn the_names_are_recorded_only_when_asked() {
     assert_eq!(read, names_on());
 }
 
+fn facts_on() -> PromptOptions {
+    PromptOptions {
+        facts: PromptFacts::On,
+        ..PromptOptions::default()
+    }
+}
+
+fn timeout() -> Vec<FileDiff> {
+    vec![FileDiff {
+        path: "src/config.rs".into(),
+        old_path: None,
+        lines: Some((1, 1)),
+        hunks: "@@ -1 +1 @@\n-const TIMEOUT: u64 = 30;\n+const TIMEOUT: u64 = 60;\n".into(),
+    }]
+}
+
+#[test]
+fn the_numbers_that_changed_are_a_line_between_the_files_and_the_diff() {
+    let ctx = context(&["feat: add history"], None);
+    let off = build(&ctx, &timeout(), &PromptOptions::default());
+    assert!(!off.user.contains("Numbers that changed"), "{}", off.user);
+    let on = build(&ctx, &timeout(), &facts_on());
+    let line = "Numbers that changed: 30 -> 60 (src/config.rs).";
+    let at = |needle: &str| {
+        on.user
+            .find(needle)
+            .unwrap_or_else(|| panic!("{needle} in {}", on.user))
+    };
+    assert!(at("Files changed:") < at(line) && at(line) < at("Diff:"));
+    // Only the user message gains the line: the diff keeps its room.
+    assert_eq!(on.system, off.system);
+    assert_eq!(on.user.replace(&format!("\n{line}\n"), ""), off.user);
+}
+
+#[test]
+fn with_the_names_too_both_lines_come_before_the_diff() {
+    let ctx = context(&["feat: add history"], None);
+    let both = PromptOptions {
+        names: PromptNames::On,
+        facts: PromptFacts::On,
+        ..PromptOptions::default()
+    };
+    let files = vec![FileDiff {
+        path: "src/git.rs".into(),
+        old_path: None,
+        lines: Some((3, 3)),
+        hunks: "@@ -80,3 +80,3 @@ impl Repo {\n-    fn retry(&self) { let n = 1; }\n+    fn retry(&self) { let n = 2; }\n".into(),
+    }];
+    let user = build(&ctx, &files, &both).user;
+    let names = user.find("Names touched").expect("names");
+    let facts = user
+        .find("Numbers that changed: 1 -> 2 (src/git.rs).")
+        .expect("facts");
+    assert!(
+        names < facts && facts < user.find("Diff:").unwrap(),
+        "{user}"
+    );
+}
+
+#[test]
+fn a_change_without_numbers_gets_no_facts_line_and_the_option_is_recorded_only_when_asked() {
+    let ctx = context(&["feat: add history"], None);
+    let none = vec![FileDiff {
+        path: "src/git.rs".into(),
+        old_path: None,
+        lines: Some((1, 1)),
+        hunks: "@@ -1 +1 @@\n-let a = b;\n+let a = c;\n".into(),
+    }];
+    assert_eq!(
+        build(&ctx, &none, &facts_on()),
+        build(&ctx, &none, &PromptOptions::default())
+    );
+    let json = serde_json::to_string(&PromptOptions::default()).unwrap();
+    assert!(!json.contains("\"facts\""), "{json}");
+    let json = serde_json::to_string(&facts_on()).unwrap();
+    assert!(json.contains("\"facts\":\"on\""), "{json}");
+    assert_eq!(
+        serde_json::from_str::<PromptOptions>(&json).unwrap(),
+        facts_on()
+    );
+}
+
 /// Eight scopes whose commits touched three places each, `depth` directories deep.
 fn deep_monorepo(depth: usize) -> RepoContext {
     let dir = |scope: usize, place: usize| {

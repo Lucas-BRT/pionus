@@ -6,7 +6,7 @@ use anyhow::Result;
 use clap::{Args, ValueEnum};
 use pionus::backend::device::Target;
 use pionus::prompt::{
-    DiffFormat, PromptExamples, PromptNames, PromptOptions, PromptRules, PromptScopes,
+    DiffFormat, PromptExamples, PromptFacts, PromptNames, PromptOptions, PromptRules, PromptScopes,
 };
 
 #[derive(Debug, Args)]
@@ -74,6 +74,10 @@ pub(super) struct PromptArgs {
     /// [default: off]
     #[arg(long, value_enum)]
     names: Option<NamesArg>,
+    /// A line with the numbers that changed in place (`30 -> 60`), read
+    /// from every file [default: off]
+    #[arg(long, value_enum)]
+    facts: Option<NamesArg>,
 }
 
 impl PromptArgs {
@@ -101,6 +105,12 @@ impl PromptArgs {
             options.names = match names {
                 NamesArg::Off => PromptNames::Off,
                 NamesArg::On => PromptNames::On,
+            };
+        }
+        if let Some(facts) = self.facts {
+            options.facts = match facts {
+                NamesArg::Off => PromptFacts::Off,
+                NamesArg::On => PromptFacts::On,
             };
         }
         if let Some(diff) = self.diff {

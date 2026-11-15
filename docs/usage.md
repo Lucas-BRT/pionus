@@ -287,7 +287,9 @@ instead of the names alone, for a model trained that way. `--examples
 similar` (or `mixed`) picks the example subjects among the commits that
 touched files close to the staged ones instead of the most recent, and
 `--names on`, which adds a line with the functions, classes and the like the
-change declares and one with the comments it adds, to evaluate those.
+change declares and one with the comments it adds, and `--facts on`, which
+adds a line with the numbers that changed in place (`30 -> 60 (src/config.rs)`),
+to evaluate those.
 
 ## Devices
 

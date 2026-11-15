@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 pub use classify::machine_written;
 pub use compact::{compact, compact_annotated};
-pub use facts::{contradiction, contradiction_in};
+pub use facts::{contradiction, contradiction_in, described};
 pub use parse::parse;
 
 /// Rough characters per token for code and pt/en prose with Qwen-style

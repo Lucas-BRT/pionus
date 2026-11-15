@@ -13,8 +13,8 @@ mod tests;
 
 pub use system::listed_types;
 pub use types::{
-    DEFAULT_MAX_PROMPT_TOKENS, DiffFormat, Prompt, PromptExamples, PromptNames, PromptOptions,
-    PromptRules, PromptScopes,
+    DEFAULT_MAX_PROMPT_TOKENS, DiffFormat, Prompt, PromptExamples, PromptFacts, PromptNames,
+    PromptOptions, PromptRules, PromptScopes,
 };
 
 use crate::context::RepoContext;
@@ -77,6 +77,14 @@ pub fn build_with_note(
         PromptNames::Off => None,
         PromptNames::On => names::touched(files),
     };
-    let user = user::user_message(&compacted, names.as_deref(), note);
+    let facts = match options.facts {
+        PromptFacts::Off => None,
+        PromptFacts::On => diff::described(files),
+    };
+    let extras = match (names, facts) {
+        (Some(names), Some(facts)) => Some(format!("{names}{facts}")),
+        (names, facts) => names.or(facts),
+    };
+    let user = user::user_message(&compacted, extras.as_deref(), note);
     Prompt { system, user }
 }
