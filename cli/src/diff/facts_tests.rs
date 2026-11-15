@@ -88,3 +88,49 @@ fn the_numbers_that_changed_are_listed_per_file_and_versions_are_not() {
     let line = described(&[file("a.rs", &many)]).unwrap();
     assert_eq!(line.matches(" -> ").count(), 4);
 }
+
+#[test]
+fn right_paraphrases_pass_and_wrong_ones_are_caught() {
+    // 30 -> 60: what a person or a model may write about it.
+    for right in [
+        "fix: raise the timeout to 60",
+        "fix: increase TIMEOUT from 30 to 60",
+        "chore: bump timeout from 30 to 60",
+        "fix: timeout is now 60 (was 30)",
+        "fix(net): set TIMEOUT to 60",
+        "fix: double the timeout",
+        "fix: allow slow disks, timeout 30 -> 60",
+        "fix: update the timeout",
+        "fix: raise the timeout to 60 seconds",
+        "fix: a longer timeout, up to 60.",
+    ] {
+        assert_eq!(contradiction_in(right, TIMEOUT), None, "{right}");
+    }
+    for wrong in [
+        "fix: lower the timeout to 30",
+        "fix: reduce the timeout from 60 to 30",
+        "fix: decrease timeout to 30",
+        "fix: shorten nothing, set the timeout to 30",
+        "fix: the timeout goes from 60",
+        "fix: increase the timeout to 30",
+    ] {
+        assert!(contradiction_in(wrong, TIMEOUT).is_some(), "{wrong}");
+    }
+}
+
+#[test]
+fn an_ambiguous_change_never_rejects_a_reply() {
+    // Two numbers in one line, or a number that is not what the reply names:
+    // not a plain pair, so the reply is not judged on it.
+    let two = "@@ -1 +1 @@\n-size = (30, 40)\n+size = (60, 40)\n";
+    assert_eq!(contradiction_in("fix: set the width to 60", two), None);
+    assert!(contradiction_in("fix: set the width to 30", two).is_some());
+    // Several files changing the same number to different values: either
+    // direction is in the diff, and "to N" is only wrong when no change ends there.
+    let both = "@@ -1 +1 @@\n-a = 30\n+a = 60\n@@ -9 +9 @@\n-b = 10\n+b = 30\n";
+    assert_eq!(contradiction_in("fix: set b to 30", both), None);
+    assert_eq!(contradiction_in("fix: lower the limits", both), None);
+    // A removed line with nothing added is not a changed number.
+    let gone = "@@ -1,2 +1 @@\n-const OLD: u64 = 30;\n const KEEP: u64 = 1;\n";
+    assert_eq!(contradiction_in("fix: set it to 30", gone), None);
+}
