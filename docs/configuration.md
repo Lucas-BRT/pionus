@@ -85,8 +85,10 @@ value, for example when an environment variable is set.
   | `quality` | `pionus-1.5b-v0.3` | 2048 |
 
   `off`, the default, changes nothing: an existing configuration behaves as
-  before. These are starting points to be measured, not promises of speed or
-  quality; the fine-tunes are experimental and have no OpenVINO export, so a
+  before. The presets are starting points: what they cost
+  ([measurements](measurements.md#by-mode)) and what they score
+  ([training](training.md#the-three-modes)) is measured on one machine, and
+  `quality` shows more of the diff without a measured gain in the messages; the fine-tunes are experimental and have no OpenVINO export, so a
   mode runs on `vulkan` and `cpu` (`pionus model` and `pionus config` show the
   model and where it came from, `mode fast` and so on).
 - `model.vulkan_device` picks a GPU on machines with more than one, as

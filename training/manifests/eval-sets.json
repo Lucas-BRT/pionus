@@ -42,6 +42,26 @@
         }
       }
     },
+    "eval-v2": {
+      "n": 250,
+      "repos": 24,
+      "owners": 24,
+      "largest_repo_share": 0.156,
+      "duplicate_targets": 0,
+      "sets": {
+        "free": 250
+      },
+      "files": {
+        "inputs": {
+          "lines": 250,
+          "sha256": "6233f5c0351076ea6352dfc5455867c69dead2a3c1b4a558222806ccc44a4965"
+        },
+        "meta": {
+          "lines": 250,
+          "sha256": "d41eb92782e0c56504701c1bfc7878b780eff146d97be4e244ba6410e2b410e8"
+        }
+      }
+    },
     "pilot1": {
       "n": 200,
       "repos": 143,
@@ -108,6 +128,15 @@
   "overlap": [
     {
       "a": "eval-v1",
+      "b": "eval-short",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 7,
+      "a_commits_from_shared_owners": 26
+    },
+    {
+      "a": "eval-v1",
       "b": "pilot1",
       "hashes": 0,
       "repos": 0,
@@ -135,6 +164,15 @@
     },
     {
       "a": "eval-short",
+      "b": "eval-v1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 7,
+      "a_commits_from_shared_owners": 11
+    },
+    {
+      "a": "eval-short",
       "b": "pilot1",
       "hashes": 0,
       "repos": 0,
@@ -159,6 +197,51 @@
       "targets": 0,
       "owners": 13,
       "a_commits_from_shared_owners": 30
+    },
+    {
+      "a": "eval-v2",
+      "b": "eval-v1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 1,
+      "a_commits_from_shared_owners": 9
+    },
+    {
+      "a": "eval-v2",
+      "b": "eval-short",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 2,
+      "a_commits_from_shared_owners": 22
+    },
+    {
+      "a": "eval-v2",
+      "b": "pilot1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 0,
+      "a_commits_from_shared_owners": 0
+    },
+    {
+      "a": "eval-v2",
+      "b": "judge1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 1,
+      "a_commits_from_shared_owners": 3
+    },
+    {
+      "a": "eval-v2",
+      "b": "dpo2-mine-all",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 0,
+      "a_commits_from_shared_owners": 0
     }
   ]
 }

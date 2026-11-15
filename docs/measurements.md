@@ -77,6 +77,34 @@ Earlier measurements, on prompts of about 250 tokens, gave the Core Ultra 5
 8.3 s on the Ryzen. The 7B model's time is mostly loading: on the RTX 3050,
 7.8 s of 8.3 s is copying 4.4 GB to the GPU, and generating takes 0.45 s.
 
+## By mode
+
+Ryzen 5 5500, RTX 3050 (8 GiB) on `vulkan`, release build of commit `7691599`;
+each mode through `pionus eval` with `PIONUS_MODE` and a config home with
+nothing in it, on the first 20 and the first 100 inputs of eval-v1 (greedy
+decoding, so a rerun gives the same replies). The time per message is
+`(t100 − t20) / 80` and the load is what is left of `t20` (process start and
+model load), over 4 runs; the range is the lowest and highest run.
+
+| Mode | Model | Prompt | Per message, model loaded | Load | VRAM above the desktop's |
+|---|---|---|---|---|---|
+| `fast` | `pionus-0.5b-v0.3` | 1024 | **0.16 s** (0.14–0.17) | 1.3 s | ~470 MiB |
+| `balanced` | `pionus-1.5b-v0.3` | 1024 | 0.26 s (0.25–0.27) | 2.1 s | ~1090 MiB |
+| `quality` | `pionus-1.5b-v0.3` | 2048 | 0.29 s (0.28–0.30) | 2.3 s | ~1120 MiB |
+
+A message that loads the model costs the load plus the time per message
+(`balanced`: 2.3 s, as the table above gives the 1.5B v0.1). The VRAM is one
+run's peak of `nvidia-smi` minus its reading before the run, and the desktop
+was using about 1 GiB of the GPU's memory then, so it is rough. What the modes
+score is in [training](training.md#the-three-modes).
+
+```bash
+for mode in fast balanced quality; do
+  XDG_CONFIG_HOME=$(mktemp -d) PIONUS_MODE=$mode time \
+    pionus eval inputs-20.jsonl --device vulkan > /dev/null
+done   # then the same with 100 inputs
+```
+
 ## Fast load
 
 Each commit starts `llama-server`, and most of a commit is that start.

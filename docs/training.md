@@ -264,6 +264,46 @@ DPO removes what the SFT model's replies got wrong (invented specifics,
 copied history subjects, falling back to the file list) at no cost to the
 scope, and does not improve the type significantly.
 
+### The three modes
+
+`model.mode` (see [configuration](configuration.md)) with the Ryzen 5 5500 and
+the RTX 3050 on `vulkan`, timings in [measurements](measurements.md#by-mode).
+One run each, on eval-v1 (500 commits, 70 repositories) and on eval-v2 (250
+free commits of 24 repositories in none of the other sets, built with
+`select` on the same shard, so a replicate of the free style only: the other
+shards have no Conventional repository left). Greedy decoding gives the same
+replies on every run, so a rerun on the same inputs says nothing: the second
+set is what gives the first one margin.
+
+| Set | Metric | `fast` | `balanced` | `quality` |
+|---|---|---|---|---|
+| eval-v1 | `type_match` (Conventional) | 0.672 | 0.692 | 0.700 |
+| eval-v1 | `type_macro_f1` (Conventional) | 0.553 | 0.603 | 0.618 |
+| eval-v1 | `word_f1` | 0.302 | 0.313 | 0.324 |
+| eval-v1 | `ungrounded` | 0.006 | 0.026 | 0.028 |
+| eval-v1 | `truncated` | 0.246 | 0.246 | 0.104 |
+| eval-v1 | `evidence_kept` | 0.825 | 0.824 | 0.938 |
+| eval-v2 | `word_f1` | 0.263 | 0.276 | 0.277 |
+| eval-v2 | `ungrounded` | 0.008 | 0.020 | 0.020 |
+| eval-v2 | `truncated` | 0.200 | 0.200 | 0.064 |
+| eval-v2 | `evidence_kept` | 0.893 | 0.893 | 0.968 |
+| scenarios | `expected` | 0.489 | 0.702 | 0.681 |
+
+- A prompt twice as long (`quality` against `balanced`) cuts the share of
+  prompts with a cut file from 0.25 to 0.10 on eval-v1 and from 0.20 to 0.06 on
+  eval-v2 (+0/−71 and +0/−34 cases, p = 0.0), and the changed lines shown rise
+  from 0.82 to 0.94 and from 0.89 to 0.97. The messages do not show a
+  measurable gain: `type_match` +4/−2 (p = 0.69), `ungrounded` +1/−0, `expected`
+  on the scenarios +0/−1.
+- `balanced` against `fast`: `type_macro_f1` 0.603 against 0.553 and the
+  scenarios' `expected` +11/−1 (p = 0.006), but `fast` invents less on eval-v1
+  (`ungrounded` +12/−2 for `balanced`, p = 0.013; `unsupported_visible`
+  +8/−1, p = 0.039). On eval-v2 the same direction, not significant
+  (`ungrounded` +3/−0, p = 0.25).
+- The `ungrounded`, `evidence_kept` and `truncated` columns are lexical or
+  count lines: they do not say whether a message is better written for seeing
+  more of the diff.
+
 ## Training
 
 - LoRA with `transformers` and `peft`, in a Python environment with every

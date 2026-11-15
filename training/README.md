@@ -128,10 +128,17 @@ sha256sum data/eval-v1/*.jsonl
 `test-00002`…`test-00005`; `inputs.jsonl` sha256 starts `42d212c0d2687dad`,
 `meta.jsonl` `867c9faf4c5e80bd`.
 
+`data/eval-v2` (250 free commits of 24 repositories in no other set, a
+replicate of the free style; the shard has no Conventional repository left):
+`pionus-training select data/test0-v1 data/eval-v2 --conventional 250 --free 250
+--exclude-repos-of data/eval-v1 data/eval-short data/judge1 data/pilot1
+data/dpo2-mine-all`; `inputs.jsonl` sha256 starts `6233f5c0351076ea`.
+
 Audit and pin the sets (what they hold, their hashes, what they share with
 what a model trained on; the output is `manifests/eval-sets.json`):
-`pionus-training manifest data/eval-v1 data/eval-short --against data/pilot1
-data/judge1 data/dpo2-mine-all > manifests/eval-sets.json`.
+`pionus-training manifest data/eval-v1 data/eval-short data/eval-v2 --against
+data/eval-v1 data/eval-short data/pilot1 data/judge1 data/dpo2-mine-all >
+manifests/eval-sets.json`.
 
 Bundle `data/kaggle/h8` (H8): `$SCT make-examples data/h8 $SC`, then
 `$SCT nest data/h8/examples.jsonl data/h8/nocap 20000`, then
