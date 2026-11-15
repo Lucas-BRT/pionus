@@ -8,6 +8,7 @@ mod build_scenarios;
 mod compare;
 mod examples;
 mod kaggle;
+mod manifest;
 mod mt;
 mod pairs;
 mod pyjson;
@@ -78,6 +79,16 @@ enum Command {
         /// Leave out the repositories of these selections (the evaluation sets).
         #[arg(long, num_args = 1..)]
         exclude_repos_of: Vec<PathBuf>,
+    },
+    /// What evaluation sets hold, the SHA-256 of their files and what they
+    /// share with other sets (commits, repositories, targets, owners), as JSON.
+    Manifest {
+        /// Directories with `inputs.jsonl` and `meta.jsonl`.
+        #[arg(required = true)]
+        sets: Vec<PathBuf>,
+        /// Sets each of them must stay apart from (what a model trained on).
+        #[arg(long, num_args = 1..)]
+        against: Vec<PathBuf>,
     },
     /// Drops from a selection the commits a cleaner label set leaves out.
     FilterSupported { src: PathBuf, out: PathBuf },
@@ -322,6 +333,11 @@ fn run(cli: Cli) -> Result<()> {
             exclude_hashes_of,
             exclude_repos_of,
         }),
+        Command::Manifest { sets, against } => {
+            let report = manifest::manifest(&sets, &against)?;
+            println!("{}", serde_json::to_string_pretty(&report)?);
+            Ok(())
+        }
         Command::FilterSupported { src, out } => select::filter_supported(&src, &out),
         Command::Pairs {
             candidates,

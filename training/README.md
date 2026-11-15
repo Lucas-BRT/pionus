@@ -128,6 +128,11 @@ sha256sum data/eval-v1/*.jsonl
 `test-00002`…`test-00005`; `inputs.jsonl` sha256 starts `42d212c0d2687dad`,
 `meta.jsonl` `867c9faf4c5e80bd`.
 
+Audit and pin the sets (what they hold, their hashes, what they share with
+what a model trained on; the output is `manifests/eval-sets.json`):
+`pionus-training manifest data/eval-v1 data/eval-short --against data/pilot1
+data/judge1 data/dpo2-mine-all > manifests/eval-sets.json`.
+
 Bundle `data/kaggle/h8` (H8): `$SCT make-examples data/h8 $SC`, then
 `$SCT nest data/h8/examples.jsonl data/h8/nocap 20000`, then
 `$SCT kaggle-bundle train data/kaggle/h8 --val data/kaggle/b2/val.examples.jsonl

@@ -167,6 +167,14 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   repositories never seen in training, 250 Conventional and 250 free;
   **eval-short**: 197 commits of young repositories (1–5 history subjects).
   How to rebuild both is in [training/README.md](../training/README.md).
+  `pionus-training manifest` lists what each set holds and the SHA-256 of its
+  files, and counts what it shares with the sets a model trained on (commits,
+  repositories, targets, owners); `training/manifests/eval-sets.json` is its
+  output for the sets and the DPO inputs on hand. Commits come from the same
+  *owners* (`apache`, `microsoft`) in a few DPO inputs, 100 of eval-v1's 500:
+  an owner's conventions travel across its repositories, a softer leak than a
+  shared repository, of which there is none. The metadata has no dates, so a
+  split by time is not audited.
 - **Scenarios**: hand-written cases of git operations on two synthetic
   repositories (Python with free style, TypeScript with
   Conventional Commits), by level of complexity from a typo to a merge in

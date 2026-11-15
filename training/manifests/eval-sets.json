@@ -1,0 +1,164 @@
+{
+  "sets": {
+    "eval-v1": {
+      "n": 500,
+      "repos": 70,
+      "owners": 66,
+      "largest_repo_share": 0.08,
+      "duplicate_targets": 0,
+      "sets": {
+        "conventional": 250,
+        "free": 250
+      },
+      "files": {
+        "inputs": {
+          "lines": 500,
+          "sha256": "6d275f0d92c607e5f80cc3be204d5a8a4444391e029abc907eb311b3f29e428c"
+        },
+        "meta": {
+          "lines": 500,
+          "sha256": "9b8d53df9863d6b214c53d2de2839ce18f26fc088d9a3e8a2f84202a44e0faaf"
+        }
+      }
+    },
+    "eval-short": {
+      "n": 197,
+      "repos": 145,
+      "owners": 137,
+      "largest_repo_share": 0.025,
+      "duplicate_targets": 0,
+      "sets": {
+        "conventional": 47,
+        "free": 150
+      },
+      "files": {
+        "inputs": {
+          "lines": 197,
+          "sha256": "42d212c0d2687dadf4fa0df3cbfb19444b67a39b93770a85ecf95d18caa92497"
+        },
+        "meta": {
+          "lines": 197,
+          "sha256": "867c9faf4c5e80bd95e3dd3ccecf7695f1f674cae0865de154f5229debb21904"
+        }
+      }
+    },
+    "pilot1": {
+      "n": 200,
+      "repos": 143,
+      "owners": 136,
+      "largest_repo_share": 0.01,
+      "duplicate_targets": 0,
+      "sets": {
+        "conventional": 100,
+        "free": 100
+      },
+      "files": {
+        "inputs": {
+          "lines": 200,
+          "sha256": "0152673799c25ff5c52c8947299f2247f22589f218b7c2d031a8e384a99bc0bf"
+        },
+        "meta": {
+          "lines": 200,
+          "sha256": "c9843b80ec39f7bafcc9e74193708daec13b38ba94f41deb492fccc03d66abbd"
+        }
+      }
+    },
+    "judge1": {
+      "n": 300,
+      "repos": 84,
+      "owners": 82,
+      "largest_repo_share": 0.02,
+      "duplicate_targets": 0,
+      "sets": {
+        "conventional": 150,
+        "free": 150
+      },
+      "files": {
+        "inputs": {
+          "lines": 300,
+          "sha256": "89228be577152543aa8a8d8d7d105b8c5beff6a243baf89c84cd64ed001993f4"
+        },
+        "meta": {
+          "lines": 300,
+          "sha256": "d2dd18b5e888c411eea0b77e521bc72f0e9b6fde7d1e5036e6cf7cbabee7ed8b"
+        }
+      }
+    },
+    "dpo2-mine-all": {
+      "n": 5500,
+      "repos": 741,
+      "owners": 571,
+      "largest_repo_share": 0.002,
+      "duplicate_targets": 4,
+      "sets": {
+        "conventional": 5500
+      },
+      "files": {
+        "inputs": {
+          "lines": 5500,
+          "sha256": "01e55a16c8eb537d894f3835bc1ed2c4ba40d47e350ba6b1f24a211361e735b6"
+        },
+        "meta": {
+          "lines": 5500,
+          "sha256": "5ccaeb7651a6246af0df9bef442255a86e2d201a1cf6ef7d27ba1d5c5020ccaa"
+        }
+      }
+    }
+  },
+  "overlap": [
+    {
+      "a": "eval-v1",
+      "b": "pilot1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 4,
+      "a_commits_from_shared_owners": 24
+    },
+    {
+      "a": "eval-v1",
+      "b": "judge1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 2,
+      "a_commits_from_shared_owners": 19
+    },
+    {
+      "a": "eval-v1",
+      "b": "dpo2-mine-all",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 6,
+      "a_commits_from_shared_owners": 100
+    },
+    {
+      "a": "eval-short",
+      "b": "pilot1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 4,
+      "a_commits_from_shared_owners": 11
+    },
+    {
+      "a": "eval-short",
+      "b": "judge1",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 2,
+      "a_commits_from_shared_owners": 6
+    },
+    {
+      "a": "eval-short",
+      "b": "dpo2-mine-all",
+      "hashes": 0,
+      "repos": 0,
+      "targets": 0,
+      "owners": 13,
+      "a_commits_from_shared_owners": 30
+    }
+  ]
+}
