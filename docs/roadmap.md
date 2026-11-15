@@ -26,7 +26,8 @@
   `pionus-0.5b-v0.3` and `pionus-1.5b-v0.3`, the v0.1 models trained
   further on their own samples, as experimental models.
 - Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the
-  model, and the prompt size of `quality` (4096), where nothing else set them;
+  model where nothing else set it, and `quality` asks for a prompt of 4096 on the
+  llama.cpp devices;
   `fast` also asks for one reply, not two, traces name the mode, and `pionus
   model mode`, the model picker (`p`) and the setup (`p`) choose it. The extra
   context of `quality` and a choice on the review screen are not done.

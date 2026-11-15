@@ -321,11 +321,16 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
         listed.contains("model.max_prompt_tokens = 1024  (default)"),
         "{listed}"
     );
-    // `quality` has a prompt of its own, and says so.
+    // `quality` asks for a longer prompt on the llama.cpp devices only, so the
+    // setting itself stays what it was.
     env.ok(&["config", "set", "model.mode", "quality"], dir.path());
     let listed = env.ok(&["config", "list", "--show-origin"], dir.path());
     assert!(
-        listed.contains("model.max_prompt_tokens = 4096  (mode quality)"),
+        listed.contains("model.max_prompt_tokens = 1024  (default)"),
+        "{listed}"
+    );
+    assert!(
+        listed.contains("model.name = pionus-1.5b-v0.3  (mode quality)"),
         "{listed}"
     );
     // A mode of the repository would reach every machine that opens it.

@@ -78,11 +78,16 @@ value, for example when an environment variable is set.
   where nothing else set them (a file, the environment or a flag: a setting
   written explicitly always wins, so a mode is a default, never an override):
 
-  | Mode | `model.name` | `model.max_prompt_tokens` |
+  | Mode | `model.name` | prompt budget |
   |---|---|---|
   | `fast` | `pionus-0.5b-v0.3` | the device's default |
   | `balanced` | `pionus-1.5b-v0.3` | the device's default |
-  | `quality` | `pionus-1.5b-v0.3` | 4096 |
+  | `quality` | `pionus-1.5b-v0.3` | 4096 on `vulkan` and `cpu`, the device's default on the others |
+
+  The longer prompt of `quality` is not written as `model.max_prompt_tokens`:
+  the NPU compiles its graph for one length, and the OpenVINO devices are not
+  measured with 4096. A `model.max_prompt_tokens` you wrote applies on every
+  device and beats it.
 
   `fast` also asks for one reply instead of two: a reply that copies the
   history, contradicts the diff or is cut off is not asked again, and the

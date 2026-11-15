@@ -1,8 +1,8 @@
 //! The modes: one choice of what to prioritise, resolved into the settings it
 //! stands for.
 //!
-//! A mode fills in `model.name`, and `model.max_prompt_tokens` for the modes
-//! that need a prompt of their own, only where nobody set them (a file, the environment or a flag): a setting written
+//! A mode fills in `model.name` only where nobody set it, and may ask for a
+//! longer prompt on the llama.cpp devices (`prompt_tokens`) (a file, the environment or a flag): a setting written
 //! explicitly always wins, so a mode is a default, never an override. The
 //! presets are starting points to be measured, not promises of quality or speed.
 
@@ -48,6 +48,16 @@ pub fn max_attempts(mode: &str) -> usize {
     }
 }
 
+/// The prompt budget a mode asks for on the llama.cpp devices (`vulkan`,
+/// `cpu`), which size their context for it. It is not a setting: the NPU
+/// compiles its graph for one length, so a mode's longer prompt is not its.
+pub fn prompt_tokens(mode: &str) -> Option<usize> {
+    PRESETS
+        .iter()
+        .find(|p| p.name == mode)
+        .and_then(|p| p.max_prompt_tokens)
+}
+
 /// The names of every mode, `off` (no preset) first.
 pub const NAMES: &[&str] = &["off", "fast", "balanced", "quality"];
 
@@ -57,13 +67,10 @@ pub fn settings(mode: &str) -> Vec<(&'static str, Value, Origin)> {
         return Vec::new();
     };
     let origin = Origin::Mode(preset.name);
-    let mut settings = vec![(
+    let settings = vec![(
         "model.name",
         Value::Text(preset.model.to_owned()),
         origin.clone(),
     )];
-    if let Some(tokens) = preset.max_prompt_tokens {
-        settings.push(("model.max_prompt_tokens", Value::Count(tokens), origin));
-    }
     settings
 }

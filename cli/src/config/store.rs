@@ -277,6 +277,7 @@ impl Resolved {
             },
             cache_dir: self.text("model.cache_dir").map(PathBuf::from),
             max_prompt_tokens: self.count("model.max_prompt_tokens"),
+            mode_prompt_tokens: super::mode::prompt_tokens(choice("model.mode")),
             max_prompt_tokens_set: matches!(
                 self.values.get("model.max_prompt_tokens"),
                 Some((_, origin)) if *origin != Origin::Default
@@ -434,6 +435,9 @@ pub struct Settings {
     /// environment, a flag or a mode) and not left at its default: only an
     /// unset one gives way to the device's default.
     pub max_prompt_tokens_set: bool,
+    /// The prompt budget the mode asks for on the llama.cpp devices, if it
+    /// does (`quality`).
+    pub mode_prompt_tokens: Option<usize>,
     pub max_new_tokens: usize,
     mode: &'static str,
     /// Replies asked for before the fallback: 1 in `fast` mode, else 2.
@@ -486,7 +490,9 @@ impl Settings {
     /// and CPU keep the setting's default until they are measured.
     pub fn prompt_tokens_on(&self, target: Target) -> usize {
         match target {
-            Target::Vulkan | Target::Cpu if !self.max_prompt_tokens_set => LLAMACPP_PROMPT_TOKENS,
+            Target::Vulkan | Target::Cpu if !self.max_prompt_tokens_set => {
+                self.mode_prompt_tokens.unwrap_or(LLAMACPP_PROMPT_TOKENS)
+            }
             _ => self.max_prompt_tokens,
         }
     }

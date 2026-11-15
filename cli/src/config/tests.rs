@@ -685,15 +685,40 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {
     let quality = resolve(None, None, HOME, vec![("model.mode", "quality".into())])
         .unwrap()
         .settings();
+    // The longer prompt is not a setting: it is the llama.cpp devices' only.
     assert_eq!(
         (
             quality.model.id,
             quality.max_prompt_tokens,
             quality.max_prompt_tokens_set
         ),
-        ("pionus-1.5b-v0.3", 4096, true)
+        ("pionus-1.5b-v0.3", 1024, false)
     );
     assert_eq!(quality.prompt_tokens_on(Target::Vulkan), 4096);
+    assert_eq!(quality.prompt_tokens_on(Target::Cpu), 4096);
+    // The NPU compiles for one length; the others are not measured.
+    for target in [Target::Npu, Target::IntelGpu, Target::OpenvinoCpu] {
+        assert_eq!(quality.prompt_tokens_on(target), 1024, "{target}");
+    }
+    assert_eq!(
+        quality
+            .llamacpp_options(Target::Vulkan, false)
+            .unwrap()
+            .max_prompt_tokens,
+        4096
+    );
+    // What someone wrote beats the mode on every device, `quality` too.
+    let written = resolve(
+        Some("[model]\nmax_prompt_tokens = 768\n"),
+        None,
+        HOME,
+        vec![("model.mode", "quality".into())],
+    )
+    .unwrap()
+    .settings();
+    for target in [Target::Npu, Target::Vulkan] {
+        assert_eq!(written.prompt_tokens_on(target), 768, "{target}");
+    }
     let balanced = resolve(None, None, HOME, vec![("model.mode", "balanced".into())])
         .unwrap()
         .settings();
