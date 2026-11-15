@@ -180,7 +180,10 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   (specifics found nowhere in the input), `ungrounded` (a description
   with no word from the diff) and `contradicted` (a number moved the wrong
   way: `to 30` where 30 was the old value, `decrease` where it grew; false
-  means no contradiction found, not that the message is right);
+  means no contradiction found, not that the message is right). `truncated`
+  and `unsupported_visible` read the prompt the model saw (the last attempt in
+  the trace): the first says files were cut, the second checks the specifics
+  against that prompt, not the whole diff;
   `pionus-training score`'s docstring defines them.
   `type_match` counts only the repository's own type as right, and its noise
   (labels, seeds) is larger than the gains tried so far, so a comparison also

@@ -262,3 +262,41 @@ fn a_type_of_the_same_group_counts_for_the_group_and_not_for_the_match() {
             .all(|(k, _)| !k.starts_with("type_"))
     );
 }
+
+#[test]
+fn the_prompt_the_model_saw_decides_what_was_visible() {
+    let meta = json!({"set": "free", "target": "chore: bump to 2.0.1"});
+    let trace = |user: &str, subject: &str| {
+        json!({
+            "inputs": {
+                "subjects": [],
+                "files": [{"path": "v", "hunks": "@@ -1 +1 @@\n-1.0.0\n+2.0.1\n"}],
+            },
+            "generation": {
+                "message": {"subject": subject},
+                "source": "model",
+                "attempts": [{"prompt": {"user": user}, "rejected": null}],
+            },
+        })
+    };
+    let flag = |trace: &serde_json::Value, name: &str| {
+        row_of(&meta, trace)
+            .into_iter()
+            .find(|(n, _)| *n == name)
+            .map(|(_, v)| v)
+    };
+    // The version is in the diff, but the prompt cut it.
+    let cut = trace(
+        "Files changed:\nv\n(1 files are only partly shown; rely on the file list.)\n",
+        "chore: bump to 2.0.1",
+    );
+    assert_eq!(flag(&cut, "truncated"), Some(Metric::Yes(true)));
+    assert_eq!(flag(&cut, "unsupported"), Some(Metric::Yes(false)));
+    assert_eq!(flag(&cut, "unsupported_visible"), Some(Metric::Yes(true)));
+    let whole = trace("Files changed:\nv\nDiff:\n+2.0.1\n", "chore: bump to 2.0.1");
+    assert_eq!(flag(&whole, "truncated"), Some(Metric::Yes(false)));
+    assert_eq!(
+        flag(&whole, "unsupported_visible"),
+        Some(Metric::Yes(false))
+    );
+}

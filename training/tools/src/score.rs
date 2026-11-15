@@ -30,6 +30,11 @@
 //!   paths: likely vague ("fix typo", "update code")
 //! - unsupported_real / ungrounded_real: the same for the real subject, the
 //!   level a human reaches with the same diff
+//! - truncated: the prompt the model saw says some files are only partly shown
+//!   (the last attempt's prompt, as recorded in the trace)
+//! - unsupported_visible: like unsupported, but against the history and what
+//!   the model's prompt showed, not the whole diff: a specific only the cut
+//!   part held counts. Without an attempt (rules), the whole inputs
 //! - contradicted: says a number moved the wrong way against the diff (`to 30`
 //!   where 30 was the old value, `decrease` where the value grew). Only a
 //!   changed number with the same line around it counts; anything else is
@@ -84,6 +89,9 @@ static DOWN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\b(decrease[sd]?|lower(?:s|ed)?|reduc(?:e|es|ed)|shrink|drop(?:s|ped)?)\b")
         .expect("a valid pattern")
 });
+
+/// What the user message says when files are cut (`prompt/user.rs`).
+const PARTLY_SHOWN: &str = "files are only partly shown";
 
 const STOP: &str = "a an the and or of to in on for with from by into onto when then
 than that this these those it its is are be was were as at not no only all
@@ -423,7 +431,20 @@ pub fn row_of(m: &Value, t: &Value) -> Vec<(&'static str, Metric)> {
         .filter_map(|f| f["hunks"].as_str())
         .collect::<Vec<_>>()
         .join("\n");
+    let shown = g["attempts"]
+        .as_array()
+        .and_then(|a| a.last())
+        .and_then(|a| a["prompt"]["user"].as_str());
+    let visible = shown.map_or_else(
+        || known.clone(),
+        |user| format!("{}\n{}", history.join("\n"), user.to_lowercase()),
+    );
     let mut row = vec![
+        (
+            "truncated",
+            Yes(shown.is_some_and(|u| u.contains(PARTLY_SHOWN))),
+        ),
+        ("unsupported_visible", Yes(unsupported(subject, &visible))),
         ("contradicted", Yes(contradicted(subject, &hunks))),
         ("unsupported", Yes(unsupported(subject, &known))),
         ("unsupported_real", Yes(unsupported(target, &known))),
