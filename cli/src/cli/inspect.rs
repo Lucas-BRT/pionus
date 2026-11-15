@@ -109,7 +109,8 @@ pub(super) fn eval(path: &Path, args: &BackendArgs, prompt_args: &PromptArgs) ->
             &options,
             &config,
             &generation,
-        );
+        )
+        .with_mode(settings.mode());
         writeln!(out, "{}", serde_json::to_string(&trace)?)?;
     }
     out.flush()?;

@@ -215,7 +215,9 @@ the prompt options, the generation config, the backend's description (device,
 model identity, NPU shapes) and every attempt: prompt, raw reply and why it
 was rejected, and, when `model.ask_type` made a person choose the type, what
 was offered with its probabilities and what was chosen (the replies begin
-with it). It leaves out the repository's path. `replay` rebuilds
+with it), and the `model.mode` asked for when there was one (`mode`: its effect
+is already in the options, the config and the model, so replay does not need
+it). It leaves out the repository's path. `replay` rebuilds
 everything from it and reports any difference in prompts, rejections or
 message.
 

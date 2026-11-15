@@ -130,7 +130,8 @@ impl Session {
                 &options,
                 &self.config,
                 &generation,
-            );
+            )
+            .with_mode(self.resolved.settings().mode());
             std::fs::write(path, trace.to_json())
                 .with_context(|| format!("cannot write {}", path.display()))?;
         }

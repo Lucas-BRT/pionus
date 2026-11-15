@@ -30,6 +30,11 @@ pub struct Trace {
     pub tool_version: String,
     /// Model and device, from [`Backend::describe`].
     pub backend: String,
+    /// The mode asked for (`model.mode`) when there was one, which `options`,
+    /// `config` and the model above already carry the effect of. Left out when
+    /// there was none, so older traces read, and replay, the same.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<String>,
     pub options: PromptOptions,
     pub config: GenerationConfig,
     pub inputs: Inputs,
@@ -103,6 +108,7 @@ impl Trace {
             format: FORMAT,
             tool_version: env!("CARGO_PKG_VERSION").to_owned(),
             backend: backend.describe(),
+            mode: None,
             options: options.clone(),
             config: config.clone(),
             inputs: Inputs {
@@ -116,6 +122,12 @@ impl Trace {
             },
             generation: generation.clone(),
         }
+    }
+
+    /// Records the mode asked for; `off`, no mode, is left out.
+    pub fn with_mode(mut self, mode: &str) -> Self {
+        self.mode = (mode != "off").then(|| mode.to_owned());
+        self
     }
 
     /// Pretty-printed, so traces diff well when kept as test fixtures.
@@ -396,6 +408,35 @@ mod tests {
         let replay = read.replay().unwrap();
         assert!(replay.differences.is_empty(), "{:?}", replay.differences);
         assert_eq!(replay.generation.asked, Some(asked));
+    }
+
+    #[test]
+    fn a_trace_names_a_mode_only_when_there_was_one() {
+        let ctx = RepoContext::new(PathBuf::new(), None, Vec::new(), Vec::new());
+        let generation = generate::generate(
+            &ctx,
+            &[],
+            &MockBackend::new(["fix: x"]),
+            &PromptOptions::default(),
+            &GenerationConfig::default(),
+        )
+        .unwrap();
+        let plain = Trace::new(
+            &ctx,
+            &[],
+            &MockBackend::new(["fix: x"]),
+            &PromptOptions::default(),
+            &GenerationConfig::default(),
+            &generation,
+        );
+        assert!(!plain.to_json().contains("\"mode\""));
+        assert_eq!(plain.clone().with_mode("off").mode, None);
+        let fast = plain.clone().with_mode("fast");
+        assert!(fast.to_json().contains("\"mode\": \"fast\""));
+        let read = Trace::from_json(&fast.to_json()).unwrap();
+        assert_eq!(read, fast);
+        // A trace without the field reads, and replays.
+        assert_eq!(Trace::from_json(&plain.to_json()).unwrap().mode, None);
     }
 
     #[test]

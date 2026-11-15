@@ -338,6 +338,35 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
 }
 
 #[test]
+fn a_trace_records_the_mode_asked_for_and_only_then() {
+    let env = Env::new();
+    let repo = staged_repo();
+    let dir = TempDir::new().unwrap();
+    let trace = |mode: Option<&str>| -> String {
+        let path = dir.path().join("trace.json");
+        let path = path.to_str().unwrap();
+        let args = [
+            "--backend",
+            "mock",
+            "--mock-response",
+            "feat: add main",
+            "--trace",
+            path,
+        ];
+        let extra: Vec<(&str, &str)> = mode.map(|m| ("PIONUS_MODE", m)).into_iter().collect();
+        let output = env.run_with(&args, repo.path(), &extra);
+        assert!(output.status.success(), "{}", stderr(&output));
+        fs::read_to_string(path).unwrap()
+    };
+    assert!(trace(Some("fast")).contains("\"mode\": \"fast\""));
+    assert!(trace(Some("quality")).contains("\"mode\": \"quality\""));
+    assert!(!trace(None).contains("\"mode\""));
+    assert!(!trace(Some("off")).contains("\"mode\""));
+    // `fast` also says it asked for one reply.
+    assert!(trace(Some("fast")).contains("\"max_attempts\": 1"));
+}
+
+#[test]
 fn global_backend_setting_reaches_generation() {
     let env = Env::new();
     let repo = staged_repo();

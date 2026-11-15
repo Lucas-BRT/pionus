@@ -283,6 +283,11 @@ impl Resolved {
             ),
             max_new_tokens: self.count("model.max_new_tokens"),
             max_attempts: super::mode::max_attempts(choice("model.mode")),
+            mode: super::mode::NAMES
+                .iter()
+                .copied()
+                .find(|n| *n == choice("model.mode"))
+                .unwrap_or("off"),
             convention: convention(choice("style.convention")),
             default_convention: convention(choice("style.default_convention")).expect("not auto"),
             history_depth: self.count("style.history_depth"),
@@ -430,6 +435,7 @@ pub struct Settings {
     /// unset one gives way to the device's default.
     pub max_prompt_tokens_set: bool,
     pub max_new_tokens: usize,
+    mode: &'static str,
     /// Replies asked for before the fallback: 1 in `fast` mode, else 2.
     pub max_attempts: usize,
     pub convention: Option<Convention>,
@@ -440,6 +446,11 @@ pub struct Settings {
 
 impl Settings {
     /// The confidence (0 to 1) below which the type is asked, when it is.
+    /// The mode asked for (`model.mode`): `off`, `fast`, `balanced` or `quality`.
+    pub fn mode(&self) -> &'static str {
+        self.mode
+    }
+
     pub fn ask_type_below(&self) -> f64 {
         self.ask_type_below as f64 / 100.0
     }
