@@ -69,6 +69,16 @@ pub const KEYS: &[Key] = &[
                       downloaded from Hugging Face, pinned and checked.",
     },
     Key {
+        name: "model.mode",
+        kind: Kind::Choice(super::mode::NAMES),
+        scope: Scope::User,
+        env: Some("PIONUS_MODE"),
+        description: "What to prioritise: `fast` (the 0.5B fine-tune), `balanced` (the 1.5B \
+                      fine-tune) or `quality` (the 1.5B with a prompt twice as long), or \
+                      `off`: no preset. A mode sets model.name and model.max_prompt_tokens \
+                      only where nothing else did.",
+    },
+    Key {
         name: "model.dir",
         kind: Kind::Path,
         scope: Scope::User,

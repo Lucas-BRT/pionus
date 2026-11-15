@@ -174,6 +174,22 @@ pub(super) struct ModelArgs {
     /// [config: model.dir; env: PIONUS_MODEL_DIR]
     #[arg(long, value_name = "DIR")]
     model_dir: Option<PathBuf>,
+    /// What to prioritise: fast, balanced or quality [config: model.mode;
+    /// env: PIONUS_MODE]
+    #[arg(long, value_enum)]
+    mode: Option<ModeArg>,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub(super) enum ModeArg {
+    /// The 0.5B fine-tune: the least time and memory per message.
+    Fast,
+    /// The 1.5B fine-tune at the default prompt size.
+    Balanced,
+    /// The 1.5B fine-tune with twice the prompt.
+    Quality,
+    /// No preset.
+    Off,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -231,6 +247,15 @@ impl BackendArgs {
 impl ModelArgs {
     pub(super) fn flags(&self) -> Result<Vec<(&'static str, String)>> {
         let mut flags = Vec::new();
+        if let Some(mode) = self.mode {
+            let name = match mode {
+                ModeArg::Fast => "fast",
+                ModeArg::Balanced => "balanced",
+                ModeArg::Quality => "quality",
+                ModeArg::Off => "off",
+            };
+            flags.push(("model.mode", name.to_owned()));
+        }
         if let Some(device) = self.device {
             flags.push(("model.device", device.name().to_owned()));
         }

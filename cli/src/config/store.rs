@@ -157,6 +157,15 @@ impl Resolved {
             })?;
             values.insert(key.name, (value, Origin::Flag));
         }
+        // A mode fills in what no layer set, before the model files follow
+        // model.name.
+        if let Some((Value::Text(mode), _)) = values.get("model.mode") {
+            for (name, value, origin) in super::mode::settings(&mode.clone()) {
+                if values.get(name).is_some_and(|(_, o)| *o == Origin::Default) {
+                    values.insert(name, (value, origin));
+                }
+            }
+        }
         // The model files default to those of model.name, whichever layer
         // set it.
         let model = match values.get("model.name") {
@@ -294,6 +303,7 @@ fn defaults(env: &dyn Fn(&str) -> Option<String>) -> Vec<(&'static str, Value)> 
         ("backend", text("auto")),
         ("model.device", text("auto")),
         ("model.name", text(models::DEFAULT)),
+        ("model.mode", text("off")),
         ("model.vulkan_device", Value::Count(0)),
         ("model.fast_load", text("auto")),
         ("model.keep_loaded_max_ram", Value::Count(15)),

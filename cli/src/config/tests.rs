@@ -655,3 +655,102 @@ fn only_a_keep_loaded_someone_set_counts_as_asked_for() {
     assert!(settings.keep_loaded_explicit);
     assert!(settings.keep_loaded.is_zero());
 }
+
+#[test]
+fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {
+    let off = resolve(None, None, HOME, vec![]).unwrap();
+    assert_eq!(off.get("model.mode").unwrap().0.to_string(), "off");
+    assert_eq!(off.settings().model.id, models::DEFAULT);
+
+    let fast = resolve(None, None, HOME, vec![("model.mode", "fast".into())]).unwrap();
+    let settings = fast.settings();
+    assert_eq!(settings.model.id, "pionus-0.5b-v0.3");
+    assert_eq!(settings.max_prompt_tokens, 1024);
+    assert_eq!(fast.get("model.name").unwrap().1, Origin::Mode("fast"));
+    assert_eq!(fast.get("model.name").unwrap().1.to_string(), "mode fast");
+    // The model's files follow the model the mode chose.
+    assert!(
+        settings
+            .gguf
+            .unwrap()
+            .ends_with("pionus-0.5b-v0.3-q4_k_m.gguf")
+    );
+
+    let quality = resolve(None, None, HOME, vec![("model.mode", "quality".into())])
+        .unwrap()
+        .settings();
+    assert_eq!(
+        (quality.model.id, quality.max_prompt_tokens),
+        ("pionus-1.5b-v0.3", 2048)
+    );
+    let balanced = resolve(None, None, HOME, vec![("model.mode", "balanced".into())])
+        .unwrap()
+        .settings();
+    assert_eq!(
+        (balanced.model.id, balanced.max_prompt_tokens),
+        ("pionus-1.5b-v0.3", 1024)
+    );
+}
+
+#[test]
+fn a_setting_written_explicitly_beats_the_mode_whatever_the_layer() {
+    let mode = "[model]\nmode = \"fast\"\n";
+    // A file, the environment and a flag, each against the mode.
+    let file = resolve(
+        Some(&format!(
+            "{mode}name = \"qwen2.5-coder-7b\"\nmax_prompt_tokens = 512\n"
+        )),
+        None,
+        HOME,
+        vec![],
+    )
+    .unwrap();
+    assert_eq!(file.settings().model.id, "qwen2.5-coder-7b");
+    assert_eq!(file.settings().max_prompt_tokens, 512);
+    let env = resolve(
+        Some(mode),
+        None,
+        &[("HOME", "/home/me"), ("PIONUS_MODEL", "qwen2.5-coder-0.5b")],
+        vec![],
+    )
+    .unwrap();
+    assert_eq!(env.settings().model.id, "qwen2.5-coder-0.5b");
+    assert_eq!(
+        env.settings().max_prompt_tokens,
+        1024,
+        "only the model was set"
+    );
+    let flag = resolve(
+        Some(mode),
+        None,
+        HOME,
+        vec![("model.max_prompt_tokens", "768".into())],
+    )
+    .unwrap();
+    assert_eq!(flag.settings().max_prompt_tokens, 768);
+    assert_eq!(flag.settings().model.id, "pionus-0.5b-v0.3");
+    // The flag beats the file's mode, and the environment's mode too.
+    let flag_mode = resolve(
+        Some(mode),
+        None,
+        &[("HOME", "/home/me"), ("PIONUS_MODE", "quality")],
+        vec![("model.mode", "balanced".into())],
+    )
+    .unwrap();
+    assert_eq!(flag_mode.settings().max_prompt_tokens, 1024);
+    assert_eq!(flag_mode.get("model.mode").unwrap().1, Origin::Flag);
+}
+
+#[test]
+fn a_mode_is_a_machine_setting_and_an_unknown_one_is_an_error() {
+    let repo = resolve(None, Some("[model]\nmode = \"fast\"\n"), HOME, vec![]);
+    assert!(
+        matches!(repo, Err(ConfigError::UserOnly { .. })),
+        "{repo:?}"
+    );
+    let unknown = resolve(None, None, HOME, vec![("model.mode", "turbo".into())]);
+    assert!(
+        matches!(unknown, Err(ConfigError::InvalidValue { .. })),
+        "{unknown:?}"
+    );
+}

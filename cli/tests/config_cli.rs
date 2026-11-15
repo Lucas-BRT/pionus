@@ -287,6 +287,50 @@ fn environment_overrides_files_and_is_shown() {
 }
 
 #[test]
+fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
+    let env = Env::new();
+    let dir = TempDir::new().unwrap();
+    env.ok(&["config", "set", "model.mode", "fast"], dir.path());
+    let listed = env.ok(&["config", "list", "--show-origin"], dir.path());
+    assert!(
+        listed.contains("model.name = pionus-0.5b-v0.3  (mode fast)"),
+        "{listed}"
+    );
+    assert!(
+        listed.contains("model.max_prompt_tokens = 1024  (mode fast)"),
+        "{listed}"
+    );
+    let models = env.ok(&["model", "list"], dir.path());
+    assert!(
+        models.contains("In use: pionus-0.5b-v0.3 (model.name, mode fast)."),
+        "{models}"
+    );
+    // The environment is written explicitly: it beats the mode for the model
+    // and leaves the prompt to it.
+    let output = env.run_with(
+        &["config", "list", "--show-origin"],
+        dir.path(),
+        &[("PIONUS_MODEL", "qwen2.5-coder-7b")],
+    );
+    let listed = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        listed.contains("model.name = qwen2.5-coder-7b  (environment PIONUS_MODEL)"),
+        "{listed}"
+    );
+    assert!(
+        listed.contains("model.max_prompt_tokens = 1024  (mode fast)"),
+        "{listed}"
+    );
+    // A mode of the repository would reach every machine that opens it.
+    let repo = staged_repo();
+    let output = env.run(
+        &["config", "set", "--repo", "model.mode", "fast"],
+        repo.path(),
+    );
+    assert!(!output.status.success());
+}
+
+#[test]
 fn global_backend_setting_reaches_generation() {
     let env = Env::new();
     let repo = staged_repo();

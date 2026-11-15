@@ -188,7 +188,7 @@ fn warn_if_shadowed(key: &str, target: &Target, changed: &Origin) -> Result<()> 
         let shadowed = match origin {
             Origin::Env(_) | Origin::Flag => true,
             Origin::Repo(_) => matches!(changed, Origin::Global(_)),
-            Origin::Global(_) | Origin::Default => false,
+            Origin::Global(_) | Origin::Default | Origin::Mode(_) => false,
         };
         if shadowed {
             note!("{key} is still {value}, from the {origin}");

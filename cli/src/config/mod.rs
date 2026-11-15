@@ -12,6 +12,7 @@
 
 mod cli;
 mod keys;
+pub mod mode;
 mod store;
 
 use std::fmt;
@@ -52,6 +53,8 @@ pub enum Origin {
     Repo(PathBuf),
     Env(&'static str),
     Flag,
+    /// Filled in by `model.mode`, where nothing else set it.
+    Mode(&'static str),
 }
 
 impl fmt::Display for Origin {
@@ -62,6 +65,7 @@ impl fmt::Display for Origin {
             Self::Repo(path) => write!(f, "repository {}", path.display()),
             Self::Env(var) => write!(f, "environment {var}"),
             Self::Flag => f.write_str("command line"),
+            Self::Mode(mode) => write!(f, "mode {mode}"),
         }
     }
 }

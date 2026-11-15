@@ -39,6 +39,7 @@ value, for example when an environment variable is set.
 | `backend` | `auto`, `openvino`, `llamacpp`, `mock` | `auto` | `PIONUS_BACKEND` | global |
 | `model.device` | `auto`, `npu`, `intel-gpu`, `vulkan`, `cpu`, `openvino-cpu` | `auto` | `PIONUS_DEVICE` | global |
 | `model.name` | `qwen2.5-coder-1.5b`, `qwen2.5-coder-0.5b`, `qwen2.5-coder-7b`, `pionus-1.5b-v0.1`, `pionus-0.5b-v0.1`, `pionus-0.5b-v0.2`, `pionus-1.5b-v0.2`, `pionus-0.5b-v0.3`, `pionus-1.5b-v0.3` | `qwen2.5-coder-1.5b` | `PIONUS_MODEL` | global |
+| `model.mode` | `off`, `fast`, `balanced`, `quality` | `off` | `PIONUS_MODE` | global |
 | `model.dir` | path | model.name's OpenVINO export in `$XDG_DATA_HOME/pionus/models/` (none for models without one) | `PIONUS_MODEL_DIR` | global |
 | `model.cache_dir` | path | `$XDG_CACHE_HOME/pionus/openvino` | `PIONUS_CACHE_DIR` | global |
 | `model.gguf` | path | model.name's GGUF file in `$XDG_DATA_HOME/pionus/models/` | `PIONUS_GGUF` | global |
@@ -73,6 +74,21 @@ value, for example when an environment variable is set.
   `pionus model use <id>` downloads it and sets it. `model.gguf` and
   `model.dir` default to its files, whichever layer sets it; set them (or
   `pionus model use FILE`) to run a model from disk instead.
+- `model.mode` (`--mode`) chooses what to prioritise and fills in two settings
+  where nothing else set them (a file, the environment or a flag: a setting
+  written explicitly always wins, so a mode is a default, never an override):
+
+  | Mode | `model.name` | `model.max_prompt_tokens` |
+  |---|---|---|
+  | `fast` | `pionus-0.5b-v0.3` | 1024 |
+  | `balanced` | `pionus-1.5b-v0.3` | 1024 |
+  | `quality` | `pionus-1.5b-v0.3` | 2048 |
+
+  `off`, the default, changes nothing: an existing configuration behaves as
+  before. These are starting points to be measured, not promises of speed or
+  quality; the fine-tunes are experimental and have no OpenVINO export, so a
+  mode runs on `vulkan` and `cpu` (`pionus model` and `pionus config` show the
+  model and where it came from, `mode fast` and so on).
 - `model.vulkan_device` picks a GPU on machines with more than one, as
   `llama-server --list-devices` numbers them (0 is `Vulkan0`).
 - `model.fast_load` starts llama-server (`vulkan` and `cpu`) with

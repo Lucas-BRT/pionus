@@ -25,6 +25,9 @@
   `pionus-1.5b-v0.2`, trained without the rules in their prompt, and
   `pionus-0.5b-v0.3` and `pionus-1.5b-v0.3`, the v0.1 models trained
   further on their own samples, as experimental models.
+- Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the
+  model and the prompt size where nothing else set them. The attempt limit and
+  the extra context of `quality` are not done.
 - Fast load for llama.cpp (`--no-repack --fit off`), turned on per device
   by the benchmark, and `--threads-batch` passed explicitly.
 - Global and per-repository configuration; the setup removes global
