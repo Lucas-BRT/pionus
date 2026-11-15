@@ -207,7 +207,9 @@ wrote it, how long it took and the staged files:
 ```
 
 **Another message** asks the model again with the messages turned down
-in the prompt: decoding is greedy, so only a different prompt gives a
+in the prompt (the three most recent different ones, so a long session does
+not crowd out the diff; a reply that repeats any earlier one is still
+rejected): decoding is greedy, so only a different prompt gives a
 different message, and the same choices always give the same messages. A
 reply that repeats one of them, or nearly (the same subject with a few
 words dropped), is rejected and asked again, as a copy of the history is.

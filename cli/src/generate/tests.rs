@@ -552,6 +552,39 @@ mod tests {
     }
 
     #[test]
+    fn only_the_latest_turned_down_subjects_are_named_but_all_are_refused() {
+        let turned_down: Vec<String> = ["feat: a", "fix: b", "feat: a", "docs: c", "chore: d"]
+            .map(str::to_owned)
+            .to_vec();
+        // The three most recent different ones, oldest first; the repeat of
+        // "feat: a" counts once, at its latest place.
+        let note = generate::avoid_note(&turned_down).unwrap();
+        assert!(
+            note.starts_with(
+                "The user turned down these messages: \"feat: a\"; \"docs: c\"; \"chore: d\"."
+            ),
+            "{note}"
+        );
+        assert!(!note.contains("fix: b"));
+        // "fix: b" is not named, but the model repeating it is still refused.
+        let generation = crate::generate::generate_avoiding(
+            &context(&["feat: add login"]),
+            &files(),
+            &MockBackend::new(["fix: b", "feat: add retry"]),
+            &PromptOptions::default(),
+            &GenerationConfig::default(),
+            &turned_down,
+        )
+        .unwrap();
+        assert_eq!(generation.message.subject, "feat: add retry");
+        assert_eq!(generation.attempts.len(), 2);
+        assert!(matches!(
+            generation.attempts[0].rejected,
+            Some(SanitizeError::TurnedDown(_))
+        ));
+    }
+
+    #[test]
     fn another_message_is_asked_for_deterministically() {
         assert_eq!(generate::avoid_note(&[]), None);
         assert_eq!(
