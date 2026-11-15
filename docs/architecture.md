@@ -126,7 +126,12 @@ off is in [measurements](measurements.md#token-estimate).
    headers and three of its lines (and 24 tokens): when the equal share is
    less, the first files of the tier get that much while the budget lasts
    and the others appear in the file list only, so a section is never a
-   bare header. Cut files end with `[... N more lines]`.
+   bare header. A cut file with several hunks keeps whole hunks, the
+   smallest first and in the file's order, so a change at the end is not lost
+   to a large hunk before it. What is left of the budget shows the start of
+   the first hunk left out, which ends with `[... N more lines]`, and the
+   hunks not shown at all are counted in `[... N more hunks]`. A file of one
+   hunk, or of none that fits whole, is cut by lines.
 
 ## Prompt
 

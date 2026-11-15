@@ -1,7 +1,7 @@
 use std::fmt::Write as _;
 
 use super::annotate;
-use super::{CompactDiff, FileDiff, FileKind, estimate_tokens};
+use super::{CompactDiff, FileDiff, FileKind, MIN_BODY_LINES, estimate_tokens};
 use crate::git::FileChange;
 
 /// Fits `files` into `budget` tokens: the stat first, then hunks.
@@ -132,19 +132,86 @@ pub(super) fn stat_line(file: &FileDiff) -> String {
     }
 }
 
+/// The file's whole hunks that fit in `tokens`, with a marker for the others;
+/// `None` when it has a single hunk or none fits whole.
+fn fit_hunks(file: &FileDiff, tokens: usize) -> Option<String> {
+    let mut hunks: Vec<String> = Vec::new();
+    for line in file.hunks.lines() {
+        if line.starts_with("@@") || hunks.is_empty() {
+            hunks.push(String::new());
+        }
+        let hunk = hunks.last_mut()?;
+        hunk.push_str(line);
+        hunk.push('\n');
+    }
+    if hunks.len() < 2 {
+        return None;
+    }
+    let costs: Vec<usize> = hunks.iter().map(|h| estimate_tokens(h)).collect();
+    let mut order: Vec<usize> = (0..hunks.len()).collect();
+    order.sort_by_key(|&i| (costs[i], i));
+    let header = format!("--- {}\n", file.path);
+    let marker = estimate_tokens(&format!("[... {} more hunks]\n", hunks.len()));
+    let mut used = estimate_tokens(&header) + marker;
+    let mut kept = vec![false; hunks.len()];
+    for i in order {
+        if used + costs[i] > tokens {
+            break;
+        }
+        kept[i] = true;
+        used += costs[i];
+    }
+    let shown = kept.iter().filter(|k| **k).count();
+    if shown == 0 || shown == hunks.len() {
+        return None;
+    }
+    // What is left of the budget shows the start of the first hunk left out,
+    // with its own marker: more evidence, and never half a hunk as a whole.
+    let first_left_out = kept.iter().position(|k| !k);
+    let partial = first_left_out.and_then(|i| {
+        cut_lines(&hunks[i], tokens.saturating_sub(used), MIN_BODY_LINES).map(|cut| (i, cut))
+    });
+    let mut text = header;
+    for (i, hunk) in hunks.iter().enumerate() {
+        match &partial {
+            Some((at, cut)) if *at == i => text.push_str(cut),
+            _ if kept[i] => text.push_str(hunk),
+            _ => {}
+        }
+    }
+    let omitted = hunks.len() - shown - usize::from(partial.is_some());
+    if omitted > 0 {
+        let _ = writeln!(text, "[... {omitted} more hunks]");
+    }
+    Some(text)
+}
+
 /// The file's `--- path` line and hunk headers, as opposed to its lines.
 pub(super) fn is_header(line: &str) -> bool {
     line.starts_with("--- ") || line.starts_with("@@")
 }
 
-/// Keeps whole lines of the file's section while they fit in `tokens`;
-/// nothing at all if no line besides the headers fits.
+/// Keeps whole hunks of the file's section while they fit in `tokens`, the
+/// smallest first and in the file's order, so a hunk at the end is not lost to
+/// a large one before it and no change is cut in half; a file of one hunk, or
+/// of none that fits whole, keeps whole lines while they fit, and nothing at
+/// all if no line besides the headers fits.
 pub(super) fn fit_file(file: &FileDiff, tokens: usize) -> (String, bool) {
     let full = file.section();
     if estimate_tokens(&full) <= tokens {
         return (full, false);
     }
-    let lines: Vec<&str> = full.lines().collect();
+    if let Some(text) = fit_hunks(file, tokens) {
+        return (text, true);
+    }
+    (cut_lines(&full, tokens, 1).unwrap_or_default(), true)
+}
+
+/// Whole lines of `text` while they fit in `tokens`, ending with a marker for
+/// the rest; `None` when fewer than `least` of them are lines besides the
+/// headers.
+fn cut_lines(text: &str, tokens: usize, least: usize) -> Option<String> {
+    let lines: Vec<&str> = text.lines().collect();
     let mut kept = String::new();
     // Sum of per-line estimates: an upper bound of the estimate of `kept`.
     let mut used = 0;
@@ -153,8 +220,8 @@ pub(super) fn fit_file(file: &FileDiff, tokens: usize) -> (String, bool) {
         let marker = format!("[... {} more lines]\n", lines.len() - n);
         let cost = estimate_tokens(line) + 1;
         if used + cost + estimate_tokens(&marker) > tokens {
-            if body == 0 {
-                return (String::new(), true);
+            if body < least {
+                return None;
             }
             kept.push_str(&marker);
             break;
@@ -163,5 +230,5 @@ pub(super) fn fit_file(file: &FileDiff, tokens: usize) -> (String, bool) {
         used += cost;
         body += usize::from(!is_header(line));
     }
-    (kept, true)
+    Some(kept)
 }

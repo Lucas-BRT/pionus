@@ -284,6 +284,54 @@ fn a_cut_without_lines_is_left_out() {
 }
 
 #[test]
+fn a_cut_keeps_whole_hunks_and_the_last_one_survives_a_large_first() {
+    let mut text = String::from("@@ -1,60 +1,60 @@\n");
+    for n in 0..60 {
+        let _ = writeln!(text, "-first_{n} = {n}\n+first_{n} = {}", n + 1);
+    }
+    text.push_str("@@ -200 +200 @@\n-timeout = 30\n+timeout = 60\n");
+    text.push_str("@@ -300 +300 @@\n-retries = 1\n+retries = 2\n");
+    let big = file("src/late.rs", &text);
+    let (cut_text, cut) = fit_file(&big, 90);
+    assert!(cut);
+    // The small hunks at the end are whole, the large one is left out whole
+    // (not half of it), and the marker says how many were left out.
+    assert!(cut_text.contains("-timeout = 30\n+timeout = 60\n"));
+    assert!(cut_text.contains("-retries = 1\n+retries = 2\n"));
+    assert!(!cut_text.contains("first_0"));
+    assert!(cut_text.ends_with("[... 1 more hunks]\n"), "{cut_text}");
+    assert!(estimate_tokens(&cut_text) <= 90);
+    // The hunks keep the file's order.
+    assert!(cut_text.find("timeout").unwrap() < cut_text.find("retries").unwrap());
+}
+
+#[test]
+fn what_is_left_of_the_budget_shows_the_start_of_the_first_hunk_left_out() {
+    let mut text = String::from("@@ -1,60 +1,60 @@\n");
+    for n in 0..60 {
+        let _ = writeln!(text, "-first_{n} = {n}\n+first_{n} = {}", n + 1);
+    }
+    text.push_str("@@ -200 +200 @@\n-timeout = 30\n+timeout = 60\n");
+    let big = file("src/late.rs", &text);
+    let (cut_text, cut) = fit_file(&big, 200);
+    assert!(cut);
+    // The small hunk whole, the large one's start with its own marker, and
+    // nothing "more hunks" because none is left out.
+    assert!(cut_text.contains("-timeout = 30\n+timeout = 60\n"));
+    assert!(cut_text.contains("first_0") && cut_text.contains("more lines]"));
+    assert!(!cut_text.contains("more hunks]"), "{cut_text}");
+    assert!(estimate_tokens(&cut_text) <= 200);
+    assert!(cut_text.find("first_0").unwrap() < cut_text.find("timeout").unwrap());
+}
+
+#[test]
+fn a_single_hunk_is_still_cut_by_lines() {
+    let big = file("src/one.rs", &hunk(50));
+    let (text, cut) = fit_file(&big, big.min_tokens());
+    assert!(cut && text.contains("more lines]") && !text.contains("more hunks]"));
+}
+
+#[test]
 fn annotated_diff_leaves_whitespace_out() {
     use crate::git::{ChangeStatus, FileChange};
     let mut spaced = String::from("@@ -1,40 +1,40 @@\n");
