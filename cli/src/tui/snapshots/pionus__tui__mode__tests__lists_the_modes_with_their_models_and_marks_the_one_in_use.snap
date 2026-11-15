@@ -1,0 +1,17 @@
+---
+source: cli/src/tui/mode.rs
+expression: "draw(78, 13, |f| ModeView::new(\"balanced\").render(f))"
+---
+ What matters most?
+ A mode picks the model; what you set yourself still wins.
+┌────────────────────────────────────────────────────────────────────────────┐
+│ 1 fast      pionus-0.5b-v0.3                                               │
+│ 2 balanced  pionus-1.5b-v0.3 (in use)                                      │
+│ 3 quality   pionus-1.5b-v0.3                                               │
+│ 4 off       nothing is chosen for you                                      │
+└────────────────────────────────────────────────────────────────────────────┘
+the 1.5B fine-tune: the best messages at the device's default prompt size
+
+
+
+[Enter] choose  [1-4] pick  [↑/↓] move  [q] cancel

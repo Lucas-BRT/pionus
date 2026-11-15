@@ -24,6 +24,8 @@ pub enum Action {
     Use(&'static Model),
     /// Use a model file or directory from disk.
     UseFile(PathBuf),
+    /// Open the choice of a mode, which picks the model.
+    ChooseMode,
 }
 
 /// One row of the list: what of the model is installed.
@@ -177,6 +179,7 @@ impl Picker {
                     self.mode = Mode::Path(String::new());
                     Action::None
                 }
+                KeyCode::Char('p') => Action::ChooseMode,
                 KeyCode::Enter if self.selected == self.file_row() => {
                     self.mode = Mode::Path(String::new());
                     Action::None
@@ -354,8 +357,9 @@ impl Picker {
         let keys_line = match self.mode {
             Mode::Browsing => hints(&[
                 ("Up/Down", "choose"),
-                ("Enter", "use (downloads it if needed)"),
-                ("f", "a file"),
+                ("Enter", "use, or download"),
+                ("f", "file"),
+                ("p", "mode"),
                 ("q", "quit"),
             ]),
             Mode::Path(_) => hints(&[("Enter", "use it"), ("Esc", "back")]),
@@ -451,6 +455,14 @@ mod tests {
     #[test]
     fn lists_the_models_with_the_one_in_use_selected() {
         insta::assert_snapshot!(draw(80, 20, |f| picker().render(f)));
+    }
+
+    #[test]
+    fn p_asks_for_a_mode_and_the_screen_says_so() {
+        let mut picker = picker();
+        assert_eq!(picker.on_key(char('p')), Action::ChooseMode);
+        let screen = draw(80, 20, |f| picker.render(f));
+        assert!(screen.contains("[p] mode  [q] quit"), "{screen}");
     }
 
     #[test]

@@ -342,6 +342,8 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
     let mut view = plan_view(model)?;
     let mut screen = Screen::new()?;
     let mut notes = Vec::new();
+    // A mode chosen here, written once its model is downloaded.
+    let mut mode: Option<&'static str> = None;
     loop {
         screen.draw(|frame| view.render(frame))?;
         match view.on_key(screen.key()?) {
@@ -351,8 +353,21 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
                 eprintln!("Setup cancelled: nothing was changed.");
                 return Ok(());
             }
+            Action::ChangeMode => {
+                if let Some(chosen) = model::choose_mode(&mut screen)? {
+                    choose_mode(
+                        chosen, &mut mode, &mut model, &mut view, &mut notes, &plan_view,
+                    )?;
+                }
+            }
             Action::ChangeModel => match model::choose(&mut screen)? {
+                Some(Chosen::Mode(chosen)) => {
+                    choose_mode(
+                        chosen, &mut mode, &mut model, &mut view, &mut notes, &plan_view,
+                    )?;
+                }
                 Some(Chosen::Model(chosen)) => {
+                    mode = None;
                     let changed = chosen.id != model.id;
                     model = chosen;
                     view = plan_view(model)?;
@@ -380,7 +395,7 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
         screen.draw(|frame| view.render(frame))?;
         let result = match kind {
             StepKind::LlamaCpp => install_llamacpp_step(&mut screen, &mut view),
-            StepKind::Model => install_model(&mut screen, &mut view, model),
+            StepKind::Model => install_model(&mut screen, &mut view, model, mode),
             StepKind::GpuDrivers => {
                 with_sudo(&mut screen, &scripts.join("setup-gpu.sh"), &["--yes"])
             }
@@ -447,6 +462,33 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
     }
     if !failed {
         print!("{NEXT_STEPS}");
+    }
+    Ok(())
+}
+
+/// A mode chosen in the setup: a preset makes its model the one to install
+/// (and the mode is written once it is), `off` is written at once. Anything
+/// the user set that would win over the mode is told in the notes.
+fn choose_mode(
+    chosen: &'static str,
+    mode: &mut Option<&'static str>,
+    model: &mut &'static Model,
+    view: &mut SetupView,
+    notes: &mut Vec<String>,
+    plan_view: &dyn Fn(&'static Model) -> Result<SetupView>,
+) -> Result<()> {
+    match model::mode_model(chosen) {
+        Some(preset) => {
+            *mode = Some(chosen);
+            *model = preset;
+            *view = plan_view(preset)?;
+            // Installed or not, the mode must still be written.
+            view.enable(StepKind::Model);
+        }
+        None => {
+            *mode = None;
+            notes.extend(model::select_mode(chosen)?);
+        }
     }
     Ok(())
 }
@@ -589,6 +631,7 @@ fn install_model(
     screen: &mut Screen,
     view: &mut SetupView,
     model: &'static Model,
+    mode: Option<&'static str>,
 ) -> Result<String, String> {
     let dir = paths::default_models_dir(env).ok_or("HOME is not set")?;
     let base = env("PIONUS_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned());
@@ -635,7 +678,12 @@ fn install_model(
         "checked against the pinned SHA-256: {}",
         file.display()
     ));
-    for line in model::select(model).map_err(|e| format!("{e:#}"))? {
+    // The model becomes the one in use as the mode chosen, if there was one.
+    let lines = match mode {
+        Some(mode) => model::select_mode(mode),
+        None => model::select(model),
+    };
+    for line in lines.map_err(|e| format!("{e:#}"))? {
         view.log(&line);
     }
     Ok(String::new())

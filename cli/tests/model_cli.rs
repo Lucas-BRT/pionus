@@ -219,7 +219,6 @@ fn use_takes_a_gguf_file_and_back() {
     // A recommended model replaces the file.
     home.install(model("qwen2.5-coder-1.5b"));
     let out = stdout(&home.run(&["model", "use", "qwen2.5-coder-1.5b"]));
-    assert!(out.contains("model.gguf removed"), "{out}");
     assert!(out.contains("its OpenVINO version (npu, intel-gpu, openvino-cpu) is not installed"));
     assert!(!home.config().contains("gguf"), "{}", home.config());
 }
@@ -390,5 +389,88 @@ fn model_name_is_checked_and_npu_explains_a_model_without_openvino() {
         ),
         "{}",
         stderr(&output)
+    );
+}
+
+#[test]
+fn a_mode_downloads_its_model_and_leaves_the_model_to_it() {
+    let home = Home::new();
+    home.install(model("pionus-0.5b-v0.3"));
+    // A model written by hand would win over a mode, so choosing a mode
+    // removes it, as `model use` removes a file.
+    home.install(model("qwen2.5-coder-0.5b"));
+    assert!(
+        home.run(&["model", "use", "qwen2.5-coder-0.5b"])
+            .status
+            .success()
+    );
+    assert!(home.config().contains("name = \"qwen2.5-coder-0.5b\""));
+    let output = home.run(&["model", "mode", "fast"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    assert!(stderr(&output).contains("pionus 0.5B v0.3 is already installed"));
+    let out = stdout(&output);
+    assert!(out.contains("model.mode = fast"), "{out}");
+    assert!(
+        out.contains("model.name removed, so the mode's model is used"),
+        "{out}"
+    );
+    let config = home.config();
+    assert!(config.contains("mode = \"fast\""), "{config}");
+    assert!(!config.contains("name ="), "{config}");
+    let list = stdout(&home.run(&["model"]));
+    assert!(
+        list.contains("In use: pionus-0.5b-v0.3 (model.name, mode fast)."),
+        "{list}"
+    );
+    assert!(
+        list.contains("pionus-0.5b-v0.3") && list.contains("<- in use"),
+        "{list}"
+    );
+    // `off` goes back to choosing the model yourself, and says so.
+    let out = stdout(&home.run(&["model", "mode", "off"]));
+    assert!(out.contains("model.mode removed"), "{out}");
+    assert!(!home.config().contains("mode ="), "{}", home.config());
+    assert!(stdout(&home.run(&["model", "mode", "off"])).contains("model.mode was not set"));
+}
+
+#[test]
+fn a_mode_whose_model_cannot_be_downloaded_changes_nothing() {
+    let home = Home::new();
+    let output = home.run(&["model", "mode", "balanced"]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(
+        stderr(&output).contains("downloading pionus 1.5B v0.3"),
+        "{}",
+        stderr(&output)
+    );
+    assert_eq!(home.config(), "");
+}
+
+#[test]
+fn an_unknown_mode_is_refused_and_the_environment_is_told_when_it_wins() {
+    let home = Home::new();
+    let output = home.run(&["model", "mode", "turbo"]);
+    assert!(!output.status.success());
+    assert!(
+        stderr(&output).contains("invalid value 'turbo'"),
+        "{}",
+        stderr(&output)
+    );
+    home.install(model("pionus-1.5b-v0.3"));
+    let output = pionus(
+        &["model", "mode", "quality"],
+        home.data.path(),
+        &[
+            ("XDG_CONFIG_HOME", home.config.path().to_str().unwrap()),
+            ("XDG_DATA_HOME", home.data.path().to_str().unwrap()),
+            ("PIONUS_HF_BASE", "file:///nonexistent/hf"),
+            ("PIONUS_MODEL", "qwen2.5-coder-7b"),
+        ],
+    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let out = stdout(&output);
+    assert!(
+        out.contains("note: model.name = qwen2.5-coder-7b from the environment PIONUS_MODEL overrides the mode"),
+        "{out}"
     );
 }

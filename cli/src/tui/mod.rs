@@ -7,6 +7,7 @@
 //! plain text output instead.
 
 pub mod bench;
+pub mod mode;
 pub mod models;
 pub mod review;
 pub mod setup;

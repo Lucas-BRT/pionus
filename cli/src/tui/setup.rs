@@ -23,6 +23,8 @@ pub enum Action {
     Start,
     /// Open the model picker.
     ChangeModel,
+    /// Open the choice of a mode, which picks the model.
+    ChangeMode,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -187,6 +189,7 @@ impl SetupView {
                     Action::None
                 }
                 KeyCode::Char('m') => Action::ChangeModel,
+                KeyCode::Char('p') => Action::ChangeMode,
                 KeyCode::Enter => Action::Start,
                 _ => Action::None,
             },
@@ -292,6 +295,7 @@ impl SetupView {
                 ("Up/Down", "choose"),
                 ("Space", "on/off"),
                 ("m", "model"),
+                ("p", "mode"),
                 ("Enter", "start"),
                 ("q", "quit"),
             ]),
@@ -380,6 +384,7 @@ mod tests {
             [StepKind::LlamaCpp, StepKind::Model, StepKind::Bench]
         );
         assert_eq!(view.on_key(char('m')), Action::ChangeModel);
+        assert_eq!(view.on_key(char('p')), Action::ChangeMode);
         assert_eq!(view.on_key(key(KeyCode::Enter)), Action::Start);
         assert_eq!(view.on_key(char('q')), Action::Quit);
     }

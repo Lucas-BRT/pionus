@@ -37,8 +37,9 @@ run `pionus setup` (with the full path when `~/.local/bin` is not on
 `PATH`).
 
 In a terminal, `pionus setup` is a full-screen interface: the hardware,
-then the plan, where Space turns each step on or off and `m` chooses another
-[model](models.md), then each step's output, with a progress bar for
+then the plan, where Space turns each step on or off, `m` chooses another
+[model](models.md) and `p` a mode ([configuration](configuration.md#keys):
+what to prioritise, which picks the model), then each step's output, with a progress bar for
 downloads, and the live benchmark at the end. Steps that use `sudo` run
 outside the full screen, where `sudo` can ask for the password. Steps
 already done are listed but off. With `--yes`, or without a terminal, the
@@ -322,7 +323,15 @@ pionus model                       # choose a model (a picker in a terminal)
 pionus model list                  # the recommended models and those from disk, and which is in use
 pionus model use qwen2.5-coder-7b  # download it from Hugging Face and use it
 pionus model use ~/models/my.gguf  # use a GGUF file from disk, unverified (remembered)
+pionus model mode fast             # what to prioritise: fast, balanced or quality; downloads its model
+pionus model mode off              # back to choosing the model yourself
 ```
+
+In the picker, `p` opens the same choice of a mode. A mode is written as
+`model.mode`, and a `model.name`, `model.gguf` or `model.dir` of the global
+file, which would win over it, is removed; `PIONUS_MODEL` or a flag still
+wins, and the command says so. `model.max_prompt_tokens` is left alone: if you
+wrote one, it beats `quality`'s prompt.
 
 Recommended models are downloaded from Hugging Face (their publishers'
 repositories, or the project's account for pionus's own fine-tunes),

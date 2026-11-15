@@ -27,4 +27,4 @@ expression: "draw(90, 26, |f| view().render(f))"
 │                                                                                        │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 
-[Up/Down] choose  [Space] on/off  [m] model  [Enter] start  [q] quit
+[Up/Down] choose  [Space] on/off  [m] model  [p] mode  [Enter] start  [q] quit

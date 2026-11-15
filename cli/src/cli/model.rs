@@ -11,6 +11,7 @@ use clap::Subcommand;
 use pionus::config::{self, Origin, Resolved};
 use pionus::models::{self, Local, Model};
 use pionus::paths;
+use pionus::tui::mode::{ModeView, Outcome as ModeOutcome};
 use pionus::tui::models::{Action, Entry, LocalEntry, Picker};
 use pionus::tui::{self, Screen};
 
@@ -28,6 +29,13 @@ pub(super) enum ModelCommand {
         /// A model id from `pionus model list`, or a path.
         model: String,
     },
+    /// Choose what to prioritise: download the model of a mode and use it.
+    Mode {
+        /// `fast`, `balanced` or `quality`; `off` goes back to choosing the
+        /// model yourself.
+        #[arg(value_parser = clap::builder::PossibleValuesParser::new(config::mode::NAMES))]
+        mode: String,
+    },
 }
 
 pub(super) fn run(command: Option<ModelCommand>) -> Result<()> {
@@ -38,6 +46,7 @@ pub(super) fn run(command: Option<ModelCommand>) -> Result<()> {
             Some(model) => use_recommended(model),
             None => use_file(&model),
         },
+        Some(ModelCommand::Mode { mode }) => use_mode(&mode),
     }
 }
 
@@ -198,7 +207,7 @@ fn pick() -> Result<()> {
             if current.worker.is_finished() {
                 let Download { model, worker, .. } = download.take().expect("checked");
                 match worker.join() {
-                    Ok(Ok(_)) => break Some(Action::Use(model)),
+                    Ok(Ok(_)) => break Some(Picked::Action(Action::Use(model))),
                     Ok(Err(err)) => picker.download_failed(err.to_string()),
                     Err(_) => picker.download_failed("the download crashed".to_owned()),
                 }
@@ -229,14 +238,40 @@ fn pick() -> Result<()> {
                     worker,
                 });
             }
-            action => break Some(action),
+            Action::ChooseMode => {
+                if let Some(mode) = choose_mode(&mut screen)? {
+                    break Some(Picked::Mode(mode));
+                }
+            }
+            action => break Some(Picked::Action(action)),
         }
     };
     drop(screen);
     match choice {
-        Some(Action::Use(model)) => use_recommended(model),
-        Some(Action::UseFile(path)) => use_file(&path.to_string_lossy()),
+        Some(Picked::Action(Action::Use(model))) => use_recommended(model),
+        Some(Picked::Action(Action::UseFile(path))) => use_file(&path.to_string_lossy()),
+        Some(Picked::Mode(mode)) => use_mode(mode),
         _ => Ok(()),
+    }
+}
+
+/// What the picker ended with: a choice of the list, or of a mode.
+enum Picked {
+    Action(Action),
+    Mode(&'static str),
+}
+
+/// The choice of a mode on `screen`, starting on the one in use; `None` if
+/// the user gave up.
+pub(super) fn choose_mode(screen: &mut Screen) -> Result<Option<&'static str>> {
+    let mut view = ModeView::new(resolve(None, Vec::new())?.settings().mode());
+    loop {
+        screen.draw(|frame| view.render(frame))?;
+        match view.on_key(screen.key()?) {
+            ModeOutcome::None => {}
+            ModeOutcome::Cancel => return Ok(None),
+            ModeOutcome::Chosen(mode) => return Ok(Some(mode)),
+        }
     }
 }
 
@@ -244,6 +279,7 @@ fn pick() -> Result<()> {
 pub(super) enum Chosen {
     Model(&'static Model),
     File(PathBuf),
+    Mode(&'static str),
 }
 
 /// The picker on `screen`, choosing without downloading.
@@ -257,6 +293,11 @@ pub(super) fn choose(screen: &mut Screen) -> Result<Option<Chosen>> {
             Action::Quit => return Ok(None),
             Action::Use(model) | Action::Download(model) => return Ok(Some(Chosen::Model(model))),
             Action::UseFile(path) => return Ok(Some(Chosen::File(path))),
+            Action::ChooseMode => {
+                if let Some(mode) = choose_mode(screen)? {
+                    return Ok(Some(Chosen::Mode(mode)));
+                }
+            }
         }
     }
 }
@@ -299,7 +340,8 @@ fn hugging_face() -> String {
     env("PIONUS_HF_BASE").unwrap_or_else(|| models::HUGGING_FACE.to_owned())
 }
 
-fn use_recommended(model: &'static Model) -> Result<()> {
+/// Downloads `model`'s GGUF unless it is installed, saying so on stderr.
+fn fetch(model: &'static Model) -> Result<()> {
     let dir = paths::default_models_dir(env).context("HOME is not set")?;
     let base = hugging_face();
     let file = dir.join(model.gguf.file);
@@ -319,6 +361,12 @@ fn use_recommended(model: &'static Model) -> Result<()> {
         progress.done();
         eprintln!("checked against the pinned SHA-256: {}", file.display());
     }
+    Ok(())
+}
+
+fn use_recommended(model: &'static Model) -> Result<()> {
+    let dir = paths::default_models_dir(env).context("HOME is not set")?;
+    fetch(model)?;
 
     for line in select(model)? {
         println!("{line}");
@@ -338,6 +386,82 @@ fn use_recommended(model: &'static Model) -> Result<()> {
     }
     suggest_bench();
     Ok(())
+}
+
+/// The model a mode runs, for a preset; none for `off`.
+pub(super) fn mode_model(mode: &str) -> Option<&'static Model> {
+    config::mode::PRESETS
+        .iter()
+        .find(|p| p.name == mode)
+        .and_then(|p| models::find(p.model))
+}
+
+/// Chooses `mode`: downloads its model, then makes it the one in use.
+fn use_mode(mode: &str) -> Result<()> {
+    if let Some(model) = mode_model(mode) {
+        fetch(model)?;
+    }
+    for line in select_mode(mode)? {
+        println!("{line}");
+    }
+    if let Some(model) = mode_model(mode)
+        && model.openvino.is_none()
+    {
+        println!(
+            "note: {} has no OpenVINO version: npu, intel-gpu and openvino-cpu cannot run it.",
+            model.id
+        );
+    }
+    suggest_bench();
+    Ok(())
+}
+
+/// Makes `mode` the one in use (`model.mode`), and for a preset leaves the
+/// model to it: a `model.name`, `model.gguf` or `model.dir` of the global
+/// file would win over the mode, so they are removed, as `model use` removes
+/// the last two; returns what changed. `off` only removes `model.mode`.
+pub(super) fn select_mode(mode: &str) -> Result<Vec<String>> {
+    let path = global_config()?;
+    let origin = Origin::Global(path.clone());
+    let mut lines = Vec::new();
+    if mode == "off" {
+        if config::unset_in_file(&path, "model.mode")? {
+            lines.push(format!(
+                "model.mode removed: model.name and the prompt budget are as configured ({origin})"
+            ));
+        } else {
+            lines.push("model.mode was not set".to_owned());
+        }
+    } else {
+        config::set_in_file(&path, &origin, "model.mode", mode, None)?;
+        lines.push(format!("model.mode = {mode}  ({origin})"));
+        for key in ["model.name", "model.gguf", "model.dir"] {
+            if config::unset_in_file(&path, key)? {
+                lines.push(format!("{key} removed, so the mode's model is used"));
+            }
+        }
+    }
+    lines.extend(stop_kept_after("model.mode"));
+    let resolved = resolve(None, Vec::new())?;
+    for key in ["model.mode", "model.name", "model.max_prompt_tokens"] {
+        if let Some((value, origin @ (Origin::Env(_) | Origin::Flag))) = resolved.get(key)
+            && (key != "model.max_prompt_tokens" || mode == "quality")
+        {
+            lines.push(format!(
+                "note: {key} = {value} from the {origin} overrides the mode"
+            ));
+        }
+    }
+    if mode == "quality"
+        && let Some((value, origin @ Origin::Global(_))) = resolved.get("model.max_prompt_tokens")
+    {
+        lines.push(format!(
+            "note: model.max_prompt_tokens = {value} ({origin}) is written, so it beats the \
+             mode's prompt of 4096; `pionus config unset model.max_prompt_tokens` lets the \
+             mode decide"
+        ));
+    }
+    Ok(lines)
 }
 
 /// Makes `model` the one in use (model.name, without model.gguf or
