@@ -191,7 +191,11 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with
   means no contradiction found, not that the message is right). `truncated`
   and `unsupported_visible` read the prompt the model saw (the last attempt in
   the trace): the first says files were cut, the second checks the specifics
-  against that prompt, not the whole diff;
+  against that prompt, not the whole diff. `evidence_kept` (the share of the
+  diff's changed lines the prompt shows) and `hunks_shown` (the share of its
+  hunks with a line in the prompt) depend on the prompt alone, so two ways of
+  cutting a diff compare on the same inputs with the mock backend and no
+  model;
   `pionus-training score`'s docstring defines them.
   `type_match` counts only the repository's own type as right, and its noise
   (labels, seeds) is larger than the gains tried so far, so a comparison also

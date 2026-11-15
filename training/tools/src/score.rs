@@ -32,6 +32,14 @@
 //!   level a human reaches with the same diff
 //! - truncated: the prompt the model saw says some files are only partly shown
 //!   (the last attempt's prompt, as recorded in the trace)
+//! - evidence_kept: the share of the diff's changed lines (`+` and `-`, except
+//!   lockfiles and generated files, which the prompt leaves to the file list)
+//!   that the prompt shows; 1 when none was cut. It depends on the prompt
+//!   alone, so two selectors compare on the same inputs with no model
+//! - hunks_shown: the share of the diff's hunks (same files as above) with a
+//!   changed line in the prompt: how many distinct changes the model can see,
+//!   which a cut that keeps the first lines and one that keeps whole hunks
+//!   differ on even when they show as many lines
 //! - unsupported_visible: like unsupported, but against the history and what
 //!   the model's prompt showed, not the whole diff: a specific only the cut
 //!   part held counts. Without an attempt (rules), the whole inputs
@@ -89,6 +97,85 @@ static DOWN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\b(decrease[sd]?|lower(?:s|ed)?|reduc(?:e|es|ed)|shrink|drop(?:s|ped)?)\b")
         .expect("a valid pattern")
 });
+
+/// Lockfiles, which the prompt keeps out of the diff whatever their size.
+fn is_lockfile(path: &str) -> bool {
+    let name = path.rsplit('/').next().unwrap_or(path);
+    name.ends_with(".lock") || name.ends_with("-lock.json") || name.ends_with("-lock.yaml")
+}
+
+/// The share of the hunks of `inputs` with a changed line in `shown`; 1 when
+/// there are no hunks.
+pub fn hunks_shown(inputs: &Value, shown: &str) -> f64 {
+    let seen: BTreeSet<&str> = shown
+        .lines()
+        .filter(|l| l.starts_with('+') || l.starts_with('-'))
+        .collect();
+    let generated = strings(inputs, "generated");
+    let (mut total, mut visible) = (0usize, 0usize);
+    for f in inputs["files"].as_array().into_iter().flatten() {
+        let path = f["path"].as_str().unwrap_or("");
+        if is_lockfile(path) || generated.contains(&path) {
+            continue;
+        }
+        let mut hunks: Vec<Vec<&str>> = Vec::new();
+        for line in f["hunks"].as_str().unwrap_or("").lines() {
+            if line.starts_with("@@") {
+                hunks.push(Vec::new());
+            } else if (line.starts_with('+') || line.starts_with('-')) && !hunks.is_empty() {
+                hunks.last_mut().expect("a hunk").push(line);
+            }
+        }
+        for hunk in hunks.iter().filter(|h| !h.is_empty()) {
+            total += 1;
+            visible += usize::from(hunk.iter().any(|l| seen.contains(l)));
+        }
+    }
+    if total == 0 {
+        1.0
+    } else {
+        visible as f64 / total as f64
+    }
+}
+
+/// The share of the changed lines of `inputs` that `shown` (the prompt's user
+/// message) has, line by line and counting repeats; 1 when there are none.
+pub fn evidence_kept(inputs: &Value, shown: &str) -> f64 {
+    let changed = |text: &str| -> Vec<String> {
+        text.lines()
+            .filter(|l| {
+                (l.starts_with('+') || l.starts_with('-'))
+                    && !l.starts_with("+++")
+                    && !l.starts_with("---")
+            })
+            .map(str::to_owned)
+            .collect()
+    };
+    let generated = strings(inputs, "generated");
+    let mut total: BTreeMap<String, usize> = BTreeMap::new();
+    for f in inputs["files"].as_array().into_iter().flatten() {
+        let path = f["path"].as_str().unwrap_or("");
+        if is_lockfile(path) || generated.contains(&path) {
+            continue;
+        }
+        for line in changed(f["hunks"].as_str().unwrap_or("")) {
+            *total.entry(line).or_insert(0) += 1;
+        }
+    }
+    let mut seen: BTreeMap<String, usize> = BTreeMap::new();
+    for line in changed(shown) {
+        *seen.entry(line).or_insert(0) += 1;
+    }
+    let all: usize = total.values().sum();
+    if all == 0 {
+        return 1.0;
+    }
+    let kept: usize = total
+        .iter()
+        .map(|(line, n)| (*n).min(*seen.get(line).unwrap_or(&0)))
+        .sum();
+    kept as f64 / all as f64
+}
 
 /// What the user message says when files are cut (`prompt/user.rs`).
 const PARTLY_SHOWN: &str = "files are only partly shown";
@@ -457,6 +544,10 @@ pub fn row_of(m: &Value, t: &Value) -> Vec<(&'static str, Metric)> {
         ("word_f1", Number(f1(subject, target))),
         ("exact", Yes(subject == target)),
     ];
+    if let Some(user) = shown {
+        row.push(("evidence_kept", Number(evidence_kept(&t["inputs"], user))));
+        row.push(("hunks_shown", Number(hunks_shown(&t["inputs"], user))));
+    }
     let patterns: Vec<String> = strings(m, "expect")
         .into_iter()
         .map(str::to_owned)

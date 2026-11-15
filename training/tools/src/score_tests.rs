@@ -300,3 +300,37 @@ fn the_prompt_the_model_saw_decides_what_was_visible() {
         Some(Metric::Yes(false))
     );
 }
+
+#[test]
+fn evidence_kept_is_the_share_of_changed_lines_the_prompt_shows() {
+    let inputs = json!({
+        "files": [
+            {"path": "a.rs", "hunks": "@@ -1,2 +1,2 @@\n-old = 1\n+old = 2\n context\n@@ -9 +9 @@\n-late = 1\n+late = 2\n"},
+            {"path": "Cargo.lock", "hunks": "@@ -1 +1 @@\n-x\n+y\n"},
+        ],
+    });
+    let whole = "Files changed:\n--- a.rs\n@@ -1 +1 @@\n-old = 1\n+old = 2\n@@ -9 +9 @@\n-late = 1\n+late = 2\n";
+    assert_eq!(evidence_kept(&inputs, whole), 1.0);
+    // The late hunk cut: half of the four changed lines (the lockfile is not counted).
+    let cut = "--- a.rs\n@@ -1 +1 @@\n-old = 1\n+old = 2\n[... 1 more hunks]\n";
+    assert_eq!(evidence_kept(&inputs, cut), 0.5);
+    assert_eq!(evidence_kept(&inputs, "Files changed:\n"), 0.0);
+    // Nothing to show is nothing lost.
+    assert_eq!(evidence_kept(&json!({"files": []}), ""), 1.0);
+}
+
+#[test]
+fn hunks_shown_counts_the_changes_the_prompt_has_a_line_of() {
+    let inputs = json!({
+        "files": [{"path": "a.rs", "hunks": "@@ -1 +1 @@\n-a = 1\n+a = 2\n@@ -5 +5 @@\n-b = 1\n+b = 2\n@@ -9 +9 @@\n-c = 1\n+c = 2\n"}],
+    });
+    assert_eq!(
+        hunks_shown(&inputs, "-a = 1\n+a = 2\n-b = 1\n+b = 2\n-c = 1\n"),
+        1.0
+    );
+    // Two lines of the first hunk show one of three changes, as many lines
+    // as the first and last hunk's one line each would show of two.
+    assert_eq!(hunks_shown(&inputs, "-a = 1\n+a = 2\n"), 1.0 / 3.0);
+    assert_eq!(hunks_shown(&inputs, "-a = 1\n-c = 1\n"), 2.0 / 3.0);
+    assert_eq!(hunks_shown(&json!({"files": []}), ""), 1.0);
+}
