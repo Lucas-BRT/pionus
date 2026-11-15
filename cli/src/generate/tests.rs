@@ -470,6 +470,42 @@ mod tests {
         }
     }
 
+    /// A backend set up for a prompt length of its own, as a llama.cpp device
+    /// whose budget was left to its default is.
+    struct SetUp(MockBackend, usize);
+
+    impl Backend for SetUp {
+        fn describe(&self) -> String {
+            self.0.describe()
+        }
+
+        fn generate(
+            &self,
+            prompt: &Prompt,
+            config: &GenerationConfig,
+        ) -> Result<String, BackendError> {
+            self.0.generate(prompt, config)
+        }
+
+        fn prompt_tokens(&self) -> Option<usize> {
+            Some(self.1)
+        }
+    }
+
+    #[test]
+    fn a_backend_set_up_for_a_prompt_length_sets_the_budget() {
+        let options = PromptOptions::default();
+        let budgeted = crate::generate::budgeted(&options, &SetUp(MockBackend::new(["x"]), 2048));
+        assert_eq!(budgeted.max_prompt_tokens, 2048);
+        assert_eq!(
+            PromptOptions {
+                max_prompt_tokens: options.max_prompt_tokens,
+                ..budgeted
+            },
+            options
+        );
+    }
+
     #[test]
     fn a_backend_can_take_less_than_the_budget_asked_for() {
         let options = PromptOptions::default();

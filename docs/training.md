@@ -275,34 +275,47 @@ shards have no Conventional repository left). Greedy decoding gives the same
 replies on every run, so a rerun on the same inputs says nothing: the second
 set is what gives the first one margin.
 
-| Set | Metric | `fast` | `balanced` | `quality` |
-|---|---|---|---|---|
-| eval-v1 | `type_match` (Conventional) | 0.672 | 0.692 | 0.700 |
-| eval-v1 | `type_macro_f1` (Conventional) | 0.553 | 0.603 | 0.618 |
-| eval-v1 | `word_f1` | 0.302 | 0.313 | 0.324 |
-| eval-v1 | `ungrounded` | 0.006 | 0.026 | 0.028 |
-| eval-v1 | `truncated` | 0.246 | 0.246 | 0.104 |
-| eval-v1 | `evidence_kept` | 0.825 | 0.824 | 0.938 |
-| eval-v2 | `word_f1` | 0.263 | 0.276 | 0.277 |
-| eval-v2 | `ungrounded` | 0.008 | 0.020 | 0.020 |
-| eval-v2 | `truncated` | 0.200 | 0.200 | 0.064 |
-| eval-v2 | `evidence_kept` | 0.893 | 0.893 | 0.968 |
-| scenarios | `expected` | 0.489 | 0.702 | 0.681 |
+`fast` against `balanced`, both with a prompt of 1024 tokens:
 
-- A prompt twice as long (`quality` against `balanced`) cuts the share of
-  prompts with a cut file from 0.25 to 0.10 on eval-v1 and from 0.20 to 0.06 on
-  eval-v2 (+0/−71 and +0/−34 cases, p = 0.0), and the changed lines shown rise
-  from 0.82 to 0.94 and from 0.89 to 0.97. The messages do not show a
-  measurable gain: `type_match` +4/−2 (p = 0.69), `ungrounded` +1/−0, `expected`
-  on the scenarios +0/−1.
-- `balanced` against `fast`: `type_macro_f1` 0.603 against 0.553 and the
-  scenarios' `expected` +11/−1 (p = 0.006), but `fast` invents less on eval-v1
-  (`ungrounded` +12/−2 for `balanced`, p = 0.013; `unsupported_visible`
-  +8/−1, p = 0.039). On eval-v2 the same direction, not significant
-  (`ungrounded` +3/−0, p = 0.25).
-- The `ungrounded`, `evidence_kept` and `truncated` columns are lexical or
-  count lines: they do not say whether a message is better written for seeing
-  more of the diff.
+| Set | Metric | `fast` | `balanced` |
+|---|---|---|---|
+| eval-v1 | `type_macro_f1` (Conventional) | 0.553 | 0.603 |
+| eval-v1 | `word_f1` | 0.302 | 0.313 |
+| eval-v1 | `ungrounded` | 0.006 | 0.026 |
+| eval-v2 | `word_f1` | 0.263 | 0.276 |
+| eval-v2 | `ungrounded` | 0.008 | 0.020 |
+| scenarios | `expected` | 0.489 | 0.702 |
+
+- `balanced` has the better type (`type_macro_f1`) and the better scenarios
+  (`expected` +11/−1, p = 0.006), but `fast` invents less on eval-v1
+  (`ungrounded` +12/−2 for `balanced`, p = 0.013; `unsupported_visible` +8/−1,
+  p = 0.039). On eval-v2 the same direction, not significant (+3/−0, p = 0.25).
+
+The prompt budget, `pionus-1.5b-v0.3`, 1024, 2048 and 4096 tokens:
+
+| Set | Metric | 1024 | 2048 | 4096 |
+|---|---|---|---|---|
+| eval-v1 | `type_match` (Conventional) | 0.692 | 0.700 | 0.708 |
+| eval-v1 | `word_f1` | 0.313 | 0.324 | 0.327 |
+| eval-v1 | `ungrounded` | 0.026 | 0.028 | 0.028 |
+| eval-v1 | `truncated` | 0.246 | 0.104 | 0.024 |
+| eval-v1 | `evidence_kept` | 0.824 | 0.938 | 0.982 |
+| eval-v2 | `word_f1` | 0.276 | 0.277 | 0.280 |
+| eval-v2 | `truncated` | 0.200 | 0.064 | 0.020 |
+| eval-v2 | `evidence_kept` | 0.893 | 0.968 | 0.991 |
+| scenarios | `expected` | 0.702 | 0.681 | 0.681 |
+
+- A longer prompt cuts the share of prompts with a cut file (1024 → 2048:
+  +0/−71 on eval-v1 and +0/−34 on eval-v2; 2048 → 4096: +0/−40 and +0/−11; all
+  p ≤ 0.001) and raises the changed lines shown, but the messages do not show
+  a measurable gain: 1024 → 2048 `type_match` +4/−2 (p = 0.69), 2048 → 4096
+  +2/−0 (p = 0.5), `expected` on the scenarios +0/−1.
+- The default model, `qwen2.5-coder-1.5b`, 1024 against 2048: `truncated`
+  0.252 → 0.104 (+0/−74), `first_try` 0.812 → 0.806 (+4/−7, p = 0.55),
+  `type_match` 0.512 → 0.508, `ungrounded` 0.128 → 0.126; on eval-v2
+  `word_f1` 0.170 → 0.174, `ungrounded` 0.108 both.
+- `ungrounded`, `evidence_kept` and `truncated` are lexical or count lines: they
+  do not say whether a message is better written for seeing more of the diff.
 
 ## Training
 

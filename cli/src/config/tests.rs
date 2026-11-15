@@ -665,7 +665,13 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {
     let fast = resolve(None, None, HOME, vec![("model.mode", "fast".into())]).unwrap();
     let settings = fast.settings();
     assert_eq!(settings.model.id, "pionus-0.5b-v0.3");
+    // Only the model: the prompt is left to the device's default.
     assert_eq!(settings.max_prompt_tokens, 1024);
+    assert!(!settings.max_prompt_tokens_set);
+    assert_eq!(
+        fast.get("model.max_prompt_tokens").unwrap().1,
+        Origin::Default
+    );
     assert_eq!(fast.get("model.name").unwrap().1, Origin::Mode("fast"));
     assert_eq!(fast.get("model.name").unwrap().1.to_string(), "mode fast");
     // The model's files follow the model the mode chose.
@@ -680,9 +686,14 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {
         .unwrap()
         .settings();
     assert_eq!(
-        (quality.model.id, quality.max_prompt_tokens),
-        ("pionus-1.5b-v0.3", 2048)
+        (
+            quality.model.id,
+            quality.max_prompt_tokens,
+            quality.max_prompt_tokens_set
+        ),
+        ("pionus-1.5b-v0.3", 4096, true)
     );
+    assert_eq!(quality.prompt_tokens_on(Target::Vulkan), 4096);
     let balanced = resolve(None, None, HOME, vec![("model.mode", "balanced".into())])
         .unwrap()
         .settings();
@@ -690,6 +701,62 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {
         (balanced.model.id, balanced.max_prompt_tokens),
         ("pionus-1.5b-v0.3", 1024)
     );
+    assert_eq!(balanced.prompt_tokens_on(Target::Vulkan), 2048);
+}
+
+#[test]
+fn the_prompt_budget_is_the_devices_unless_someone_set_one() {
+    let unset = resolve(None, None, HOME, vec![]).unwrap().settings();
+    assert!(!unset.max_prompt_tokens_set);
+    // The NPU compiles for one length and the OpenVINO devices are not
+    // measured yet: the setting's default. The llama.cpp devices take more.
+    for (target, tokens) in [
+        (Target::Npu, 1024),
+        (Target::IntelGpu, 1024),
+        (Target::OpenvinoCpu, 1024),
+        (Target::Vulkan, 2048),
+        (Target::Cpu, 2048),
+    ] {
+        assert_eq!(unset.prompt_tokens_on(target), tokens, "{target}");
+    }
+    assert_eq!(
+        unset
+            .llamacpp_options(Target::Vulkan, false)
+            .unwrap()
+            .max_prompt_tokens,
+        2048
+    );
+    assert_eq!(
+        unset
+            .llamacpp_options(Target::Cpu, false)
+            .unwrap()
+            .max_prompt_tokens,
+        2048
+    );
+    // A value someone wrote wins on every device, even the default's own.
+    for value in ["512", "1024", "4096"] {
+        let set = resolve(
+            Some(&format!("[model]\nmax_prompt_tokens = {value}\n")),
+            None,
+            HOME,
+            vec![],
+        )
+        .unwrap()
+        .settings();
+        assert!(set.max_prompt_tokens_set);
+        let value: usize = value.parse().unwrap();
+        for target in [Target::Npu, Target::IntelGpu, Target::Vulkan, Target::Cpu] {
+            assert_eq!(set.prompt_tokens_on(target), value, "{target}");
+        }
+        assert_eq!(
+            set.llamacpp_options(Target::Vulkan, false)
+                .unwrap()
+                .max_prompt_tokens,
+            value
+        );
+    }
+    // The NPU's own check is on the setting, as before.
+    assert_eq!(unset.max_prompt_tokens, 1024);
 }
 
 #[test]

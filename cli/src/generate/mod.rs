@@ -65,7 +65,8 @@ pub struct Generation {
 /// with, and what a trace of them records.
 pub fn budgeted(options: &PromptOptions, backend: &dyn Backend) -> PromptOptions {
     PromptOptions {
-        max_prompt_tokens: backend.prompt_budget(options.max_prompt_tokens),
+        max_prompt_tokens: backend
+            .prompt_budget(backend.prompt_tokens().unwrap_or(options.max_prompt_tokens)),
         ..options.clone()
     }
 }

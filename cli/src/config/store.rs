@@ -277,6 +277,10 @@ impl Resolved {
             },
             cache_dir: self.text("model.cache_dir").map(PathBuf::from),
             max_prompt_tokens: self.count("model.max_prompt_tokens"),
+            max_prompt_tokens_set: matches!(
+                self.values.get("model.max_prompt_tokens"),
+                Some((_, origin)) if *origin != Origin::Default
+            ),
             max_new_tokens: self.count("model.max_new_tokens"),
             convention: convention(choice("style.convention")),
             default_convention: convention(choice("style.default_convention")).expect("not auto"),
@@ -387,6 +391,12 @@ impl FastLoad {
     }
 }
 
+/// The prompt budget of a llama.cpp device when nobody set one: twice the
+/// setting's default, which the NPU's fixed length keeps (measured on the
+/// RTX 3050: the prompts with a cut file fall from 25% to 10% for 12% more
+/// time per message).
+pub const LLAMACPP_PROMPT_TOKENS: usize = 2048;
+
 /// Every setting, typed and resolved.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Settings {
@@ -414,6 +424,10 @@ pub struct Settings {
     pub npu: NpuTuning,
     pub cache_dir: Option<PathBuf>,
     pub max_prompt_tokens: usize,
+    /// Whether `model.max_prompt_tokens` was set by someone (a file, the
+    /// environment, a flag or a mode) and not left at its default: only an
+    /// unset one gives way to the device's default.
+    pub max_prompt_tokens_set: bool,
     pub max_new_tokens: usize,
     pub convention: Option<Convention>,
     pub default_convention: Convention,
@@ -447,6 +461,19 @@ impl Settings {
             // Measured on eval-v1 with the v0.2 fine-tunes and the base
             // models: better types for all four (training H11).
             diff: DiffFormat::Annotated,
+        }
+    }
+
+    /// The prompt budget on `target`: `model.max_prompt_tokens` where someone
+    /// set it, else the target's default. The NPU compiles its graph for one
+    /// prompt length, so its default is the setting's own; the llama.cpp
+    /// devices (`vulkan`, `cpu`) take what the context is sized for, and
+    /// [`LLAMACPP_PROMPT_TOKENS`] shows more of a large diff. The OpenVINO GPU
+    /// and CPU keep the setting's default until they are measured.
+    pub fn prompt_tokens_on(&self, target: Target) -> usize {
+        match target {
+            Target::Vulkan | Target::Cpu if !self.max_prompt_tokens_set => LLAMACPP_PROMPT_TOKENS,
+            _ => self.max_prompt_tokens,
         }
     }
 
@@ -514,7 +541,7 @@ impl Settings {
                 Target::Cpu => LlamaDevice::Cpu,
                 _ => LlamaDevice::Vulkan(self.vulkan_device),
             },
-            max_prompt_tokens: self.max_prompt_tokens,
+            max_prompt_tokens: self.prompt_tokens_on(target),
             max_new_tokens: self.max_new_tokens,
             threads_batch: match self.threads_batch {
                 0 => crate::hardware::physical_cores(Path::new("/sys"))

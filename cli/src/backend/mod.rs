@@ -73,6 +73,14 @@ pub trait Backend {
         requested
     }
 
+    /// The prompt length this backend was set up for, when that is not what
+    /// the settings ask for: a llama.cpp device whose budget was left to its
+    /// default, which is not the NPU's (see `Settings::prompt_tokens_on`).
+    /// `None` when the settings decide.
+    fn prompt_tokens(&self) -> Option<usize> {
+        None
+    }
+
     /// The Conventional Commits types the reply to `prompt` may start with,
     /// most likely first, with their probabilities. Empty when the backend
     /// cannot tell (only llama.cpp's devices can).

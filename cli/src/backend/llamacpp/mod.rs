@@ -84,6 +84,8 @@ pub struct LlamaCppBackend {
     dir: Option<PathBuf>,
     socket: PathBuf,
     description: String,
+    /// The prompt budget the server's context was sized for.
+    prompt_tokens: usize,
     load_ms: f32,
     last_metrics: Mutex<Option<Metrics>>,
 }
@@ -189,6 +191,7 @@ impl LlamaCppBackend {
             dir: Some(dir),
             socket,
             description: describe(options),
+            prompt_tokens: options.max_prompt_tokens,
             load_ms: 0.0,
             last_metrics: Mutex::new(None),
         };
@@ -235,12 +238,13 @@ impl LlamaCppBackend {
 
     /// Talks to a server that is already running, without managing it.
     #[doc(hidden)]
-    pub fn connect(socket: PathBuf, description: String) -> Self {
+    pub fn connect(socket: PathBuf, description: String, prompt_tokens: usize) -> Self {
         Self {
             server: None,
             dir: None,
             socket,
             description,
+            prompt_tokens,
             load_ms: 0.0,
             last_metrics: Mutex::new(None),
         }
@@ -323,6 +327,10 @@ impl Drop for LlamaCppBackend {
 impl Backend for LlamaCppBackend {
     fn describe(&self) -> String {
         self.description.clone()
+    }
+
+    fn prompt_tokens(&self) -> Option<usize> {
+        Some(self.prompt_tokens)
     }
 
     fn generate(&self, prompt: &Prompt, config: &GenerationConfig) -> Result<String, BackendError> {

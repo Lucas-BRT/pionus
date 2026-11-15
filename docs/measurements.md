@@ -81,7 +81,9 @@ Earlier measurements, on prompts of about 250 tokens, gave the Core Ultra 5
 
 Ryzen 5 5500, RTX 3050 (8 GiB) on `vulkan`, release build of commit `7691599`;
 each mode through `pionus eval` with `PIONUS_MODE` and a config home with
-nothing in it, on the first 20 and the first 100 inputs of eval-v1 (greedy
+nothing in it (with the presets of that time: a prompt of 1024, 1024 and 2048
+tokens; the modes now leave the prompt to the device or, `quality`, give it
+4096: see [the prompt budget](#prompt-budget)), on the first 20 and the first 100 inputs of eval-v1 (greedy
 decoding, so a rerun gives the same replies). The time per message is
 `(t100 − t20) / 80` and the load is what is left of `t20` (process start and
 model load), over 4 runs; the range is the lowest and highest run.
@@ -104,6 +106,29 @@ for mode in fast balanced quality; do
     pionus eval inputs-20.jsonl --device vulkan > /dev/null
 done   # then the same with 100 inputs
 ```
+
+## Prompt budget
+
+`model.max_prompt_tokens` left unset is 2048 on `vulkan` and `cpu` and 1024 on
+the NPU, whose length is fixed when it compiles. Ryzen 5 5500 and RTX 3050
+(`vulkan`), `pionus eval` with each value written in a config home, and
+`pionus-1.5b-v0.3` unless said: the time per message is `(t100 − t20) / 80`
+over 3 runs of the same inputs, so the rows compare within this table (the
+machine was not otherwise idle, and `by mode` above ran on another day).
+
+| Prompt | Per message | Load | Prompts with a cut file (eval-v1) | Changed lines shown |
+|---|---|---|---|---|
+| 1024 | 0.24 s | 1.9 s | 25% | 82% |
+| 2048 | 0.27 s (+12%) | 2.1 s | 10% | 94% |
+| 4096 | 0.29 s (+20%) | 2.3 s | 2% | 98% |
+
+The default model, `qwen2.5-coder-1.5b`, on `vulkan`: 0.34 s per message at
+1024 and at 2048 (one run each; the load goes from 2.9 to 3.6 s). On the `cpu`
+device (one run each, so the order of magnitude only): `pionus-1.5b-v0.3`
+2.9 s at 1024 and 3.5 s at 2048 per message, the default model 3.7 s and
+4.3 s, 16–21% more. What the longer prompts score is in
+[training](training.md#the-three-modes): the messages are not measurably
+different, the share of the diff the model sees is.
 
 ## Fast load
 

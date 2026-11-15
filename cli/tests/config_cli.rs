@@ -297,7 +297,7 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
         "{listed}"
     );
     assert!(
-        listed.contains("model.max_prompt_tokens = 1024  (mode fast)"),
+        listed.contains("model.max_prompt_tokens = 1024  (default)"),
         "{listed}"
     );
     let models = env.ok(&["model", "list"], dir.path());
@@ -306,7 +306,7 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
         "{models}"
     );
     // The environment is written explicitly: it beats the mode for the model
-    // and leaves the prompt to it.
+    // and leaves the prompt to it, which fast does not set.
     let output = env.run_with(
         &["config", "list", "--show-origin"],
         dir.path(),
@@ -318,7 +318,14 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {
         "{listed}"
     );
     assert!(
-        listed.contains("model.max_prompt_tokens = 1024  (mode fast)"),
+        listed.contains("model.max_prompt_tokens = 1024  (default)"),
+        "{listed}"
+    );
+    // `quality` has a prompt of its own, and says so.
+    env.ok(&["config", "set", "model.mode", "quality"], dir.path());
+    let listed = env.ok(&["config", "list", "--show-origin"], dir.path());
+    assert!(
+        listed.contains("model.max_prompt_tokens = 4096  (mode quality)"),
         "{listed}"
     );
     // A mode of the repository would reach every machine that opens it.

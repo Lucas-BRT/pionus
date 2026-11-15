@@ -171,6 +171,7 @@ pub fn connect(
     Ok(LlamaCppBackend::connect(
         socket,
         llamacpp::describe(options),
+        options.max_prompt_tokens,
     ))
 }
 

@@ -53,7 +53,7 @@ value, for example when an environment variable is set.
 | `model.ask_type_below` | 1–99 | 50 | `PIONUS_ASK_TYPE_BELOW` | global |
 | `model.npu_prefill_chunk` | 512–8192 | 512 | | global |
 | `model.npu_generate_hint` | `best_perf`, `fast_compile` | `best_perf` | | global |
-| `model.max_prompt_tokens` | 256–8192 | 1024 | | global |
+| `model.max_prompt_tokens` | 256–8192 | 2048 on `vulkan` and `cpu`, 1024 on the other devices | | global |
 | `model.max_new_tokens` | 16–1024 | 128 | | global |
 | `style.convention` | `auto`, `conventional`, `gitmoji`, `free` | `auto` | | global or repository |
 | `style.default_convention` | `conventional`, `gitmoji`, `free` | `conventional` | | global or repository |
@@ -80,17 +80,19 @@ value, for example when an environment variable is set.
 
   | Mode | `model.name` | `model.max_prompt_tokens` |
   |---|---|---|
-  | `fast` | `pionus-0.5b-v0.3` | 1024 |
-  | `balanced` | `pionus-1.5b-v0.3` | 1024 |
-  | `quality` | `pionus-1.5b-v0.3` | 2048 |
+  | `fast` | `pionus-0.5b-v0.3` | the device's default |
+  | `balanced` | `pionus-1.5b-v0.3` | the device's default |
+  | `quality` | `pionus-1.5b-v0.3` | 4096 |
 
   `off`, the default, changes nothing: an existing configuration behaves as
   before. The presets are starting points: what they cost
   ([measurements](measurements.md#by-mode)) and what they score
   ([training](training.md#the-three-modes)) is measured on one machine, and
-  `quality` shows more of the diff without a measured gain in the messages; the fine-tunes are experimental and have no OpenVINO export, so a
-  mode runs on `vulkan` and `cpu` (`pionus model` and `pionus config` show the
-  model and where it came from, `mode fast` and so on).
+  `quality` shows nearly all of a large diff (4096 tokens) without a measured
+  gain in the messages. The fine-tunes are experimental and have no OpenVINO
+  export, so a mode runs on `vulkan` and `cpu`; `pionus model` and
+  `pionus config list --show-origin` show the model and where it came from
+  (`mode fast` and so on).
 - `model.vulkan_device` picks a GPU on machines with more than one, as
   `llama-server --list-devices` numbers them (0 is `Vulkan0`).
 - `model.fast_load` starts llama-server (`vulkan` and `cpu`) with
@@ -154,7 +156,16 @@ value, for example when an environment variable is set.
   [measurements](measurements.md#asking-for-the-type).
 - `model.npu_prefill_chunk` must divide `model.max_prompt_tokens`. Chunks
   smaller than 512 fail to compile with NPU driver 1.38.
-- `model.max_prompt_tokens` is also the prompt length the NPU compiles for;
+- `model.max_prompt_tokens` is the prompt budget, in estimated tokens. Left
+  unset, it is 2048 on `vulkan` and `cpu`, whose llama.cpp context is sized for
+  it (the prompts with a cut file fall from 25% to 10% for about 12% more time
+  per message, on an RTX 3050: [measurements](measurements.md#prompt-budget)),
+  and 1024 on the NPU, whose length is fixed when it compiles, and on
+  `intel-gpu` and `openvino-cpu`, not measured yet. A value you write (a file,
+  the environment, a flag or a mode) applies on every device, and
+  `pionus prompt` shows that one, or 1024 when none is set: it does not load
+  a device.
+  It is also the prompt length the NPU compiles for;
   the NPU is given a fifth less of it as the prompt budget, since it fails
   on a longer prompt and the estimate can be short
   ([architecture](architecture.md#fitting-the-diff)).

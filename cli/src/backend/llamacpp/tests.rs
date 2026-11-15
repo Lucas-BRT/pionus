@@ -229,7 +229,9 @@ fn generates_through_the_socket() {
             reply("500 Internal Server Error", "boom"),
         ],
     );
-    let backend = LlamaCppBackend::connect(socket, "fake".into());
+    let backend = LlamaCppBackend::connect(socket, "fake".into(), 1024);
+    // The budget the server's context was sized for decides the prompt's.
+    assert_eq!(backend.prompt_tokens(), Some(1024));
 
     let text = backend
         .generate(&prompt(), &GenerationConfig::default())
@@ -417,7 +419,7 @@ fn types_and_a_chosen_start_go_through_the_socket() {
         &socket,
         vec![reply("200 OK", choices), reply("200 OK", reply_body)],
     );
-    let backend = LlamaCppBackend::connect(socket, "fake".into());
+    let backend = LlamaCppBackend::connect(socket, "fake".into(), 1024);
 
     let types = backend.type_choices(&prompt()).unwrap();
     assert_eq!(types[0].name, "feat");
