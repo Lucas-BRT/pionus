@@ -427,7 +427,7 @@ only these show it. `--read 30` prints that many cases side by side (half
 Conventional, the same whatever the models): what no metric counts is seen
 there. A candidate costs
 about two minutes of GPU on 500 inputs. The hand-written scenarios
-(`pionus-training scenarios build data/scenarios-eval $SC --split eval`, 46 cases,
+(`pionus-training scenarios build data/scenarios-eval $SC --split eval`, 48 cases,
 14 Conventional) are a second set for the same purpose: small, so they confirm
 more than they decide, and they add the column `expected`, the share of cases
 whose message matches the patterns written for them. The evaluation sets

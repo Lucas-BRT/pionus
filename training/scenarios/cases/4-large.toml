@@ -183,3 +183,29 @@ ops = [{ op = "regex", paths = ["src/*.ts", "test/*.ts"], pattern = "\\bRegistry
 target = "refactor(accounts): rename Registry to AccountBook"
 expect = ["^refactor", "registry|accountbook|rename"]
 tags = ["rename"]
+
+# One decisive change in the file that sorts last, once buried under a bulk
+# edit that fills the prompt budget and once alone: the pair differs only in
+# whether the change fits, so a gap between them is the cost of truncation.
+[[case]]
+id = "late-decisive-hunk"
+title = "bulk formatting hides a number that moves down"
+repo = "coffeeshop"
+split = "eval"
+ops = [
+  { op = "regex", paths = ["src/coffeeshop/*.py", "tests/*.py"], pattern = "\"(?!\"\")([^\"\\n]*)\"", repl = "'\\1'", optional = true },
+  { op = "replace", path = "tests/test_order.py", old = "discount=0.9", new = "discount=0.8" },
+]
+target = "use single quotes and lower the order test discount to 0.8"
+expect = ["quote", "0\\.8"]
+tags = ["formatting", "numbers"]
+
+[[case]]
+id = "late-decisive-control"
+title = "a number moves down, nothing else"
+repo = "coffeeshop"
+split = "eval"
+ops = [{ op = "replace", path = "tests/test_order.py", old = "discount=0.9", new = "discount=0.8" }]
+target = "lower the order test discount to 0.8"
+expect = ["discount", "0\\.8"]
+tags = ["numbers"]
