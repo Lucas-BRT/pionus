@@ -140,10 +140,10 @@ fn changed_numbers(hunks: &str) -> Vec<(f64, f64)> {
             );
             if x.len() == y.len() && NUMBER.replace_all(a, "#") == NUMBER.replace_all(b, "#") {
                 for (p, q) in x.iter().zip(&y) {
-                    if let (Ok(p), Ok(q)) = (p.parse::<f64>(), q.parse::<f64>()) {
-                        if p != q {
-                            found.push((p, q));
-                        }
+                    if let (Ok(p), Ok(q)) = (p.parse::<f64>(), q.parse::<f64>())
+                        && p != q
+                    {
+                        found.push((p, q));
                     }
                 }
             }
