@@ -541,6 +541,29 @@ prompt code builds the training prompts and the evaluation's. Then `kaggle kerne
 lucasbrt/pionus-lora`, `export_gguf.py` on each adapter and `pionus-training compare` on `data/val1`
 with `--diff annotated` (S0 is the baseline).
 
+### The prompt of the product, two arms (a pilot)
+
+A is the old prompt and B the new one, built from the same selection with
+`--max-prompt-tokens` and `--facts`; `--max-length` must hold the longer prompts, or
+`train.py` skips them. The binary of A is release 0.15.0.
+
+```bash
+SC=../target/release/pionus; SCT=../target/release/pionus-training
+$SCT select data/train-8 data/p4/sel --conventional 7000 --free 5000 --per-repo 150 \
+  --supported-only --max-type-share 0.3 \
+  --exclude-repos-of data/eval-v1 data/eval-short data/eval-v2 data/judge1 data/pilot1
+for a in A B; do mkdir -p data/p4/$a; cp data/p4/sel/*.jsonl data/p4/$a/; done
+$SCT make-examples data/p4/A ~/.local/bin/pionus --rules full --diff annotated
+$SCT make-examples data/p4/B $SC --rules full --diff annotated --facts on --max-prompt-tokens 2048
+$SCT kaggle-bundle train data/kaggle/p4 \
+  "pB-0.5b=0.5b:data/p4/B/examples.jsonl:--max-length 2560" \
+  "pA-0.5b=0.5b:data/p4/A/examples.jsonl:--max-length 2560"   # --seed 1 for the second
+```
+
+`data/train-8` is `build-inputs` of the first eight train shards. Evaluate A with the
+old binary and B with the new one, a configuration with `max_prompt_tokens = 2048`
+and `--facts on`.
+
 ## Scenarios
 
 Hand-written cases from `scenarios/`, in the same layout as a selection:

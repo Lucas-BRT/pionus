@@ -317,6 +317,54 @@ The prompt budget, `pionus-1.5b-v0.3`, 1024, 2048 and 4096 tokens:
 - `ungrounded`, `evidence_kept` and `truncated` are lexical or count lines: they
   do not say whether a message is better written for seeing more of the diff.
 
+### Retraining for the new prompt (a pilot)
+
+Does a model trained on the prompt of the product now (a budget of 2048, whole
+hunks, the numbers line) write better than one trained on the old one? Two SFT
+runs of the 0.5B from `Qwen2.5-Coder-0.5B-Instruct`, on the same 12,000 commits
+(7,000 Conventional of 86 repositories, 5,000 free of 778; `select` on eight of
+CommitChronicle's 61 train shards, none of its repositories in eval-v1,
+eval-short, eval-v2, judge1 or pilot1), the same targets, system prompt and
+hyperparameters (one epoch, 4-bit, fp16, `--max-length 2560`), on a Kaggle T4
+each, in parallel: 41 minutes for A and 52 to 54 for B, 0.9 GPU hours a session.
+
+- **A**: the prompt of release 0.15.0 (1024, cut by prefix, no numbers line):
+  23% of the prompts have a cut file.
+- **B**: the prompt of the product (2048, whole hunks, `--facts on`): 8% have a
+  cut file, 3.3% the numbers line, 25% more tokens on average.
+
+Each arm is measured with the prompt it trained on, on one machine (RTX 3050,
+`vulkan`), two seeds (0 and 1) of the same data:
+
+| Set | `type_match` | A, seed 0 | B, seed 0 | A, seed 1 | B, seed 1 |
+|---|---|---|---|---|---|
+| eval-v1 | Conventional | 0.600 | 0.624 | 0.632 | 0.616 |
+| eval-short | Conventional | 0.553 | 0.617 | 0.638 | 0.617 |
+| eval-v1 | `fallback` | 0.072 | 0.072 | 0.050 | 0.054 |
+| eval-v2 | `ungrounded` | 0.084 | 0.056 | 0.052 | 0.052 |
+
+- **No effect that holds.** Seed 0 favours B on the type in both sets (+8/−2,
+  p = 0.11, and +3/−0 on eval-short); seed 1 favours A in both (+7/−11 and
+  +0/−1). The same arm A moves 0.032 on eval-v1 between its two seeds, more than
+  any gap between A and B. The direction fixed beforehand (B above A on both
+  sets in both seeds) was not met.
+- **What does change** is the cut: `truncated` falls from 0.25 to 0.10 (eval-v1),
+  from 0.20 to 0.06 (eval-v2) and from 0.17 to 0.07 (eval-short), as it does for
+  a model that was not retrained.
+- **Not worth retraining for the prompt.** `pionus-0.5b-v0.3` barely moves when
+  only the pipeline changes (eval-v1 `type_match` 0.668 in the old one, 0.660 in
+  the new), so the models in use work with it.
+- **What SFT alone lacks** is what DPO gives: both arms fall back on 5 to 7% of
+  eval-v1 and invent a detail on 8 to 9%, against 0.6% and 0.8% for
+  `pionus-0.5b-v0.3` (`fallback` +33/−0, `ungrounded` +45/−3 for B against it, all
+  p = 0.0). The v0.3 also trained on 40,000 commits, not 12,000, so the gap mixes
+  the two.
+
+Limits: one model per arm and seed, not the same data as the released models, 12,000
+commits, a single epoch, no validation set, and the Conventional commits come from
+86 repositories. The adapters are exported with a CPU build of torch 2.14.1 and
+the versions of `uv.lock` (the pinned CUDA build would have been several GB).
+
 ## Training
 
 - LoRA with `transformers` and `peft`, in a Python environment with every
