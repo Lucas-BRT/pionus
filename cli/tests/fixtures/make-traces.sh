@@ -347,6 +347,9 @@ real_change conventional-en-setting-as-docs a8dafca "docs(config): add keep_load
 real_change conventional-en-fix-as-feat-budget ae339ad "feat(generate): add prompt budgeting"
 # Devices limited to the machine's hardware, answered as a new backend.
 real_change conventional-en-invented-backend 87533ac "feat: add a device backend that can run benchmarks on NPU and GPU"
+# A limit on the turned-down subjects the prompt names, answered with the
+# training scope and a command that does not exist.
+real_change conventional-en-note-limit-as-training-command b99d667 "feat(training): add avoid-note command"
 
 # Prompts the size of real ones, for `pionus bench`: a change of one of
 # this repository's files, from a pinned commit, sized like the 25th, 50th,

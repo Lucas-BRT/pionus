@@ -1,0 +1,101 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of b99d667",
+      "feat(training): score how much of the diff the prompt shows",
+      "feat(diff): keep whole hunks when a file is cut",
+      "feat(training): add a manifest of evaluation sets",
+      "feat(training): add scenarios that hide a decisive hunk from the prompt",
+      "feat(training): add a number-direction scenario",
+      "feat(training): score against the prompt the model saw"
+    ],
+    "history_files": [
+      [
+        "cli/src/generate/notes.rs",
+        "cli/src/generate/tests.rs",
+        "docs/usage.md"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "cli/src/generate/notes.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/usage.md",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "cli/src/generate/notes.rs",
+        "old_path": null,
+        "lines": [
+          27,
+          16
+        ],
+        "hunks": "@@ -7,20 +7,31 @@ use super::SanitizeError;\n \n-/// Asks for a message other than the subjects of `messages`.\n+/// How many turned-down subjects the prompt names: each one takes room the\n+/// diff could use, and the sanitizer rejects every one of them anyway.\n+pub const MAX_NAMED: usize = 3;\n+\n+/// Asks for a message other than the subjects of `messages`, naming the\n+/// [`MAX_NAMED`] most recent different ones, oldest first.\n pub fn avoid_note(messages: &[String]) -> Option<String> {\n-    if messages.is_empty() {\n+    let mut named: Vec<String> = Vec::new();\n+    for m in messages.iter().rev() {\n+        let subject: String = m\n+            .lines()\n+            .next()\n+            .unwrap_or_default()\n+            .chars()\n+            .take(message::SUBJECT_MAX)\n+            .collect();\n+        let subject = format!(\"\\\"{subject}\\\"\");\n+        if !named.contains(&subject) {\n+            named.push(subject);\n+        }\n+        if named.len() == MAX_NAMED {\n+            break;\n+        }\n+    }\n+    if named.is_empty() {\n         return None;\n     }\n-    let subjects: Vec<String> = messages\n-        .iter()\n-        .map(|m| {\n-            let subject: String = m\n-                .lines()\n-                .next()\n-                .unwrap_or_default()\n-                .chars()\n-                .take(message::SUBJECT_MAX)\n-                .collect();\n-            format!(\"\\\"{subject}\\\"\")\n-        })\n-        .collect();\n+    named.reverse();\n+    let subjects = named;\n     Some(format!(\n@@ -28,3 +39,3 @@ pub fn avoid_note(messages: &[String]) -> Option<String> {\n          the change better.\",\n-        if messages.len() == 1 {\n+        if subjects.len() == 1 {\n             \"this message\"\n"
+      },
+      {
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null,
+        "lines": [
+          33,
+          0
+        ],
+        "hunks": "@@ -553,2 +553,35 @@ mod tests {\n \n+    #[test]\n+    fn only_the_latest_turned_down_subjects_are_named_but_all_are_refused() {\n+        let turned_down: Vec<String> = [\"feat: a\", \"fix: b\", \"feat: a\", \"docs: c\", \"chore: d\"]\n+            .map(str::to_owned)\n+            .to_vec();\n+        // The three most recent different ones, oldest first; the repeat of\n+        // \"feat: a\" counts once, at its latest place.\n+        let note = generate::avoid_note(&turned_down).unwrap();\n+        assert!(\n+            note.starts_with(\n+                \"The user turned down these messages: \\\"feat: a\\\"; \\\"docs: c\\\"; \\\"chore: d\\\".\"\n+            ),\n+            \"{note}\"\n+        );\n+        assert!(!note.contains(\"fix: b\"));\n+        // \"fix: b\" is not named, but the model repeating it is still refused.\n+        let generation = crate::generate::generate_avoiding(\n+            &context(&[\"feat: add login\"]),\n+            &files(),\n+            &MockBackend::new([\"fix: b\", \"feat: add retry\"]),\n+            &PromptOptions::default(),\n+            &GenerationConfig::default(),\n+            &turned_down,\n+        )\n+        .unwrap();\n+        assert_eq!(generation.message.subject, \"feat: add retry\");\n+        assert_eq!(generation.attempts.len(), 2);\n+        assert!(matches!(\n+            generation.attempts[0].rejected,\n+            Some(SanitizeError::TurnedDown(_))\n+        ));\n+    }\n+\n     #[test]\n"
+      },
+      {
+        "path": "docs/usage.md",
+        "old_path": null,
+        "lines": [
+          3,
+          1
+        ],
+        "hunks": "@@ -209,3 +209,5 @@ wrote it, how long it took and the staged files:\n **Another message** asks the model again with the messages turned down\n-in the prompt: decoding is greedy, so only a different prompt gives a\n+in the prompt (the three most recent different ones, so a long session does\n+not crowd out the diff; a reply that repeats any earlier one is still\n+rejected): decoding is greedy, so only a different prompt gives a\n different message, and the same choices always give the same messages. A\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(training): add avoid-note command",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, refactor.\n- Scopes used here: training, diff. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nfeat(training): score how much of the diff the prompt shows\nfeat(diff): keep whole hunks when a file is cut\nfeat(training): add a manifest of evaluation sets\nfeat(training): add scenarios that hide a decisive hunk from the prompt\nfeat(training): add a number-direction scenario\n",
+          "user": "Files changed:\ncli/src/generate/notes.rs | +27 -16\ncli/src/generate/tests.rs | +33 -0\ndocs/usage.md | +3 -1\n\nDiff:\n--- cli/src/generate/notes.rs\n@@ -7,20 +7,31 @@ use super::SanitizeError;\n \n-/// Asks for a message other than the subjects of `messages`.\n+/// How many turned-down subjects the prompt names: each one takes room the\n+/// diff could use, and the sanitizer rejects every one of them anyway.\n+pub const MAX_NAMED: usize = 3;\n+\n+/// Asks for a message other than the subjects of `messages`, naming the\n+/// [`MAX_NAMED`] most recent different ones, oldest first.\n pub fn avoid_note(messages: &[String]) -> Option<String> {\n-    if messages.is_empty() {\n+    let mut named: Vec<String> = Vec::new();\n[... 35 more lines]\n@@ -28,3 +39,3 @@ pub fn avoid_note(messages: &[String]) -> Option<String> {\n          the change better.\",\n-        if messages.len() == 1 {\n+        if subjects.len() == 1 {\n             \"this message\"\n--- cli/src/generate/tests.rs\n@@ -553,2 +553,35 @@ mod tests {\n \n+    #[test]\n+    fn only_the_latest_turned_down_subjects_are_named_but_all_are_refused() {\n+        let turned_down: Vec<String> = [\"feat: a\", \"fix: b\", \"feat: a\", \"docs: c\", \"chore: d\"]\n+            .map(str::to_owned)\n+            .to_vec();\n+        // The three most recent different ones, oldest first; the repeat of\n+        // \"feat: a\" counts once, at its latest place.\n+        let note = generate::avoid_note(&turned_down).unwrap();\n+        assert!(\n+            note.starts_with(\n+                \"The user turned down these messages: \\\"feat: a\\\"; \\\"docs: c\\\"; \\\"chore: d\\\".\"\n+            ),\n+            \"{note}\"\n+        );\n+        assert!(!note.contains(\"fix: b\"));\n+        // \"fix: b\" is not named, but the model repeating it is still refused.\n[... 18 more lines]\n\n(3 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(training): add avoid-note command",
+        "rejected": null
+      }
+    ]
+  }
+}
