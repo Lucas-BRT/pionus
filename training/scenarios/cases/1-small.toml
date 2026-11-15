@@ -155,3 +155,37 @@ ops = [{ op = "regex", path = "src/report.ts", pattern = "\\bwidth\\b", repl = "
 target = "refactor(report): rename width to pad"
 expect = ["^refactor\\(report\\)", "width|pad|rename"]
 tags = ["rename"]
+
+# The oracle of `contradicted` (score): the operation fixes which way each
+# number moves, and the same pair is cut both ways so a reply cannot be right
+# by always saying "raise".
+[[case]]
+id = "number-direction"
+title = "moves a number up or down"
+repo = "coffeeshop"
+split = "eval"
+ops = [{ op = "replace", path = "src/coffeeshop/config.py", old = "{{old}}", new = "{{new}}" }]
+target = "{{target}}"
+tags = ["config", "numbers"]
+
+  [[case.variants]]
+  name = "fee-up"
+  vars = { old = "service_fee: float = 0.12", new = "service_fee: float = 0.15", target = "raise the service fee to 0.15" }
+  expect = ["raise|increase", "fee", "0\\.15"]
+
+  [[case.variants]]
+  name = "fee-down"
+  vars = { old = "service_fee: float = 0.12", new = "service_fee: float = 0.05", target = "lower the service fee to 0.05" }
+  expect = ["lower|reduce|decrease", "fee", "0\\.05"]
+
+  [[case.variants]]
+  name = "discount-up"
+  split = "train"
+  vars = { old = "max_discount: float = 0.30", new = "max_discount: float = 0.40", target = "raise the maximum discount to 0.40" }
+  expect = ["raise|increase", "discount", "0\\.40"]
+
+  [[case.variants]]
+  name = "discount-down"
+  split = "train"
+  vars = { old = "max_discount: float = 0.30", new = "max_discount: float = 0.20", target = "lower the maximum discount to 0.20" }
+  expect = ["lower|reduce|decrease", "discount", "0\\.20"]
