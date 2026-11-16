@@ -17,7 +17,8 @@ const NARROW_ROW: StaticClass = class!(
     "max-sm:bg-card max-sm:px-4 max-sm:py-1 max-sm:last:mb-0"
 );
 const CELL: StaticClass = class!(
-    "align-top whitespace-normal",
+    // `!`: the table cell sets whitespace-nowrap, and the order of the two is Tailwind's.
+    "align-top whitespace-normal!",
     "max-sm:block max-sm:px-0 max-sm:py-2 max-sm:first:pl-0 max-sm:last:pr-0",
     "max-sm:before:block max-sm:before:font-mono max-sm:before:text-xs max-sm:before:text-primary",
     "max-sm:before:content-[attr(data-label)] max-sm:[&+td]:border-t max-sm:[&+td]:border-border",
