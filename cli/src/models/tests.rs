@@ -109,6 +109,38 @@ fn the_default_model_is_the_one_the_export_script_makes() {
 }
 
 #[test]
+fn every_model_with_an_openvino_export_is_one_the_export_script_makes() {
+    let export = include_str!("../../../scripts/export-model.sh");
+    let manifests = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../scripts/export");
+    let with_export: Vec<_> = REGISTRY.iter().filter(|m| m.openvino.is_some()).collect();
+    assert!(with_export.iter().any(|m| m.id == DEFAULT));
+    for model in with_export {
+        // The script's table knows the model by its id and names its directory
+        // as the registry does, and a manifest is committed for it.
+        assert!(
+            export.contains(&format!("    {})\n", model.id)),
+            "{} is not in the export script's table",
+            model.id
+        );
+        assert!(
+            export.contains(&format!("NAME={}\n", model.openvino.unwrap())),
+            "{}: the script makes another directory",
+            model.id
+        );
+        let manifest = if model.id == DEFAULT {
+            "MANIFEST.sha256".to_owned()
+        } else {
+            format!("MANIFEST-{}.sha256", model.id)
+        };
+        assert!(
+            manifests.join(&manifest).is_file(),
+            "{}: scripts/export/{manifest} is missing",
+            model.id
+        );
+    }
+}
+
+#[test]
 fn urls_point_at_the_pinned_revision() {
     let gguf = find("qwen2.5-coder-0.5b").unwrap().gguf;
     assert_eq!(

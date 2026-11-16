@@ -98,8 +98,9 @@ pinning:
   the exported tokenizer matches the runtime's `openvino-tokenizers`;
 - the NPU's flags: `--weight-format int4 --sym --group-size 128 --ratio 1.0`.
 
-The result must match `scripts/export/MANIFEST.sha256` byte for byte, or the
-script fails. The manifest's hash is the model's identity in traces. A
+The result must match the model's manifest byte for byte, or the script
+fails: `scripts/export/MANIFEST.sha256` for the default model,
+`scripts/export/MANIFEST-<id>.sha256` for another (`--model <id>`). The manifest's hash is the model's identity in traces. A
 change to the export (revision, flags, lock) needs two identical exports from
 scratch, the new manifest in the same commit, and a run of the **Model**
 workflow. uv

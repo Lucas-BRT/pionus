@@ -317,6 +317,40 @@ The prompt budget, `pionus-1.5b-v0.3`, 1024, 2048 and 4096 tokens:
 - `ungrounded`, `evidence_kept` and `truncated` are lexical or count lines: they
   do not say whether a message is better written for seeing more of the diff.
 
+### The OpenVINO export of pionus-1.5b-v0.3
+
+`scripts/export-model.sh --model pionus-1.5b-v0.3` exports the published
+safetensors (revision `99ee4f07…`, the one the registry pins) to symmetric INT4
+with groups of 128, the NPU's flags, and two exports from scratch were
+identical (model id `27b1e0858cc6fe36`). Does it write like the GGUF (Q4_K_M)
+on `vulkan`? The same 1.5B, the release 0.15.0 pipeline, a configuration with
+nothing in it, greedy decoding, on a Core Ultra 5 225H: the first 150 commits
+of eval-v1, all of eval-short (197) and the 47 scenarios. Conventional
+commits are 47 of eval-short, so its `type_match` rests on 47 cases.
+
+| Set | Metric | `vulkan`, GGUF | `openvino-cpu` | `npu` |
+|---|---|---|---|---|
+| eval-v1 (150) | `type_match` | 0.633 | 0.640 | 0.660 |
+| eval-v1 (150) | `ungrounded` | 0.027 | 0.007 | 0.007 |
+| eval-short | `type_match` | 0.702 | 0.617 | 0.617 |
+| eval-short | `ungrounded` | 0.030 | 0.056 | 0.056 |
+| scenarios | `expected` | 0.723 | 0.638 | 0.617 |
+| all three | `fallback` | 0.0 to 0.007 | 0.0 to 0.013 | 0.0 to 0.013 |
+
+- **No difference is significant** (all p ≥ 0.2: `type_match` +11/−7 on eval-v1,
+  +1/−5 on eval-short; `expected` +3/−8 on the scenarios, for the NPU against
+  `vulkan`), and the signs differ from set to set, but the two lowest numbers
+  are on the two smallest samples (47 cases each): a loss of a few points on
+  the type of young repositories and on the scenarios cannot be ruled out.
+- **The NPU and `openvino-cpu` agree with each other** (same weights): the same
+  subject on 40 of 47, 156 of 197 and 107 of 150 commits, and the same
+  `type_match`. They agree with `vulkan` on the same subject for only 11 to 13% of the
+  commits (the quantisation differs), against 78 to 83% between `cpu` and
+  `vulkan` in the [modes](measurements.md#the-modes-on-the-cpu).
+- On the Intel GPU the `i915` driver hung three times that day (a fence
+  timeout in the kernel log), twice before the runs above and once during a
+  test, so `intel-gpu` is not measured here.
+
 ### Retraining for the new prompt (a pilot)
 
 Does a model trained on the prompt of the product now (a budget of 2048, whole
@@ -451,8 +485,9 @@ What is published is one model per size pionus offers, named
 2. For the OpenVINO devices (NPU, Intel GPU), users' machines are to
    export the published safetensors through `scripts/export/`, following
    the model export rules of [reproducibility](reproducibility.md#the-model) (two
-   identical exports, `MANIFEST.sha256`, the **Model** workflow). Not done for v0.1, which runs on `vulkan` and
-   `cpu` only.
+   identical exports, a manifest, the **Model** workflow). Done for
+   `pionus-1.5b-v0.3`; the other fine-tunes run on `vulkan` and `cpu` only, and
+   the 0.5B cannot be compiled by the NPU (see [models](models.md#the-openvino-devices)).
 3. Upload both to the project's Hugging Face account,
    [LucasBRT](https://huggingface.co/LucasBRT), one repository per model and
    version (`LucasBRT/pionus-1.5b-v0.1`): the merged safetensors, the

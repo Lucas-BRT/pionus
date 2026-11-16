@@ -88,7 +88,7 @@ done
 # `pionus update` and `uninstall` run the installer they came with.
 install -m 755 install.sh "$stage/share/pionus/scripts/"
 install -m 644 scripts/export/requirements.in scripts/export/requirements.lock \
-    scripts/export/MANIFEST.sha256 scripts/export/normalize_ir.py "$stage/share/pionus/scripts/export/"
+    scripts/export/MANIFEST*.sha256 scripts/export/normalize_ir.py "$stage/share/pionus/scripts/export/"
 install -m 644 LICENSE README.md docs/usage.md "$stage/share/doc/pionus/"
 echo "$VERSION" >"$stage/share/pionus/VERSION"
 

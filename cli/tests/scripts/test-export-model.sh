@@ -106,6 +106,26 @@ check "--check fails on a changed file" fails run --check
 check "--keep exports again" run --keep
 check "and keeps the environment and the source" test -d "$cache/pionus/export-venv" -a -d "$cache/pionus/sources"
 
+# Another model: its own source, its own directory and its own manifest.
+FT=pionus-1.5b-v0.3
+ft_out=$data/pionus/models/$FT-int4-sym-g128
+check "an unknown model is refused" fails run --model nope
+check "and the ones there are are listed" said "no OpenVINO export is defined for nope (qwen2.5-coder-1.5b, pionus-1.5b-v0.3)"
+check "--model needs an id" fails run --model
+check "the default is a model of the table too" run --check --model qwen2.5-coder-1.5b
+rm -rf "$out"
+check "a model without its manifest fails like an unexpected export" fails run --model "$FT"
+check "from the project's account at the pinned revision" logged "hf download LucasBRT/pionus-1.5b-v0.3 --revision 99ee4f079707edca8c625e9d78f125177727a324"
+check "with the same flags" logged "--weight-format int4 --sym --group-size 128 --ratio 1.0"
+check "into its own directory, left for diagnosis" test -f "$ft_out.partial/MANIFEST.sha256"
+check "it never touches the default model's" test ! -e "$out"
+cp "$ft_out.partial/MANIFEST.sha256" "$work/scripts/export/MANIFEST-$FT.sha256"
+check "with its manifest it installs" run --model "$FT"
+check "under its own name" test -f "$ft_out/openvino_model.xml" -a -f "$ft_out/MANIFEST.sha256"
+check "--check passes for it" run --check --model "$FT"
+check "and not for the default, which is not exported" fails run --check
+check "the manifest of one is not the other's" fails cmp -s "$work/scripts/export/MANIFEST.sha256" "$work/scripts/export/MANIFEST-$FT.sha256"
+
 # A uv download with another checksum is refused.
 mkdir -p "$work/fake-uv/uv-x86_64-unknown-linux-gnu"
 cp "$work/bin/uv" "$work/fake-uv/uv-x86_64-unknown-linux-gnu/uv"

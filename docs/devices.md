@@ -5,7 +5,7 @@ backends:
 
 | Device | Backend | Hardware | Model |
 |---|---|---|---|
-| `npu` | OpenVINO GenAI | Intel NPU (Core Ultra) | the model's OpenVINO export, INT4 symmetric, made on the machine; today only Qwen2.5-Coder-1.5B-Instruct has one |
+| `npu` | OpenVINO GenAI | Intel NPU (Core Ultra) | the model's OpenVINO export, INT4 symmetric, made on the machine; today Qwen2.5-Coder-1.5B-Instruct and `pionus-1.5b-v0.3` have one |
 | `intel-gpu` | OpenVINO GenAI | Intel GPU (integrated or Arc) | same |
 | `vulkan` | llama.cpp (`llama-server`) | any GPU with a Vulkan driver: AMD (RADV), NVIDIA (proprietary driver or NVK), Intel (ANV) | the model's GGUF (Q4_K_M), any [recommended model](models.md) |
 | `cpu` | llama.cpp (`llama-server`) | any x86_64 CPU, Intel or AMD | same GGUF |

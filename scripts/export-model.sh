@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# Exports the default model, downloaded from its publisher on Hugging Face,
-# in the format the OpenVINO devices need (INT4 symmetric weights, which the
-# NPU requires), on this machine: pionus does not host models. It is
+# Exports a model, downloaded from its publisher on Hugging Face (for
+# pionus's own fine-tunes, from the project's account), in the format the
+# OpenVINO devices need (INT4 symmetric weights, which the NPU requires), on
+# this machine: pionus does not host models. It is
 # reproducible: the source model is pinned to a revision, uv and Python to
 # exact versions, and every Python package to a hash (or, for the two git
 # dependencies, a commit) in scripts/export/requirements.lock. The result
 # carries a MANIFEST.sha256 of its files, which identifies the model in
 # traces.
 #
-#   scripts/export-model.sh [--check] [--keep] [OUTPUT_DIR]
+#   scripts/export-model.sh [--model ID] [--check] [--keep] [OUTPUT_DIR]
 #
+#   --model  which model, by its id in `pionus model list`: qwen2.5-coder-1.5b
+#            (the default) or pionus-1.5b-v0.3
 #   --check  exit 0 if the model is already exported and intact, 1 if not
 #   --keep   keep the Python environment and the downloaded source model,
 #            to export again faster
@@ -20,8 +23,9 @@
 # this version is not in the cache. PIONUS_UV names a uv binary to use
 # instead and PIONUS_UV_URL replaces its download URL, for tests.
 #
-# Exporting twice gives identical files; scripts/export/MANIFEST.sha256 holds
-# the expected result, and the script fails if the export differs from it.
+# Exporting twice gives identical files; scripts/export/MANIFEST.sha256 (or
+# MANIFEST-ID.sha256 for another model) holds the expected result, and the
+# script fails if the export differs from it.
 # Any change to the pinned inputs below or to the lock must update it.
 #
 # To change the Python packages, edit scripts/export/requirements.in and run:
@@ -31,9 +35,6 @@
 #     --generate-hashes -o scripts/export/requirements.lock
 set -euo pipefail
 
-MODEL_ID=Qwen/Qwen2.5-Coder-1.5B-Instruct
-MODEL_REVISION=2e1fd397ee46e1388853d2af2c993145b0f1098a
-NAME=qwen2.5-coder-1.5b-instruct-int4-sym-g128
 PYTHON_VERSION=3.11.17
 UV_VERSION=0.13.1
 UV_URL=${PIONUS_UV_URL:-https://github.com/astral-sh/uv/releases/download/$UV_VERSION/uv-x86_64-unknown-linux-gnu.tar.gz}
@@ -44,14 +45,17 @@ EXPORT_FLAGS=(--weight-format int4 --sym --group-size 128 --ratio 1.0)
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 LOCK=$HERE/export/requirements.lock
-# What the export produced when the pinned inputs were committed; any other
-# result means it is not reproducible and must not be used silently.
-EXPECTED=$HERE/export/MANIFEST.sha256
+MODEL=qwen2.5-coder-1.5b
 CHECK=0
 KEEP=0
 OUT=
-for arg in "$@"; do
-    case $arg in
+while [ $# -gt 0 ]; do
+    case $1 in
+        --model)
+            [ $# -ge 2 ] || { echo "--model needs an id" >&2; exit 2; }
+            MODEL=$2
+            shift
+            ;;
         --check) CHECK=1 ;;
         --keep) KEEP=1 ;;
         -h | --help)
@@ -59,12 +63,37 @@ for arg in "$@"; do
             exit 0
             ;;
         -*)
-            echo "unknown option: $arg" >&2
+            echo "unknown option: $1" >&2
             exit 2
             ;;
-        *) OUT=$arg ;;
+        *) OUT=$1 ;;
     esac
+    shift
 done
+
+# The models this script exports: the source on Hugging Face, pinned to a
+# revision, the name of the directory it makes (cli/src/models/registry.rs
+# names it too) and the manifest the export must equal. What the export
+# produced when the pinned inputs were committed; any other result means it is
+# not reproducible and must not be used silently.
+case $MODEL in
+    qwen2.5-coder-1.5b)
+        MODEL_ID=Qwen/Qwen2.5-Coder-1.5B-Instruct
+        MODEL_REVISION=2e1fd397ee46e1388853d2af2c993145b0f1098a
+        NAME=qwen2.5-coder-1.5b-instruct-int4-sym-g128
+        EXPECTED=$HERE/export/MANIFEST.sha256
+        ;;
+    pionus-1.5b-v0.3)
+        MODEL_ID=LucasBRT/pionus-1.5b-v0.3
+        MODEL_REVISION=99ee4f079707edca8c625e9d78f125177727a324
+        NAME=pionus-1.5b-v0.3-int4-sym-g128
+        EXPECTED=$HERE/export/MANIFEST-pionus-1.5b-v0.3.sha256
+        ;;
+    *)
+        echo "error: no OpenVINO export is defined for $MODEL (qwen2.5-coder-1.5b, pionus-1.5b-v0.3)" >&2
+        exit 2
+        ;;
+esac
 OUT=$(realpath -m "${OUT:-${XDG_DATA_HOME:-$HOME/.local/share}/pionus/models/$NAME}")
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/pionus
 VENV=${PIONUS_EXPORT_VENV:-$CACHE/export-venv}

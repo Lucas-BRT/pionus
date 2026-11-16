@@ -413,7 +413,7 @@ it, the case can become a test fixture.
 | `pionus is not set up yet` | Nothing is installed yet (no model, no llama.cpp): `pionus setup`. `-v` shows what each device lacks |
 | `no device could run the model` | `pionus setup`; the message lists what each device lacks |
 | `no model in …`, `no GGUF model at …`, `no llama-server at …` | `pionus setup` downloads them; `pionus model use <id>` downloads a model |
-| `… has no OpenVINO version, which npu needs` | the model runs on `vulkan` and `cpu` only; `pionus model use qwen2.5-coder-1.5b` for the NPU |
+| `… has no OpenVINO version, which npu needs` | the model runs on `vulkan` and `cpu` only; `pionus model use qwen2.5-coder-1.5b` or `pionus-1.5b-v0.3` for the NPU |
 | `OpenVINO GenAI not found` | only `npu`, `intel-gpu` and `openvino-cpu` need it; on a machine without an Intel NPU or GPU, use `vulkan` or `cpu` |
 | `model.device = gpu … is the old name of intel-gpu` | `pionus device use intel-gpu` (or `auto`) |
 | `cannot load the model on the NPU` | `~/.local/share/pionus/scripts/check-npu.sh`; after being added to the `render` group, log out and back in |

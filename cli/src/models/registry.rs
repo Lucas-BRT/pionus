@@ -230,7 +230,7 @@ pub const REGISTRY: &[Model] = &[
             size: 986_048_064,
             sha256: "92b0743ad80b2954b3af79af9f0550aca97d3ae589a03b260b6b94008e530d48",
         },
-        openvino: None,
+        openvino: Some("pionus-1.5b-v0.3-int4-sym-g128"),
         // Trained with the full prompt, as v0.1 (training H12).
         rules: PromptRules::Full,
     },

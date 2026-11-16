@@ -165,7 +165,7 @@ fn plain(scripts: &Path, yes: bool, no_drivers: bool, no_bench: bool) -> Result<
                     "Export the model for OpenVINO here (downloads it from Hugging Face; \
                      about 10 GB of disk while it runs, a few minutes)?",
                     yes,
-                ) && !run_script(&scripts.join("export-model.sh"), &[])
+                ) && !run_script(&scripts.join("export-model.sh"), &["--model", model.id])
                 {
                     failed = true;
                     println!("  Could not export the model; run `pionus setup` again.");
@@ -321,7 +321,8 @@ fn facts(
         llama_installed: settings.llama_server.as_ref().is_some_and(|p| p.is_file()),
         model_installed: models::is_installed(&model.gguf, &models_dir.join(model.gguf.file)),
         npu_ready: hw.npu == Npu::Intel && quiet("check-npu.sh", &[]),
-        exported: model.openvino.is_some() && quiet("export-model.sh", &["--check"]),
+        exported: model.openvino.is_some()
+            && quiet("export-model.sh", &["--check", "--model", model.id]),
         gpu_plan,
         drivers,
         bench,
@@ -409,7 +410,7 @@ fn interactive(scripts: &Path, no_drivers: bool, no_bench: bool) -> Result<()> {
                 &mut screen,
                 &mut view,
                 &scripts.join("export-model.sh"),
-                &[],
+                &["--model", model.id],
             ),
             StepKind::Bench if render_group_pending() => Err(
                 "you were just added to the render group: log out and back in, then run \

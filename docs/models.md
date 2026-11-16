@@ -179,13 +179,20 @@ $ pionus model list
 
 `npu`, `intel-gpu` and `openvino-cpu` need the model exported for OpenVINO
 with symmetric INT4 weights, which the NPU requires. Only models with a
-pinned, reproducible export have one: today `qwen2.5-coder-1.5b`.
-`pionus setup` exports it on machines with an Intel NPU or GPU, from
-the publisher's files on Hugging Face (`scripts/export-model.sh`, about
+pinned, reproducible export have one: today `qwen2.5-coder-1.5b` and
+`pionus-1.5b-v0.3`. `pionus setup` exports the model in use on machines with
+an Intel NPU or GPU, from the files on Hugging Face (the publisher's, or for a
+fine-tune the project's account; `scripts/export-model.sh --model ID`, about
 10 GB of disk while it runs, a few minutes), and checks the result against
 the committed manifest; see [reproducibility](reproducibility.md).
 With another model those devices are unavailable, with a message saying so,
 and `auto` uses `vulkan` or `cpu`.
+
+`pionus-0.5b-v0.3` has no export, though it exports and runs on
+`openvino-cpu`: the NPU's compiler fails on the shapes of the 0.5B (driver 1.38,
+OpenVINO 2026.3: `UnrollPermuteDMA Pass failed`), so registering it would promise
+a device it cannot use. How the exported 1.5B writes is in
+[training](training.md#the-openvino-export-of-pionus-15b-v03).
 
 ## Adding a recommended model
 

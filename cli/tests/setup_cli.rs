@@ -260,7 +260,8 @@ fn an_intel_machine_exports_the_openvino_model_when_told_to() {
     has(&out, "NPU  Intel NPU");
     has(&out, "-> npu (OpenVINO)");
     has(&out, "the model for OpenVINO");
-    has(&out, "stub export-model");
+    // The model in use, by its id: the script exports whichever it is told.
+    has(&out, "stub export-model --model qwen2.5-coder-1.5b");
     lacks(&out, "Not needed");
     in_order(&out, "==> OpenVINO model", "stub export-model");
 }

@@ -31,6 +31,11 @@
   `fast` also asks for one reply, not two, traces name the mode, and `pionus
   model mode`, the model picker (`p`) and the setup (`p`) choose it. The extra
   context of `quality` and a choice on the review screen are not done.
+- An OpenVINO export for `pionus-1.5b-v0.3` (`scripts/export-model.sh --model`,
+  a manifest per model, the **Model** workflow for each): it runs on the NPU and
+  `openvino-cpu`, with no significant difference from the GGUF in what it
+  scores. `pionus-0.5b-v0.3` is not exported: the NPU's compiler fails on it.
+  `intel-gpu` with it was not measured.
 - A prompt budget by device: unset, `model.max_prompt_tokens` is 2048 on
   `vulkan` and `cpu` and 1024 on the NPU, whose length is fixed when it
   compiles; a value written applies everywhere. `intel-gpu` and `openvino-cpu`
