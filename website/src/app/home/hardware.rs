@@ -2,7 +2,7 @@ use topcoat::{
     Result,
     icon::IconData,
     router::href,
-    view::{Child, View, component, view},
+    view::{Child, View, attributes, component, view},
 };
 
 use crate::{
@@ -31,6 +31,7 @@ async fn device_card(
                 card_description((summary))
             )
             card_content(
+                attrs: attributes! { class="mt-auto" },
                 <ul
                     class="m-0 grid max-w-none list-none gap-1.5 p-0 text-sm text-muted-foreground"
                 >
