@@ -356,6 +356,16 @@ real_change conventional-en-note-limit-as-training-command b99d667 "feat(trainin
 real_change conventional-en-prompt-metrics-as-test 6350569 "feat(training): add a test for the prompt the model saw"
 real_change conventional-en-hunk-cut-as-test d79ae67 "test(cli): add a test for a cut that keeps the last one"
 real_change conventional-en-number-check-as-score 37c9602 "feat(generate): add facts to the score"
+# Six more that pionus described wrongly in real use: a setting called
+# `model.config` for `model.mode`, a flag called `on` for `--facts` and
+# `--max-prompt-tokens`, an option that already existed, a mode that already
+# existed, and two changes described by their tests with the wrong scope.
+real_change conventional-en-mode-key-misnamed 7691599 "feat(cli): add model.config option"
+real_change conventional-en-examples-flag-as-on 5dfd0e5 "feat(training): add \`on\` flag to make_examples"
+real_change conventional-en-budget-by-device-as-option 54a7bf1 "feat(cli): add max_prompt_tokens option to backend"
+real_change conventional-en-attempts-as-fast-mode eec7a69 "feat(cli): add \`fast\` mode with default \`max_attempts\`"
+real_change conventional-en-number-metric-as-test a7beb74 "feat(training): add a test for a number moved the wrong way"
+real_change conventional-en-number-check-tests-as-facts ba33b6f "test(cli): add facts tests for the timeout"
 
 # Prompts the size of real ones, for `pionus bench`: a change of one of
 # this repository's files, from a pinned commit, sized like the 25th, 50th,

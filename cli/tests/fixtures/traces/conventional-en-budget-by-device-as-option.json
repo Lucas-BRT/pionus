@@ -1,0 +1,266 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of 54a7bf1",
+      "docs: record what the three modes cost and score",
+      "feat(cli): add model.mode config option",
+      "feat(diff): add facts option to prompt",
+      "feat(generate): reject a reply that moves a number the wrong way",
+      "test(fixtures): trace a limit on the turned-down subjects answered as a command",
+      "feat(generate): name only the latest turned-down subjects in the prompt"
+    ],
+    "history_files": [
+      [
+        "cli/src/backend/llamacpp/mod.rs",
+        "cli/src/backend/llamacpp/tests.rs",
+        "cli/src/backend/mod.rs",
+        "cli/src/backend/server/mod.rs",
+        "cli/src/config/mode.rs",
+        "cli/src/config/store.rs",
+        "cli/src/config/tests.rs",
+        "cli/src/generate/mod.rs",
+        "cli/src/generate/tests.rs",
+        "cli/tests/config_cli.rs",
+        "docs/configuration.md",
+        "docs/measurements.md",
+        "docs/roadmap.md",
+        "docs/training.md"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "cli/src/backend/llamacpp/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/backend/llamacpp/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/backend/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/backend/server/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/mode.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/store.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/generate/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/tests/config_cli.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/configuration.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/measurements.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/roadmap.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/training.md",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "cli/src/backend/llamacpp/mod.rs",
+        "old_path": null,
+        "lines": [
+          9,
+          1
+        ],
+        "hunks": "@@ -86,2 +86,4 @@ pub struct LlamaCppBackend {\n     description: String,\n+    /// The prompt budget the server's context was sized for.\n+    prompt_tokens: usize,\n     load_ms: f32,\n@@ -191,2 +193,3 @@ impl LlamaCppBackend {\n             description: describe(options),\n+            prompt_tokens: options.max_prompt_tokens,\n             load_ms: 0.0,\n@@ -237,3 +240,3 @@ impl LlamaCppBackend {\n     #[doc(hidden)]\n-    pub fn connect(socket: PathBuf, description: String) -> Self {\n+    pub fn connect(socket: PathBuf, description: String, prompt_tokens: usize) -> Self {\n         Self {\n@@ -243,2 +246,3 @@ impl LlamaCppBackend {\n             description,\n+            prompt_tokens,\n             load_ms: 0.0,\n@@ -327,2 +331,6 @@ impl Backend for LlamaCppBackend {\n \n+    fn prompt_tokens(&self) -> Option<usize> {\n+        Some(self.prompt_tokens)\n+    }\n+\n     fn generate(&self, prompt: &Prompt, config: &GenerationConfig) -> Result<String, BackendError> {\n"
+      },
+      {
+        "path": "cli/src/backend/llamacpp/tests.rs",
+        "old_path": null,
+        "lines": [
+          4,
+          2
+        ],
+        "hunks": "@@ -231,3 +231,5 @@ fn generates_through_the_socket() {\n     );\n-    let backend = LlamaCppBackend::connect(socket, \"fake\".into());\n+    let backend = LlamaCppBackend::connect(socket, \"fake\".into(), 1024);\n+    // The budget the server's context was sized for decides the prompt's.\n+    assert_eq!(backend.prompt_tokens(), Some(1024));\n \n@@ -419,3 +421,3 @@ fn types_and_a_chosen_start_go_through_the_socket() {\n     );\n-    let backend = LlamaCppBackend::connect(socket, \"fake\".into());\n+    let backend = LlamaCppBackend::connect(socket, \"fake\".into(), 1024);\n \n"
+      },
+      {
+        "path": "cli/src/backend/mod.rs",
+        "old_path": null,
+        "lines": [
+          8,
+          0
+        ],
+        "hunks": "@@ -75,2 +75,10 @@ pub trait Backend {\n \n+    /// The prompt length this backend was set up for, when that is not what\n+    /// the settings ask for: a llama.cpp device whose budget was left to its\n+    /// default, which is not the NPU's (see `Settings::prompt_tokens_on`).\n+    /// `None` when the settings decide.\n+    fn prompt_tokens(&self) -> Option<usize> {\n+        None\n+    }\n+\n     /// The Conventional Commits types the reply to `prompt` may start with,\n"
+      },
+      {
+        "path": "cli/src/backend/server/mod.rs",
+        "old_path": null,
+        "lines": [
+          1,
+          0
+        ],
+        "hunks": "@@ -173,2 +173,3 @@ pub fn connect(\n         llamacpp::describe(options),\n+        options.max_prompt_tokens,\n     ))\n"
+      },
+      {
+        "path": "cli/src/config/mode.rs",
+        "old_path": null,
+        "lines": [
+          18,
+          20
+        ],
+        "hunks": "@@ -3,4 +3,4 @@\n //!\n-//! A mode fills in `model.name` and `model.max_prompt_tokens` only where\n-//! nobody set them (a file, the environment or a flag): a setting written\n+//! A mode fills in `model.name`, and `model.max_prompt_tokens` for the modes\n+//! that need a prompt of their own, only where nobody set them (a file, the environment or a flag): a setting written\n //! explicitly always wins, so a mode is a default, never an override. The\n@@ -14,3 +14,4 @@ pub struct Preset {\n     pub model: &'static str,\n-    pub max_prompt_tokens: usize,\n+    /// `None` leaves the prompt budget to the device's default.\n+    pub max_prompt_tokens: Option<usize>,\n     pub about: &'static str,\n@@ -22,3 +23,3 @@ pub const PRESETS: &[Preset] = &[\n         model: \"pionus-0.5b-v0.3\",\n-        max_prompt_tokens: 1024,\n+        max_prompt_tokens: None,\n         about: \"the smallest fine-tune: the least time and memory per message\",\n@@ -28,4 +29,4 @@ pub const PRESETS: &[Preset] = &[\n         model: \"pionus-1.5b-v0.3\",\n-        max_prompt_tokens: 1024,\n-        about: \"the 1.5B fine-tune: the best messages at the default prompt size\",\n+        max_prompt_tokens: None,\n+        about: \"the 1.5B fine-tune: the best messages at the device's default prompt size\",\n     },\n@@ -34,4 +35,4 @@ pub const PRESETS: &[Preset] = &[\n         model: \"pionus-1.5b-v0.3\",\n-        max_prompt_tokens: 2048,\n-        about: \"the 1.5B fine-tune with twice the prompt: sees more of a large diff, slower\",\n+        max_prompt_tokens: Some(4096),\n+        about: \"the 1.5B fine-tune with a prompt of 4096 tokens: sees more of a large diff, slower\",\n     },\n@@ -48,14 +49,11 @@ pub fn settings(mode: &str) -> Vec<(&'static str, Value, Origin)> {\n     let origin = Origin::Mode(preset.name);\n-    vec![\n-        (\n-            \"model.name\",\n-            Value::Text(preset.model.to_owned()),\n-            origin.clone(),\n-        ),\n-        (\n-            \"model.max_prompt_tokens\",\n-            Value::Count(preset.max_prompt_tokens),\n-            origin,\n-        ),\n-    ]\n+    let mut settings = vec![(\n+        \"model.name\",\n+        Value::Text(preset.model.to_owned()),\n+        origin.clone(),\n+    )];\n+    if let Some(tokens) = preset.max_prompt_tokens {\n+        settings.push((\"model.max_prompt_tokens\", Value::Count(tokens), origin));\n+    }\n+    settings\n }\n"
+      },
+      {
+        "path": "cli/src/config/store.rs",
+        "old_path": null,
+        "lines": [
+          28,
+          1
+        ],
+        "hunks": "@@ -279,2 +279,6 @@ impl Resolved {\n             max_prompt_tokens: self.count(\"model.max_prompt_tokens\"),\n+            max_prompt_tokens_set: matches!(\n+                self.values.get(\"model.max_prompt_tokens\"),\n+                Some((_, origin)) if *origin != Origin::Default\n+            ),\n             max_new_tokens: self.count(\"model.max_new_tokens\"),\n@@ -389,2 +393,8 @@ impl FastLoad {\n \n+/// The prompt budget of a llama.cpp device when nobody set one: twice the\n+/// setting's default, which the NPU's fixed length keeps (measured on the\n+/// RTX 3050: the prompts with a cut file fall from 25% to 10% for 12% more\n+/// time per message).\n+pub const LLAMACPP_PROMPT_TOKENS: usize = 2048;\n+\n /// Every setting, typed and resolved.\n@@ -416,2 +426,6 @@ pub struct Settings {\n     pub max_prompt_tokens: usize,\n+    /// Whether `model.max_prompt_tokens` was set by someone (a file, the\n+    /// environment, a flag or a mode) and not left at its default: only an\n+    /// unset one gives way to the device's default.\n+    pub max_prompt_tokens_set: bool,\n     pub max_new_tokens: usize,\n@@ -452,2 +466,15 @@ impl Settings {\n \n+    /// The prompt budget on `target`: `model.max_prompt_tokens` where someone\n+    /// set it, else the target's default. The NPU compiles its graph for one\n+    /// prompt length, so its default is the setting's own; the llama.cpp\n+    /// devices (`vulkan`, `cpu`) take what the context is sized for, and\n+    /// [`LLAMACPP_PROMPT_TOKENS`] shows more of a large diff. The OpenVINO GPU\n+    /// and CPU keep the setting's default until they are measured.\n+    pub fn prompt_tokens_on(&self, target: Target) -> usize {\n+        match target {\n+            Target::Vulkan | Target::Cpu if !self.max_prompt_tokens_set => LLAMACPP_PROMPT_TOKENS,\n+            _ => self.max_prompt_tokens,\n+        }\n+    }\n+\n     pub fn generation_config(&self) -> GenerationConfig {\n@@ -516,3 +543,3 @@ impl Settings {\n             },\n-            max_prompt_tokens: self.max_prompt_tokens,\n+            max_prompt_tokens: self.prompt_tokens_on(target),\n             max_new_tokens: self.max_new_tokens,\n"
+      },
+      {
+        "path": "cli/src/config/tests.rs",
+        "old_path": null,
+        "lines": [
+          69,
+          2
+        ],
+        "hunks": "@@ -667,3 +667,9 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {\n     assert_eq!(settings.model.id, \"pionus-0.5b-v0.3\");\n+    // Only the model: the prompt is left to the device's default.\n     assert_eq!(settings.max_prompt_tokens, 1024);\n+    assert!(!settings.max_prompt_tokens_set);\n+    assert_eq!(\n+        fast.get(\"model.max_prompt_tokens\").unwrap().1,\n+        Origin::Default\n+    );\n     assert_eq!(fast.get(\"model.name\").unwrap().1, Origin::Mode(\"fast\"));\n@@ -682,5 +688,10 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {\n     assert_eq!(\n-        (quality.model.id, quality.max_prompt_tokens),\n-        (\"pionus-1.5b-v0.3\", 2048)\n+        (\n+            quality.model.id,\n+            quality.max_prompt_tokens,\n+            quality.max_prompt_tokens_set\n+        ),\n+        (\"pionus-1.5b-v0.3\", 4096, true)\n     );\n+    assert_eq!(quality.prompt_tokens_on(Target::Vulkan), 4096);\n     let balanced = resolve(None, None, HOME, vec![(\"model.mode\", \"balanced\".into())])\n@@ -692,2 +703,58 @@ fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {\n     );\n+    assert_eq!(balanced.prompt_tokens_on(Target::Vulkan), 2048);\n+}\n+\n+#[test]\n+fn the_prompt_budget_is_the_devices_unless_someone_set_one() {\n+    let unset = resolve(None, None, HOME, vec![]).unwrap().settings();\n+    assert!(!unset.max_prompt_tokens_set);\n+    // The NPU compiles for one length and the OpenVINO devices are not\n+    // measured yet: the setting's default. The llama.cpp devices take more.\n+    for (target, tokens) in [\n+        (Target::Npu, 1024),\n+        (Target::IntelGpu, 1024),\n+        (Target::OpenvinoCpu, 1024),\n+        (Target::Vulkan, 2048),\n+        (Target::Cpu, 2048),\n+    ] {\n+        assert_eq!(unset.prompt_tokens_on(target), tokens, \"{target}\");\n+    }\n+    assert_eq!(\n+        unset\n+            .llamacpp_options(Target::Vulkan, false)\n+            .unwrap()\n+            .max_prompt_tokens,\n+        2048\n+    );\n+    assert_eq!(\n+        unset\n+            .llamacpp_options(Target::Cpu, false)\n+            .unwrap()\n+            .max_prompt_tokens,\n+        2048\n+    );\n+    // A value someone wrote wins on every device, even the default's own.\n+    for value in [\"512\", \"1024\", \"4096\"] {\n+        let set = resolve(\n+            Some(&format!(\"[model]\\nmax_prompt_tokens = {value}\\n\")),\n+            None,\n+            HOME,\n+            vec![],\n+        )\n+        .unwrap()\n+        .settings();\n+        assert!(set.max_prompt_tokens_set);\n+        let value: usize = value.parse().unwrap();\n+        for target in [Target::Npu, Target::IntelGpu, Target::Vulkan, Target::Cpu] {\n+            assert_eq!(set.prompt_tokens_on(target), value, \"{target}\");\n+        }\n+        assert_eq!(\n+            set.llamacpp_options(Target::Vulkan, false)\n+                .unwrap()\n+                .max_prompt_tokens,\n+            value\n+        );\n+    }\n+    // The NPU's own check is on the setting, as before.\n+    assert_eq!(unset.max_prompt_tokens, 1024);\n }\n"
+      },
+      {
+        "path": "cli/src/generate/mod.rs",
+        "old_path": null,
+        "lines": [
+          2,
+          1
+        ],
+        "hunks": "@@ -67,3 +67,4 @@ pub fn budgeted(options: &PromptOptions, backend: &dyn Backend) -> PromptOptions\n     PromptOptions {\n-        max_prompt_tokens: backend.prompt_budget(options.max_prompt_tokens),\n+        max_prompt_tokens: backend\n+            .prompt_budget(backend.prompt_tokens().unwrap_or(options.max_prompt_tokens)),\n         ..options.clone()\n"
+      },
+      {
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null,
+        "lines": [
+          36,
+          0
+        ],
+        "hunks": "@@ -472,2 +472,38 @@ mod tests {\n \n+    /// A backend set up for a prompt length of its own, as a llama.cpp device\n+    /// whose budget was left to its default is.\n+    struct SetUp(MockBackend, usize);\n+\n+    impl Backend for SetUp {\n+        fn describe(&self) -> String {\n+            self.0.describe()\n+        }\n+\n+        fn generate(\n+            &self,\n+            prompt: &Prompt,\n+            config: &GenerationConfig,\n+        ) -> Result<String, BackendError> {\n+            self.0.generate(prompt, config)\n+        }\n+\n+        fn prompt_tokens(&self) -> Option<usize> {\n+            Some(self.1)\n+        }\n+    }\n+\n+    #[test]\n+    fn a_backend_set_up_for_a_prompt_length_sets_the_budget() {\n+        let options = PromptOptions::default();\n+        let budgeted = crate::generate::budgeted(&options, &SetUp(MockBackend::new([\"x\"]), 2048));\n+        assert_eq!(budgeted.max_prompt_tokens, 2048);\n+        assert_eq!(\n+            PromptOptions {\n+                max_prompt_tokens: options.max_prompt_tokens,\n+                ..budgeted\n+            },\n+            options\n+        );\n+    }\n+\n     #[test]\n"
+      },
+      {
+        "path": "cli/tests/config_cli.rs",
+        "old_path": null,
+        "lines": [
+          10,
+          3
+        ],
+        "hunks": "@@ -299,3 +299,3 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {\n     assert!(\n-        listed.contains(\"model.max_prompt_tokens = 1024  (mode fast)\"),\n+        listed.contains(\"model.max_prompt_tokens = 1024  (default)\"),\n         \"{listed}\"\n@@ -308,3 +308,3 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {\n     // The environment is written explicitly: it beats the mode for the model\n-    // and leaves the prompt to it.\n+    // and leaves the prompt to it, which fast does not set.\n     let output = env.run_with(\n@@ -320,3 +320,10 @@ fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {\n     assert!(\n-        listed.contains(\"model.max_prompt_tokens = 1024  (mode fast)\"),\n+        listed.contains(\"model.max_prompt_tokens = 1024  (default)\"),\n+        \"{listed}\"\n+    );\n+    // `quality` has a prompt of its own, and says so.\n+    env.ok(&[\"config\", \"set\", \"model.mode\", \"quality\"], dir.path());\n+    let listed = env.ok(&[\"config\", \"list\", \"--show-origin\"], dir.path());\n+    assert!(\n+        listed.contains(\"model.max_prompt_tokens = 4096  (mode quality)\"),\n         \"{listed}\"\n"
+      },
+      {
+        "path": "docs/configuration.md",
+        "old_path": null,
+        "lines": [
+          19,
+          8
+        ],
+        "hunks": "@@ -55,3 +55,3 @@ value, for example when an environment variable is set.\n | `model.npu_generate_hint` | `best_perf`, `fast_compile` | `best_perf` | | global |\n-| `model.max_prompt_tokens` | 256–8192 | 1024 | | global |\n+| `model.max_prompt_tokens` | 256–8192 | 2048 on `vulkan` and `cpu`, 1024 on the other devices | | global |\n | `model.max_new_tokens` | 16–1024 | 128 | | global |\n@@ -82,5 +82,5 @@ value, for example when an environment variable is set.\n   |---|---|---|\n-  | `fast` | `pionus-0.5b-v0.3` | 1024 |\n-  | `balanced` | `pionus-1.5b-v0.3` | 1024 |\n-  | `quality` | `pionus-1.5b-v0.3` | 2048 |\n+  | `fast` | `pionus-0.5b-v0.3` | the device's default |\n+  | `balanced` | `pionus-1.5b-v0.3` | the device's default |\n+  | `quality` | `pionus-1.5b-v0.3` | 4096 |\n \n@@ -90,5 +90,7 @@ value, for example when an environment variable is set.\n   ([training](training.md#the-three-modes)) is measured on one machine, and\n-  `quality` shows more of the diff without a measured gain in the messages; the fine-tunes are experimental and have no OpenVINO export, so a\n-  mode runs on `vulkan` and `cpu` (`pionus model` and `pionus config` show the\n-  model and where it came from, `mode fast` and so on).\n+  `quality` shows nearly all of a large diff (4096 tokens) without a measured\n+  gain in the messages. The fine-tunes are experimental and have no OpenVINO\n+  export, so a mode runs on `vulkan` and `cpu`; `pionus model` and\n+  `pionus config list --show-origin` show the model and where it came from\n+  (`mode fast` and so on).\n - `model.vulkan_device` picks a GPU on machines with more than one, as\n@@ -156,3 +158,12 @@ value, for example when an environment variable is set.\n   smaller than 512 fail to compile with NPU driver 1.38.\n-- `model.max_prompt_tokens` is also the prompt length the NPU compiles for;\n+- `model.max_prompt_tokens` is the prompt budget, in estimated tokens. Left\n+  unset, it is 2048 on `vulkan` and `cpu`, whose llama.cpp context is sized for\n+  it (the prompts with a cut file fall from 25% to 10% for about 12% more time\n+  per message, on an RTX 3050: [measurements](measurements.md#prompt-budget)),\n+  and 1024 on the NPU, whose length is fixed when it compiles, and on\n+  `intel-gpu` and `openvino-cpu`, not measured yet. A value you write (a file,\n+  the environment, a flag or a mode) applies on every device, and\n+  `pionus prompt` shows that one, or 1024 when none is set: it does not load\n+  a device.\n+  It is also the prompt length the NPU compiles for;\n   the NPU is given a fifth less of it as the prompt budget, since it fails\n"
+      },
+      {
+        "path": "docs/measurements.md",
+        "old_path": null,
+        "lines": [
+          26,
+          1
+        ],
+        "hunks": "@@ -83,3 +83,5 @@ Ryzen 5 5500, RTX 3050 (8 GiB) on `vulkan`, release build of commit `7691599`;\n each mode through `pionus eval` with `PIONUS_MODE` and a config home with\n-nothing in it, on the first 20 and the first 100 inputs of eval-v1 (greedy\n+nothing in it (with the presets of that time: a prompt of 1024, 1024 and 2048\n+tokens; the modes now leave the prompt to the device or, `quality`, give it\n+4096: see [the prompt budget](#prompt-budget)), on the first 20 and the first 100 inputs of eval-v1 (greedy\n decoding, so a rerun gives the same replies). The time per message is\n@@ -107,2 +109,25 @@ done   # then the same with 100 inputs\n \n+## Prompt budget\n+\n+`model.max_prompt_tokens` left unset is 2048 on `vulkan` and `cpu` and 1024 on\n+the NPU, whose length is fixed when it compiles. Ryzen 5 5500 and RTX 3050\n+(`vulkan`), `pionus eval` with each value written in a config home, and\n+`pionus-1.5b-v0.3` unless said: the time per message is `(t100 − t20) / 80`\n+over 3 runs of the same inputs, so the rows compare within this table (the\n+machine was not otherwise idle, and `by mode` above ran on another day).\n+\n+| Prompt | Per message | Load | Prompts with a cut file (eval-v1) | Changed lines shown |\n+|---|---|---|---|---|\n+| 1024 | 0.24 s | 1.9 s | 25% | 82% |\n+| 2048 | 0.27 s (+12%) | 2.1 s | 10% | 94% |\n+| 4096 | 0.29 s (+20%) | 2.3 s | 2% | 98% |\n+\n+The default model, `qwen2.5-coder-1.5b`, on `vulkan`: 0.34 s per message at\n+1024 and at 2048 (one run each; the load goes from 2.9 to 3.6 s). On the `cpu`\n+device (one run each, so the order of magnitude only): `pionus-1.5b-v0.3`\n+2.9 s at 1024 and 3.5 s at 2048 per message, the default model 3.7 s and\n+4.3 s, 16–21% more. What the longer prompts score is in\n+[training](training.md#the-three-modes): the messages are not measurably\n+different, the share of the diff the model sees is.\n+\n ## Fast load\n"
+      },
+      {
+        "path": "docs/roadmap.md",
+        "old_path": null,
+        "lines": [
+          6,
+          2
+        ],
+        "hunks": "@@ -28,4 +28,8 @@\n - Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the\n-  model and the prompt size where nothing else set them. The attempt limit and\n-  the extra context of `quality` are not done.\n+  model, and the prompt size of `quality` (4096), where nothing else set them.\n+  The attempt limit of `fast` is not done.\n+- A prompt budget by device: unset, `model.max_prompt_tokens` is 2048 on\n+  `vulkan` and `cpu` and 1024 on the NPU, whose length is fixed when it\n+  compiles; a value written applies everywhere. `intel-gpu` and `openvino-cpu`\n+  keep 1024 until they are measured.\n - Fast load for llama.cpp (`--no-repack --fit off`), turned on per device\n"
+      },
+      {
+        "path": "docs/training.md",
+        "old_path": null,
+        "lines": [
+          40,
+          27
+        ],
+        "hunks": "@@ -277,30 +277,43 @@ set is what gives the first one margin.\n \n-| Set | Metric | `fast` | `balanced` | `quality` |\n+`fast` against `balanced`, both with a prompt of 1024 tokens:\n+\n+| Set | Metric | `fast` | `balanced` |\n+|---|---|---|---|\n+| eval-v1 | `type_macro_f1` (Conventional) | 0.553 | 0.603 |\n+| eval-v1 | `word_f1` | 0.302 | 0.313 |\n+| eval-v1 | `ungrounded` | 0.006 | 0.026 |\n+| eval-v2 | `word_f1` | 0.263 | 0.276 |\n+| eval-v2 | `ungrounded` | 0.008 | 0.020 |\n+| scenarios | `expected` | 0.489 | 0.702 |\n+\n+- `balanced` has the better type (`type_macro_f1`) and the better scenarios\n+  (`expected` +11/−1, p = 0.006), but `fast` invents less on eval-v1\n+  (`ungrounded` +12/−2 for `balanced`, p = 0.013; `unsupported_visible` +8/−1,\n+  p = 0.039). On eval-v2 the same direction, not significant (+3/−0, p = 0.25).\n+\n+The prompt budget, `pionus-1.5b-v0.3`, 1024, 2048 and 4096 tokens:\n+\n+| Set | Metric | 1024 | 2048 | 4096 |\n |---|---|---|---|---|\n-| eval-v1 | `type_match` (Conventional) | 0.672 | 0.692 | 0.700 |\n-| eval-v1 | `type_macro_f1` (Conventional) | 0.553 | 0.603 | 0.618 |\n-| eval-v1 | `word_f1` | 0.302 | 0.313 | 0.324 |\n-| eval-v1 | `ungrounded` | 0.006 | 0.026 | 0.028 |\n-| eval-v1 | `truncated` | 0.246 | 0.246 | 0.104 |\n-| eval-v1 | `evidence_kept` | 0.825 | 0.824 | 0.938 |\n-| eval-v2 | `word_f1` | 0.263 | 0.276 | 0.277 |\n-| eval-v2 | `ungrounded` | 0.008 | 0.020 | 0.020 |\n-| eval-v2 | `truncated` | 0.200 | 0.200 | 0.064 |\n-| eval-v2 | `evidence_kept` | 0.893 | 0.893 | 0.968 |\n-| scenarios | `expected` | 0.489 | 0.702 | 0.681 |\n-\n-- A prompt twice as long (`quality` against `balanced`) cuts the share of\n-  prompts with a cut file from 0.25 to 0.10 on eval-v1 and from 0.20 to 0.06 on\n-  eval-v2 (+0/−71 and +0/−34 cases, p = 0.0), and the changed lines shown rise\n-  from 0.82 to 0.94 and from 0.89 to 0.97. The messages do not show a\n-  measurable gain: `type_match` +4/−2 (p = 0.69), `ungrounded` +1/−0, `expected`\n-  on the scenarios +0/−1.\n-- `balanced` against `fast`: `type_macro_f1` 0.603 against 0.553 and the\n-  scenarios' `expected` +11/−1 (p = 0.006), but `fast` invents less on eval-v1\n-  (`ungrounded` +12/−2 for `balanced`, p = 0.013; `unsupported_visible`\n-  +8/−1, p = 0.039). On eval-v2 the same direction, not significant\n-  (`ungrounded` +3/−0, p = 0.25).\n-- The `ungrounded`, `evidence_kept` and `truncated` columns are lexical or\n-  count lines: they do not say whether a message is better written for seeing\n-  more of the diff.\n+| eval-v1 | `type_match` (Conventional) | 0.692 | 0.700 | 0.708 |\n+| eval-v1 | `word_f1` | 0.313 | 0.324 | 0.327 |\n+| eval-v1 | `ungrounded` | 0.026 | 0.028 | 0.028 |\n+| eval-v1 | `truncated` | 0.246 | 0.104 | 0.024 |\n+| eval-v1 | `evidence_kept` | 0.824 | 0.938 | 0.982 |\n+| eval-v2 | `word_f1` | 0.276 | 0.277 | 0.280 |\n+| eval-v2 | `truncated` | 0.200 | 0.064 | 0.020 |\n+| eval-v2 | `evidence_kept` | 0.893 | 0.968 | 0.991 |\n+| scenarios | `expected` | 0.702 | 0.681 | 0.681 |\n+\n+- A longer prompt cuts the share of prompts with a cut file (1024 → 2048:\n+  +0/−71 on eval-v1 and +0/−34 on eval-v2; 2048 → 4096: +0/−40 and +0/−11; all\n+  p ≤ 0.001) and raises the changed lines shown, but the messages do not show\n+  a measurable gain: 1024 → 2048 `type_match` +4/−2 (p = 0.69), 2048 → 4096\n+  +2/−0 (p = 0.5), `expected` on the scenarios +0/−1.\n+- The default model, `qwen2.5-coder-1.5b`, 1024 against 2048: `truncated`\n+  0.252 → 0.104 (+0/−74), `first_try` 0.812 → 0.806 (+4/−7, p = 0.55),\n+  `type_match` 0.512 → 0.508, `ungrounded` 0.128 → 0.126; on eval-v2\n+  `word_f1` 0.170 → 0.174, `ungrounded` 0.108 both.\n+- `ungrounded`, `evidence_kept` and `truncated` are lexical or count lines: they\n+  do not say whether a message is better written for seeing more of the diff.\n \n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(cli): add max_prompt_tokens option to backend",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, docs, test, refactor.\n- Scopes used here: generate, cli, diff, fixtures. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\ndocs: record what the three modes cost and score\nfeat(cli): add model.mode config option\nfeat(diff): add facts option to prompt\nfeat(generate): reject a reply that moves a number the wrong way\ntest(fixtures): trace a limit on the turned-down subjects answered as a command\n",
+          "user": "Files changed:\ncli/src/backend/llamacpp/mod.rs | +9 -1\ncli/src/backend/llamacpp/tests.rs | +4 -2\ncli/src/backend/mod.rs | +8 -0\ncli/src/backend/server/mod.rs | +1 -0\ncli/src/config/mode.rs | +18 -20\ncli/src/config/store.rs | +28 -1\ncli/src/config/tests.rs | +69 -2\ncli/src/generate/mod.rs | +2 -1\ncli/src/generate/tests.rs | +36 -0\ncli/tests/config_cli.rs | +10 -3\ndocs/configuration.md | +19 -8\ndocs/measurements.md | +26 -1\ndocs/roadmap.md | +6 -2\ndocs/training.md | +40 -27\n\nDiff:\n--- cli/src/backend/llamacpp/mod.rs\n@@ -243,2 +246,3 @@ impl LlamaCppBackend {\n             description,\n+            prompt_tokens,\n             load_ms: 0.0,\n[... 4 more hunks]\n--- cli/src/backend/llamacpp/tests.rs\n@@ -231,3 +231,5 @@ fn generates_through_the_socket() {\n     );\n-    let backend = LlamaCppBackend::connect(socket, \"fake\".into());\n+    let backend = LlamaCppBackend::connect(socket, \"fake\".into(), 1024);\n[... 8 more lines]\n--- cli/src/backend/mod.rs\n@@ -75,2 +75,10 @@ pub trait Backend {\n \n+    /// The prompt length this backend was set up for, when that is not what\n+    /// the settings ask for: a llama.cpp device whose budget was left to its\n[... 7 more lines]\n--- cli/src/backend/server/mod.rs\n@@ -173,2 +173,3 @@ pub fn connect(\n         llamacpp::describe(options),\n+        options.max_prompt_tokens,\n     ))\n--- cli/src/generate/mod.rs\n@@ -67,3 +67,4 @@ pub fn budgeted(options: &PromptOptions, backend: &dyn Backend) -> PromptOptions\n     PromptOptions {\n-        max_prompt_tokens: backend.prompt_budget(options.max_prompt_tokens),\n+        max_prompt_tokens: backend\n[... 2 more lines]\n\n(13 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(cli): add max_prompt_tokens option to backend",
+        "rejected": null
+      }
+    ]
+  }
+}

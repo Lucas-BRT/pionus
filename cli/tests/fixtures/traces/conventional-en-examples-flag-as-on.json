@@ -1,0 +1,116 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of 5dfd0e5",
+      "feat(cli): choose a mode in the setup, the model picker and `model mode`",
+      "feat(trace): record the mode asked for",
+      "feat(generate): ask for one reply in fast mode",
+      "test(fixtures): trace three changes pionus described by their tests",
+      "test(diff): add paraphrases and ambiguous changes to the number check",
+      "test(training): ask the late-decisive scenarios for the entity, not the number"
+    ],
+    "history_files": [
+      [
+        "training/README.md",
+        "training/tools/src/examples.rs",
+        "training/tools/src/examples_tests.rs",
+        "training/tools/src/main.rs"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "training/README.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/examples.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/examples_tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/main.rs",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "training/README.md",
+        "old_path": null,
+        "lines": [
+          4,
+          0
+        ],
+        "hunks": "@@ -82,2 +82,6 @@ $SCT filter-supported data/h1 data/h3a\n #    Python script it replaces had no `--diff`, and ran with the annotated one).\n+#    `--max-prompt-tokens N` cuts the diff for another budget than 1024 (the\n+#    binary is given a configuration with it; `train.py`'s `--max-length` must\n+#    hold the longer prompts, or it skips them), and `--facts on` adds the line\n+#    of the numbers that changed, for a binary that has it.\n $SCT make-examples data/h1 $SC\n"
+      },
+      {
+        "path": "training/tools/src/examples.rs",
+        "old_path": null,
+        "lines": [
+          23,
+          2
+        ],
+        "hunks": "@@ -26,2 +26,8 @@ use crate::pytext::read_lines as lines_of;\n /// how many examples.\n+///\n+/// `facts` is `on` for the line of the numbers that changed, which only a\n+/// binary that has the option takes (it is passed when on, never otherwise).\n+/// `max_prompt_tokens` is written to the configuration directory the binary\n+/// reads when it is not pionus's default of 1024, so the prompts are cut for\n+/// the budget the model will be given.\n pub fn make_examples(\n@@ -32,5 +38,16 @@ pub fn make_examples(\n     scopes: &str,\n+    facts: &str,\n+    max_prompt_tokens: usize,\n ) -> Result<usize> {\n     let config_home = tempfile::TempDir::new()?;\n-    let done = Command::new(binary)\n+    if max_prompt_tokens != pionus::prompt::DEFAULT_MAX_PROMPT_TOKENS {\n+        let file = config_home.path().join(\"pionus/config.toml\");\n+        std::fs::create_dir_all(file.parent().expect(\"a directory\"))?;\n+        std::fs::write(\n+            file,\n+            format!(\"[model]\\nmax_prompt_tokens = {max_prompt_tokens}\\n\"),\n+        )?;\n+    }\n+    let mut command = Command::new(binary);\n+    command\n         .env_clear()\n@@ -40,3 +57,7 @@ pub fn make_examples(\n         .arg(dir.join(\"inputs.jsonl\"))\n-        .args([\"--rules\", rules, \"--diff\", diff, \"--scopes\", scopes])\n+        .args([\"--rules\", rules, \"--diff\", diff, \"--scopes\", scopes]);\n+    if facts == \"on\" {\n+        command.args([\"--facts\", \"on\"]);\n+    }\n+    let done = command\n         .output()\n"
+      },
+      {
+        "path": "training/tools/src/examples_tests.rs",
+        "old_path": null,
+        "lines": [
+          71,
+          6
+        ],
+        "hunks": "@@ -16,3 +16,3 @@ i=0\n while [ \"$i\" -lt \"$n\" ]; do\n-  echo \"{\\\"system\\\": \\\"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] café\\\", \\\"user\\\": \\\"u$i\\\"}\"\n+  echo \"{\\\"system\\\": \\\"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] cfg=[$(tr '\\n' ' ' < \"$XDG_CONFIG_HOME/pionus/config.toml\" 2>/dev/null)] café\\\", \\\"user\\\": \\\"u$i\\\"}\"\n   i=$((i+1))\n@@ -71,3 +71,12 @@ fn the_examples_carry_the_prompt_the_target_without_its_period_and_where_it_came\n     assert_eq!(\n-        make_examples(dir.path(), &fake_prompt_binary(), \"full\", \"plain\", \"list\").unwrap(),\n+        make_examples(\n+            dir.path(),\n+            &fake_prompt_binary(),\n+            \"full\",\n+            \"plain\",\n+            \"list\",\n+            \"off\",\n+            1024\n+        )\n+        .unwrap(),\n         4\n@@ -111,3 +120,12 @@ fn rules_the_file_list_and_scopes_are_always_passed_and_nothing_of_the_environme\n     ] {\n-        make_examples(dir.path(), &fake_prompt_binary(), rules, diff, scopes).unwrap();\n+        make_examples(\n+            dir.path(),\n+            &fake_prompt_binary(),\n+            rules,\n+            diff,\n+            scopes,\n+            \"off\",\n+            1024,\n+        )\n+        .unwrap();\n         let system = examples(dir.path())[0][\"system\"]\n@@ -137,5 +155,13 @@ fn a_prompt_for_every_case_or_an_error() {\n     std::fs::write(dir.path().join(\"meta.jsonl\"), \"{}\\n\").unwrap();\n-    let err = make_examples(dir.path(), &fake_prompt_binary(), \"full\", \"plain\", \"list\")\n-        .unwrap_err()\n-        .to_string();\n+    let err = make_examples(\n+        dir.path(),\n+        &fake_prompt_binary(),\n+        \"full\",\n+        \"plain\",\n+        \"list\",\n+        \"off\",\n+        1024,\n+    )\n+    .unwrap_err()\n+    .to_string();\n     assert!(err.contains(\"2 prompts for 1 cases\"), \"{err}\");\n@@ -147,2 +173,4 @@ fn a_prompt_for_every_case_or_an_error() {\n         \"list\",\n+        \"off\",\n+        1024,\n     )\n@@ -247 +275,38 @@ fn the_ranking_is_by_the_salted_hash_not_the_plain_one_and_a_size_too_big_is_ref\n }\n+\n+#[test]\n+fn the_budget_and_the_facts_line_are_passed_only_when_they_are_not_the_defaults() {\n+    let dir = tempfile::TempDir::new().unwrap();\n+    write_set(dir.path(), &[\"feat: a\"]);\n+    let system = |facts: &str, tokens: usize| {\n+        make_examples(\n+            dir.path(),\n+            &fake_prompt_binary(),\n+            \"full\",\n+            \"plain\",\n+            \"list\",\n+            facts,\n+            tokens,\n+        )\n+        .unwrap();\n+        examples(dir.path())[0][\"system\"]\n+            .as_str()\n+            .unwrap()\n+            .to_owned()\n+    };\n+    // The defaults say nothing: the prompts are the ones of every set so far.\n+    let plain = system(\"off\", 1024);\n+    assert!(\n+        !plain.contains(\"--facts\") && plain.contains(\"cfg=[]\"),\n+        \"{plain}\"\n+    );\n+    let on = system(\"on\", 2048);\n+    assert!(on.contains(\"--scopes list --facts on \"), \"{on}\");\n+    assert!(\n+        on.contains(\"cfg=[[model] max_prompt_tokens = 2048 ]\"),\n+        \"{on}\"\n+    );\n+    // Only one of them at a time.\n+    assert!(!system(\"off\", 2048).contains(\"--facts\"));\n+    assert!(system(\"on\", 1024).contains(\"cfg=[]\"));\n+}\n"
+      },
+      {
+        "path": "training/tools/src/main.rs",
+        "old_path": null,
+        "lines": [
+          18,
+          1
+        ],
+        "hunks": "@@ -162,2 +162,9 @@ enum Command {\n         scopes: String,\n+        /// `on` adds the line of the numbers that changed, for a binary that\n+        /// has `--facts`.\n+        #[arg(long, default_value = \"off\")]\n+        facts: String,\n+        /// The prompt budget the prompts are cut for (`model.max_prompt_tokens`).\n+        #[arg(long, default_value_t = pionus::prompt::DEFAULT_MAX_PROMPT_TOKENS)]\n+        max_prompt_tokens: usize,\n     },\n@@ -395,4 +402,14 @@ fn run(cli: Cli) -> Result<()> {\n             scopes,\n+            facts,\n+            max_prompt_tokens,\n         } => {\n-            let n = examples::make_examples(&dir, &binary, &rules, &diff, &scopes)?;\n+            let n = examples::make_examples(\n+                &dir,\n+                &binary,\n+                &rules,\n+                &diff,\n+                &scopes,\n+                &facts,\n+                max_prompt_tokens,\n+            )?;\n             eprintln!(\"{n} examples in {}\", dir.join(\"examples.jsonl\").display());\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(training): add `on` flag to make_examples",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, test, refactor.\n- Scopes used here: cli, diff, fixtures, generate, trace, training. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nfeat(cli): choose a mode in the setup, the model picker and `model mode`\nfeat(trace): record the mode asked for\nfeat(generate): ask for one reply in fast mode\ntest(fixtures): trace three changes pionus described by their tests\ntest(diff): add paraphrases and ambiguous changes to the number check\n",
+          "user": "Files changed:\ntraining/README.md | +4 -0\ntraining/tools/src/examples.rs | +23 -2\ntraining/tools/src/examples_tests.rs | +71 -6\ntraining/tools/src/main.rs | +18 -1\n\nDiff:\n--- training/tools/src/examples.rs\n@@ -40,3 +57,7 @@ pub fn make_examples(\n         .arg(dir.join(\"inputs.jsonl\"))\n-        .args([\"--rules\", rules, \"--diff\", diff, \"--scopes\", scopes])\n+        .args([\"--rules\", rules, \"--diff\", diff, \"--scopes\", scopes]);\n+    if facts == \"on\" {\n+        command.args([\"--facts\", \"on\"]);\n+    }\n+    let done = command\n         .output()\n[... 2 more hunks]\n--- training/tools/src/examples_tests.rs\n@@ -16,3 +16,3 @@ i=0\n while [ \"$i\" -lt \"$n\" ]; do\n-  echo \"{\\\"system\\\": \\\"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] café\\\", \\\"user\\\": \\\"u$i\\\"}\"\n+  echo \"{\\\"system\\\": \\\"$* home=[$HOME] xdg=[$XDG_CONFIG_HOME] cfg=[$(tr '\\n' ' ' < \"$XDG_CONFIG_HOME/pionus/config.toml\" 2>/dev/null)] café\\\", \\\"user\\\": \\\"u$i\\\"}\"\n   i=$((i+1))\n@@ -147,2 +173,4 @@ fn a_prompt_for_every_case_or_an_error() {\n         \"list\",\n+        \"off\",\n+        1024,\n     )\n[... 4 more hunks]\n--- training/tools/src/main.rs\n@@ -162,2 +162,9 @@ enum Command {\n         scopes: String,\n+        /// `on` adds the line of the numbers that changed, for a binary that\n+        /// has `--facts`.\n+        #[arg(long, default_value = \"off\")]\n+        facts: String,\n+        /// The prompt budget the prompts are cut for (`model.max_prompt_tokens`).\n+        #[arg(long, default_value_t = pionus::prompt::DEFAULT_MAX_PROMPT_TOKENS)]\n+        max_prompt_tokens: usize,\n     },\n[... 1 more hunks]\n\n(4 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(training): add `on` flag to make_examples",
+        "rejected": null
+      }
+    ]
+  }
+}

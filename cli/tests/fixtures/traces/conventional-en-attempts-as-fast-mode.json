@@ -1,0 +1,221 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of eec7a69",
+      "test(fixtures): trace three changes pionus described by their tests",
+      "test(diff): add paraphrases and ambiguous changes to the number check",
+      "test(training): ask the late-decisive scenarios for the entity, not the number",
+      "feat(config): give the llama.cpp devices a larger prompt budget",
+      "docs: record what the three modes cost and score",
+      "feat(cli): add model.mode config option"
+    ],
+    "history_files": [
+      [
+        "cli/src/backend/llamacpp/mod.rs",
+        "cli/src/backend/llamacpp/tests.rs",
+        "cli/src/backend/mod.rs",
+        "cli/src/config/mode.rs",
+        "cli/src/config/store.rs",
+        "cli/src/config/tests.rs",
+        "cli/src/generate/mod.rs",
+        "cli/src/generate/tests.rs",
+        "cli/tests/hardware.rs",
+        "docs/configuration.md",
+        "docs/roadmap.md"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "cli/src/backend/llamacpp/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/backend/llamacpp/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/backend/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/mode.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/store.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/generate/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/tests/hardware.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/configuration.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/roadmap.md",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "cli/src/backend/llamacpp/mod.rs",
+        "old_path": null,
+        "lines": [
+          7,
+          1
+        ],
+        "hunks": "@@ -450,3 +450,9 @@ const TOP_LOGPROBS: usize = 12;\n pub fn type_request(prompt: &Prompt) -> Value {\n-    let mut request = chat_request(prompt, &GenerationConfig { max_new_tokens: 1 });\n+    let mut request = chat_request(\n+        prompt,\n+        &GenerationConfig {\n+            max_new_tokens: 1,\n+            ..GenerationConfig::default()\n+        },\n+    );\n     request[\"logprobs\"] = json!(true);\n"
+      },
+      {
+        "path": "cli/src/backend/llamacpp/tests.rs",
+        "old_path": null,
+        "lines": [
+          15,
+          3
+        ],
+        "hunks": "@@ -121,3 +121,9 @@ fn a_failed_fast_load_is_retried_normally() {\n fn requests_are_greedy_and_seeded() {\n-    let request = chat_request(&prompt(), &GenerationConfig { max_new_tokens: 96 });\n+    let request = chat_request(\n+        &prompt(),\n+        &GenerationConfig {\n+            max_new_tokens: 96,\n+            ..GenerationConfig::default()\n+        },\n+    );\n     assert_eq!(request[\"temperature\"], 0);\n@@ -368,4 +374,10 @@ fn socket_dirs_are_private_and_short() {\n fn a_reply_can_be_begun_for_the_model() {\n-    let request =\n-        chat_request_starting_with(&prompt(), &GenerationConfig { max_new_tokens: 96 }, \"fix\");\n+    let request = chat_request_starting_with(\n+        &prompt(),\n+        &GenerationConfig {\n+            max_new_tokens: 96,\n+            ..GenerationConfig::default()\n+        },\n+        \"fix\",\n+    );\n     let messages = request[\"messages\"].as_array().unwrap();\n"
+      },
+      {
+        "path": "cli/src/backend/mod.rs",
+        "old_path": null,
+        "lines": [
+          20,
+          0
+        ],
+        "hunks": "@@ -28,2 +28,21 @@ pub struct GenerationConfig {\n     pub max_new_tokens: usize,\n+    /// How many replies to ask for before the message is built from the file\n+    /// list: the first, and a retry that says what was wrong. Left out of\n+    /// traces when 2, so older traces read, and replay, the same.\n+    #[serde(\n+        default = \"default_max_attempts\",\n+        skip_serializing_if = \"is_default_max_attempts\"\n+    )]\n+    pub max_attempts: usize,\n+}\n+\n+/// The first reply and one retry.\n+pub const DEFAULT_MAX_ATTEMPTS: usize = 2;\n+\n+fn default_max_attempts() -> usize {\n+    DEFAULT_MAX_ATTEMPTS\n+}\n+\n+fn is_default_max_attempts(n: &usize) -> bool {\n+    *n == DEFAULT_MAX_ATTEMPTS\n }\n@@ -34,2 +53,3 @@ impl Default for GenerationConfig {\n             max_new_tokens: 128,\n+            max_attempts: DEFAULT_MAX_ATTEMPTS,\n         }\n"
+      },
+      {
+        "path": "cli/src/config/mode.rs",
+        "old_path": null,
+        "lines": [
+          10,
+          0
+        ],
+        "hunks": "@@ -40,2 +40,12 @@ pub const PRESETS: &[Preset] = &[\n \n+/// How many replies a mode asks for before the fallback: `fast` takes the\n+/// first one, as the cheapest way to a message.\n+pub fn max_attempts(mode: &str) -> usize {\n+    if mode == \"fast\" {\n+        1\n+    } else {\n+        crate::backend::DEFAULT_MAX_ATTEMPTS\n+    }\n+}\n+\n /// The names of every mode, `off` (no preset) first.\n"
+      },
+      {
+        "path": "cli/src/config/store.rs",
+        "old_path": null,
+        "lines": [
+          4,
+          0
+        ],
+        "hunks": "@@ -284,2 +284,3 @@ impl Resolved {\n             max_new_tokens: self.count(\"model.max_new_tokens\"),\n+            max_attempts: super::mode::max_attempts(choice(\"model.mode\")),\n             convention: convention(choice(\"style.convention\")),\n@@ -431,2 +432,4 @@ pub struct Settings {\n     pub max_new_tokens: usize,\n+    /// Replies asked for before the fallback: 1 in `fast` mode, else 2.\n+    pub max_attempts: usize,\n     pub convention: Option<Convention>,\n@@ -482,2 +485,3 @@ impl Settings {\n             max_new_tokens: self.max_new_tokens,\n+            max_attempts: self.max_attempts,\n         }\n"
+      },
+      {
+        "path": "cli/src/config/tests.rs",
+        "old_path": null,
+        "lines": [
+          30,
+          0
+        ],
+        "hunks": "@@ -823 +823,31 @@ fn a_mode_is_a_machine_setting_and_an_unknown_one_is_an_error() {\n }\n+\n+#[test]\n+fn only_fast_asks_for_a_single_reply_and_a_default_trace_does_not_say_so() {\n+    for (mode, attempts) in [(\"off\", 2), (\"balanced\", 2), (\"quality\", 2), (\"fast\", 1)] {\n+        let resolved = resolve(None, None, HOME, vec![(\"model.mode\", mode.into())]).unwrap();\n+        assert_eq!(\n+            resolved.settings().generation_config().max_attempts,\n+            attempts,\n+            \"{mode}\"\n+        );\n+    }\n+    let json = serde_json::to_string(&GenerationConfig::default()).unwrap();\n+    assert_eq!(json, r#\"{\"max_new_tokens\":128}\"#);\n+    let one = GenerationConfig {\n+        max_attempts: 1,\n+        ..GenerationConfig::default()\n+    };\n+    let json = serde_json::to_string(&one).unwrap();\n+    assert!(json.contains(\"\\\"max_attempts\\\":1\"), \"{json}\");\n+    assert_eq!(\n+        serde_json::from_str::<GenerationConfig>(&json).unwrap(),\n+        one\n+    );\n+    assert_eq!(\n+        serde_json::from_str::<GenerationConfig>(r#\"{\"max_new_tokens\":64}\"#)\n+            .unwrap()\n+            .max_attempts,\n+        2\n+    );\n+}\n"
+      },
+      {
+        "path": "cli/src/generate/mod.rs",
+        "old_path": null,
+        "lines": [
+          4,
+          3
+        ],
+        "hunks": "@@ -25,4 +25,5 @@ pub use rules::by_rules;\n \n-/// The first try plus one retry that says what was wrong.\n-pub const MAX_ATTEMPTS: usize = 2;\n+/// The first try plus one retry that says what was wrong, unless the config\n+/// asks for fewer or more (`fast` asks for one).\n+pub const MAX_ATTEMPTS: usize = crate::backend::DEFAULT_MAX_ATTEMPTS;\n \n@@ -135,3 +136,3 @@ pub fn generate_asked(\n     let mut attempts: Vec<Attempt> = Vec::new();\n-    while attempts.len() < MAX_ATTEMPTS {\n+    while attempts.len() < config.max_attempts.max(1) {\n         let retry = attempts\n"
+      },
+      {
+        "path": "cli/src/generate/tests.rs",
+        "old_path": null,
+        "lines": [
+          40,
+          0
+        ],
+        "hunks": "@@ -637,2 +637,42 @@ mod tests {\n \n+    #[test]\n+    fn one_attempt_goes_straight_to_the_fallback_and_the_default_is_two() {\n+        let config = GenerationConfig {\n+            max_attempts: 1,\n+            ..GenerationConfig::default()\n+        };\n+        let mock = MockBackend::new([\"feat: add login\", \"feat: add retry\"]);\n+        let generation = crate::generate::generate(\n+            &context(&[\"feat: add login\"]),\n+            &files(),\n+            &mock,\n+            &PromptOptions::default(),\n+            &config,\n+        )\n+        .unwrap();\n+        // The copy of the history is not asked again.\n+        assert_eq!(generation.attempts.len(), 1);\n+        assert_eq!(generation.source, Source::Fallback);\n+        let again = run(\n+            &[\"feat: add login\"],\n+            &MockBackend::new([\"feat: add login\", \"feat: add retry\"]),\n+        );\n+        assert_eq!(again.attempts.len(), 2);\n+        assert_eq!(again.message.subject, \"feat: add retry\");\n+        // Zero is read as one: a reply is always asked for.\n+        let zero = GenerationConfig {\n+            max_attempts: 0,\n+            ..GenerationConfig::default()\n+        };\n+        let generation = crate::generate::generate(\n+            &context(&[\"feat: add login\"]),\n+            &files(),\n+            &MockBackend::new([\"feat: add retry\"]),\n+            &PromptOptions::default(),\n+            &zero,\n+        )\n+        .unwrap();\n+        assert_eq!(generation.source, Source::Model);\n+    }\n+\n     #[test]\n"
+      },
+      {
+        "path": "cli/tests/hardware.rs",
+        "old_path": null,
+        "lines": [
+          4,
+          1
+        ],
+        "hunks": "@@ -238,3 +238,6 @@ fn token_estimate_is_at_most_a_quarter_short() {\n     let backend = backend();\n-    let config = GenerationConfig { max_new_tokens: 1 };\n+    let config = GenerationConfig {\n+        max_new_tokens: 1,\n+        ..GenerationConfig::default()\n+    };\n     for (name, prompt) in fixture_prompts() {\n"
+      },
+      {
+        "path": "docs/configuration.md",
+        "old_path": null,
+        "lines": [
+          5,
+          0
+        ],
+        "hunks": "@@ -86,2 +86,7 @@ value, for example when an environment variable is set.\n \n+  `fast` also asks for one reply instead of two: a reply that copies the\n+  history, contradicts the diff or is cut off is not asked again, and the\n+  message is built from the file list at once (`max_attempts` in a trace, left\n+  out when 2).\n+\n   `off`, the default, changes nothing: an existing configuration behaves as\n"
+      },
+      {
+        "path": "docs/roadmap.md",
+        "old_path": null,
+        "lines": [
+          4,
+          2
+        ],
+        "hunks": "@@ -28,4 +28,6 @@\n - Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the\n-  model, and the prompt size of `quality` (4096), where nothing else set them.\n-  The attempt limit of `fast` is not done.\n+  model, and the prompt size of `quality` (4096), where nothing else set them;\n+  `fast` also asks for one reply, not two. The extra context of `quality`, the\n+  mode in traces and the choice in the setup and the review screen are not\n+  done.\n - A prompt budget by device: unset, `model.max_prompt_tokens` is 2048 on\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(cli): add `fast` mode with default `max_attempts`",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: test, feat, docs, refactor.\n- Scopes used here: cli, config, diff, fixtures, training. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\ntest(fixtures): trace three changes pionus described by their tests\ntest(diff): add paraphrases and ambiguous changes to the number check\ntest(training): ask the late-decisive scenarios for the entity, not the number\nfeat(config): give the llama.cpp devices a larger prompt budget\ndocs: record what the three modes cost and score\n",
+          "user": "Files changed:\ncli/src/backend/llamacpp/mod.rs | +7 -1\ncli/src/backend/llamacpp/tests.rs | +15 -3\ncli/src/backend/mod.rs | +20 -0\ncli/src/config/mode.rs | +10 -0\ncli/src/config/store.rs | +4 -0\ncli/src/config/tests.rs | +30 -0\ncli/src/generate/mod.rs | +4 -3\ncli/src/generate/tests.rs | +40 -0\ncli/tests/hardware.rs | +4 -1\ndocs/configuration.md | +5 -0\ndocs/roadmap.md | +4 -2\n\nDiff:\n--- cli/src/backend/llamacpp/mod.rs\n@@ -450,3 +450,9 @@ const TOP_LOGPROBS: usize = 12;\n pub fn type_request(prompt: &Prompt) -> Value {\n-    let mut request = chat_request(prompt, &GenerationConfig { max_new_tokens: 1 });\n+    let mut request = chat_request(\n[... 7 more lines]\n--- cli/src/backend/mod.rs\n@@ -34,2 +53,3 @@ impl Default for GenerationConfig {\n             max_new_tokens: 128,\n+            max_attempts: DEFAULT_MAX_ATTEMPTS,\n         }\n[... 1 more hunks]\n--- cli/src/config/mode.rs\n@@ -40,2 +40,12 @@ pub const PRESETS: &[Preset] = &[\n \n+/// How many replies a mode asks for before the fallback: `fast` takes the\n[... 10 more lines]\n--- cli/src/config/store.rs\n@@ -482,2 +485,3 @@ impl Settings {\n             max_new_tokens: self.max_new_tokens,\n+            max_attempts: self.max_attempts,\n         }\n[... 2 more hunks]\n--- cli/src/generate/mod.rs\n@@ -25,4 +25,5 @@ pub use rules::by_rules;\n \n-/// The first try plus one retry that says what was wrong.\n[... 10 more lines]\n\n(11 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(cli): add `fast` mode with default `max_attempts`",
+        "rejected": null
+      }
+    ]
+  }
+}

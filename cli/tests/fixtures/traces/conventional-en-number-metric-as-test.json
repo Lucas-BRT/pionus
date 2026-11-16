@@ -1,0 +1,101 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of a7beb74",
+      "chore(fixtures): regenerate the traces for 0.15.0",
+      "test(fixtures): trace a fix answered with the repository name as its area",
+      "Merge branch 'plan/model-quality'",
+      "feat(website): draw the measurements from the documents at build time",
+      "docs(training): keep the models' scores in the document",
+      "test(training): write the scenarios in English"
+    ],
+    "history_files": [
+      [
+        "docs/training.md",
+        "training/tools/src/score.rs",
+        "training/tools/src/score_tests.rs"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "docs/training.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/score.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "training/tools/src/score_tests.rs",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "docs/training.md",
+        "old_path": null,
+        "lines": [
+          6,
+          3
+        ],
+        "hunks": "@@ -178,5 +178,8 @@ Every decision (fine-tune, 0.5B against 1.5B, prompt, data) is judged with\n - Metrics: first_try, fallback, copied, type_match, scope_known,\n-  scope_fits, word_f1, and two cheap faithfulness checks, `unsupported`\n-  (specifics found nowhere in the input) and `ungrounded` (a description\n-  with no word from the diff); `pionus-training score`'s docstring defines them.\n+  scope_fits, word_f1, and three cheap faithfulness checks, `unsupported`\n+  (specifics found nowhere in the input), `ungrounded` (a description\n+  with no word from the diff) and `contradicted` (a number moved the wrong\n+  way: `to 30` where 30 was the old value, `decrease` where it grew; false\n+  means no contradiction found, not that the message is right);\n+  `pionus-training score`'s docstring defines them.\n   `type_match` counts only the repository's own type as right, and its noise\n"
+      },
+      {
+        "path": "training/tools/src/score.rs",
+        "old_path": null,
+        "lines": [
+          92,
+          0
+        ],
+        "hunks": "@@ -32,2 +32,6 @@\n //!   level a human reaches with the same diff\n+//! - contradicted: says a number moved the wrong way against the diff (`to 30`\n+//!   where 30 was the old value, `decrease` where the value grew). Only a\n+//!   changed number with the same line around it counts; anything else is\n+//!   unknown, so false means \"no contradiction found\", not \"correct\"\n //! - expected: the subject matches every `expect` pattern of the case (only\n@@ -68,2 +72,17 @@ static SPECIFIC: LazyLock<Regex> = LazyLock::new(|| {\n \n+static NUMBER: LazyLock<Regex> =\n+    LazyLock::new(|| Regex::new(r\"-?\\d+(?:\\.\\d+)?\").expect(\"a valid pattern\"));\n+static TO: LazyLock<Regex> =\n+    LazyLock::new(|| Regex::new(r\"\\bto (-?\\d+(?:\\.\\d+)?)\\b\").expect(\"a valid pattern\"));\n+static FROM: LazyLock<Regex> =\n+    LazyLock::new(|| Regex::new(r\"\\bfrom (-?\\d+(?:\\.\\d+)?)\\b\").expect(\"a valid pattern\"));\n+static UP: LazyLock<Regex> = LazyLock::new(|| {\n+    Regex::new(r\"\\b(increase[sd]?|rais(?:e|es|ed)|bump(?:s|ed)?|grow|higher)\\b\")\n+        .expect(\"a valid pattern\")\n+});\n+static DOWN: LazyLock<Regex> = LazyLock::new(|| {\n+    Regex::new(r\"\\b(decrease[sd]?|lower(?:s|ed)?|reduc(?:e|es|ed)|shrink|drop(?:s|ped)?)\\b\")\n+        .expect(\"a valid pattern\")\n+});\n+\n const STOP: &str = \"a an the and or of to in on for with from by into onto when then\n@@ -111,2 +130,67 @@ pub fn evidence(inputs: &Value) -> String {\n \n+/// The numbers that changed in place: a removed line and the added line at the\n+/// same position, equal once their numbers are blanked, as (old, new).\n+fn changed_numbers(hunks: &str) -> Vec<(f64, f64)> {\n+    let (mut old, mut new, mut found) = (Vec::new(), Vec::new(), Vec::new());\n+    let mut pair_up = |old: &mut Vec<&str>, new: &mut Vec<&str>| {\n+        for (a, b) in old.iter().zip(new.iter()) {\n+            let (x, y): (Vec<_>, Vec<_>) = (\n+                NUMBER.find_iter(a).map(|m| m.as_str()).collect(),\n+                NUMBER.find_iter(b).map(|m| m.as_str()).collect(),\n+            );\n+            if x.len() == y.len() && NUMBER.replace_all(a, \"#\") == NUMBER.replace_all(b, \"#\") {\n+                for (p, q) in x.iter().zip(&y) {\n+                    if let (Ok(p), Ok(q)) = (p.parse::<f64>(), q.parse::<f64>()) {\n+                        if p != q {\n+                            found.push((p, q));\n+                        }\n+                    }\n+                }\n+            }\n+        }\n+        old.clear();\n+        new.clear();\n+    };\n+    for line in hunks.lines() {\n+        if line.starts_with(\"---\") || line.starts_with(\"+++\") {\n+            continue;\n+        }\n+        if let Some(rest) = line.strip_prefix('-') {\n+            if !new.is_empty() {\n+                pair_up(&mut old, &mut new);\n+            }\n+            old.push(rest);\n+        } else if let Some(rest) = line.strip_prefix('+') {\n+            new.push(rest);\n+        } else {\n+            pair_up(&mut old, &mut new);\n+        }\n+    }\n+    pair_up(&mut old, &mut new);\n+    found\n+}\n+\n+/// The subject says a number moved the wrong way: `to N` where N was the old\n+/// value, `from N` where N is the new one, or a rise/fall word against changes\n+/// that all go the other way. No changed number to compare is not a\n+/// contradiction.\n+pub fn contradicted(subject: &str, hunks: &str) -> bool {\n+    let changes = changed_numbers(hunks);\n+    let text = description(subject).to_lowercase();\n+    let named = |re: &Regex| -> Vec<f64> {\n+        re.captures_iter(&text)\n+            .filter_map(|c| c[1].parse().ok())\n+            .collect()\n+    };\n+    let wrong_to = named(&TO)\n+        .into_iter()\n+        .any(|n| changes.iter().any(|c| c.0 == n) && !changes.iter().any(|c| c.1 == n));\n+    let wrong_from = named(&FROM)\n+        .into_iter()\n+        .any(|n| changes.iter().any(|c| c.1 == n) && !changes.iter().any(|c| c.0 == n));\n+    let all = |up: bool| !changes.is_empty() && changes.iter().all(|c| (c.1 > c.0) == up);\n+    let wrong_way = (UP.is_match(&text) && all(false)) || (DOWN.is_match(&text) && all(true));\n+    wrong_to || wrong_from || wrong_way\n+}\n+\n /// The directory a file is in, with a trailing slash; \"\" at the root.\n@@ -334,3 +418,11 @@ pub fn row_of(m: &Value, t: &Value) -> Vec<(&'static str, Metric)> {\n     use Metric::{Number, Yes};\n+    let hunks: String = t[\"inputs\"][\"files\"]\n+        .as_array()\n+        .into_iter()\n+        .flatten()\n+        .filter_map(|f| f[\"hunks\"].as_str())\n+        .collect::<Vec<_>>()\n+        .join(\"\\n\");\n     let mut row = vec![\n+        (\"contradicted\", Yes(contradicted(subject, &hunks))),\n         (\"unsupported\", Yes(unsupported(subject, &known))),\n"
+      },
+      {
+        "path": "training/tools/src/score_tests.rs",
+        "old_path": null,
+        "lines": [
+          21,
+          0
+        ],
+        "hunks": "@@ -32,2 +32,23 @@ fn support_and_grounding_are_read_from_the_evidence() {\n \n+#[test]\n+fn a_number_moved_the_wrong_way_is_a_contradiction() {\n+    let timeout = \"@@ -1 +1 @@\\n-const TIMEOUT: u64 = 30;\\n+const TIMEOUT: u64 = 60;\\n\";\n+    // The case the unsupported/ungrounded metrics accepted.\n+    assert!(contradicted(\"fix: decrease timeout to 30\", timeout));\n+    assert!(contradicted(\"fix: lower the timeout\", timeout));\n+    assert!(contradicted(\"fix: raise timeout from 60\", timeout));\n+    assert!(!contradicted(\"fix: increase timeout to 60\", timeout));\n+    assert!(!contradicted(\n+        \"fix: double the timeout from 30 to 60\",\n+        timeout\n+    ));\n+    // Nothing comparable: unknown, never a contradiction.\n+    assert!(!contradicted(\"fix: decrease timeout to 30\", \"\"));\n+    let renamed = \"@@ -1 +1 @@\\n-let a = 30;\\n+let b = 60;\\n\";\n+    assert!(!contradicted(\"fix: decrease a to 30\", renamed));\n+    // A mixed change has no single direction.\n+    let mixed = \"@@ -1,2 +1,2 @@\\n-a = 1\\n-b = 9\\n+a = 5\\n+b = 2\\n\";\n+    assert!(!contradicted(\"fix: lower the limits\", mixed));\n+}\n+\n #[test]\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(training): add a test for a number moved the wrong way",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: test, chore, docs, feat, refactor.\n- Scopes used here: fixtures, training, website. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nchore(fixtures): regenerate the traces for 0.15.0\ntest(fixtures): trace a fix answered with the repository name as its area\nfeat(website): draw the measurements from the documents at build time\ndocs(training): keep the models' scores in the document\ntest(training): write the scenarios in English\n",
+          "user": "Files changed:\ndocs/training.md | +6 -3\ntraining/tools/src/score.rs | +92 -0\ntraining/tools/src/score_tests.rs | +21 -0\n\nDiff:\n--- training/tools/src/score.rs\n@@ -32,2 +32,6 @@\n //!   level a human reaches with the same diff\n+//! - contradicted: says a number moved the wrong way against the diff (`to 30`\n+//!   where 30 was the old value, `decrease` where the value grew). Only a\n+//!   changed number with the same line around it counts; anything else is\n+//!   unknown, so false means \"no contradiction found\", not \"correct\"\n //! - expected: the subject matches every `expect` pattern of the case (only\n@@ -68,2 +72,17 @@ static SPECIFIC: LazyLock<Regex> = LazyLock::new(|| {\n \n+static NUMBER: LazyLock<Regex> =\n+    LazyLock::new(|| Regex::new(r\"-?\\d+(?:\\.\\d+)?\").expect(\"a valid pattern\"));\n+static TO: LazyLock<Regex> =\n+    LazyLock::new(|| Regex::new(r\"\\bto (-?\\d+(?:\\.\\d+)?)\\b\").expect(\"a valid pattern\"));\n[... 12 more lines]\n[... 2 more hunks]\n--- training/tools/src/score_tests.rs\n@@ -32,2 +32,23 @@ fn support_and_grounding_are_read_from_the_evidence() {\n \n+#[test]\n+fn a_number_moved_the_wrong_way_is_a_contradiction() {\n+    let timeout = \"@@ -1 +1 @@\\n-const TIMEOUT: u64 = 30;\\n+const TIMEOUT: u64 = 60;\\n\";\n+    // The case the unsupported/ungrounded metrics accepted.\n+    assert!(contradicted(\"fix: decrease timeout to 30\", timeout));\n+    assert!(contradicted(\"fix: lower the timeout\", timeout));\n+    assert!(contradicted(\"fix: raise timeout from 60\", timeout));\n+    assert!(!contradicted(\"fix: increase timeout to 60\", timeout));\n+    assert!(!contradicted(\n+        \"fix: double the timeout from 30 to 60\",\n+        timeout\n+    ));\n+    // Nothing comparable: unknown, never a contradiction.\n[... 9 more lines]\n\n(3 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(training): add a test for a number moved the wrong way",
+        "rejected": null
+      }
+    ]
+  }
+}

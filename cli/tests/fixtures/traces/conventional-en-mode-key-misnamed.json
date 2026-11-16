@@ -1,0 +1,205 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of 7691599",
+      "feat(diff): add facts option to prompt",
+      "feat(generate): reject a reply that moves a number the wrong way",
+      "test(fixtures): trace a limit on the turned-down subjects answered as a command",
+      "feat(generate): name only the latest turned-down subjects in the prompt",
+      "feat(training): score how much of the diff the prompt shows",
+      "feat(diff): keep whole hunks when a file is cut"
+    ],
+    "history_files": [
+      [
+        "cli/src/cli/args.rs",
+        "cli/src/cli/configure.rs",
+        "cli/src/config/keys.rs",
+        "cli/src/config/mod.rs",
+        "cli/src/config/store.rs",
+        "cli/src/config/tests.rs",
+        "cli/tests/config_cli.rs",
+        "docs/configuration.md",
+        "docs/roadmap.md"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "cli/src/cli/args.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/cli/configure.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/keys.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/mod.rs",
+        "old_path": null
+      },
+      {
+        "status": "added",
+        "path": "cli/src/config/mode.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/store.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/src/config/tests.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "cli/tests/config_cli.rs",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/configuration.md",
+        "old_path": null
+      },
+      {
+        "status": "modified",
+        "path": "docs/roadmap.md",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "cli/src/cli/args.rs",
+        "old_path": null,
+        "lines": [
+          25,
+          0
+        ],
+        "hunks": "@@ -176,2 +176,18 @@ pub(super) struct ModelArgs {\n     model_dir: Option<PathBuf>,\n+    /// What to prioritise: fast, balanced or quality [config: model.mode;\n+    /// env: PIONUS_MODE]\n+    #[arg(long, value_enum)]\n+    mode: Option<ModeArg>,\n+}\n+\n+#[derive(Debug, Clone, Copy, ValueEnum)]\n+pub(super) enum ModeArg {\n+    /// The 0.5B fine-tune: the least time and memory per message.\n+    Fast,\n+    /// The 1.5B fine-tune at the default prompt size.\n+    Balanced,\n+    /// The 1.5B fine-tune with twice the prompt.\n+    Quality,\n+    /// No preset.\n+    Off,\n }\n@@ -233,2 +249,11 @@ impl ModelArgs {\n         let mut flags = Vec::new();\n+        if let Some(mode) = self.mode {\n+            let name = match mode {\n+                ModeArg::Fast => \"fast\",\n+                ModeArg::Balanced => \"balanced\",\n+                ModeArg::Quality => \"quality\",\n+                ModeArg::Off => \"off\",\n+            };\n+            flags.push((\"model.mode\", name.to_owned()));\n+        }\n         if let Some(device) = self.device {\n"
+      },
+      {
+        "path": "cli/src/cli/configure.rs",
+        "old_path": null,
+        "lines": [
+          1,
+          1
+        ],
+        "hunks": "@@ -190,3 +190,3 @@ fn warn_if_shadowed(key: &str, target: &Target, changed: &Origin) -> Result<()>\n             Origin::Repo(_) => matches!(changed, Origin::Global(_)),\n-            Origin::Global(_) | Origin::Default => false,\n+            Origin::Global(_) | Origin::Default | Origin::Mode(_) => false,\n         };\n"
+      },
+      {
+        "path": "cli/src/config/keys.rs",
+        "old_path": null,
+        "lines": [
+          10,
+          0
+        ],
+        "hunks": "@@ -70,2 +70,12 @@ pub const KEYS: &[Key] = &[\n     },\n+    Key {\n+        name: \"model.mode\",\n+        kind: Kind::Choice(super::mode::NAMES),\n+        scope: Scope::User,\n+        env: Some(\"PIONUS_MODE\"),\n+        description: \"What to prioritise: `fast` (the 0.5B fine-tune), `balanced` (the 1.5B \\\n+                      fine-tune) or `quality` (the 1.5B with a prompt twice as long), or \\\n+                      `off`: no preset. A mode sets model.name and model.max_prompt_tokens \\\n+                      only where nothing else did.\",\n+    },\n     Key {\n"
+      },
+      {
+        "path": "cli/src/config/mod.rs",
+        "old_path": null,
+        "lines": [
+          4,
+          0
+        ],
+        "hunks": "@@ -14,2 +14,3 @@ mod cli;\n mod keys;\n+pub mod mode;\n mod store;\n@@ -54,2 +55,4 @@ pub enum Origin {\n     Flag,\n+    /// Filled in by `model.mode`, where nothing else set it.\n+    Mode(&'static str),\n }\n@@ -64,2 +67,3 @@ impl fmt::Display for Origin {\n             Self::Flag => f.write_str(\"command line\"),\n+            Self::Mode(mode) => write!(f, \"mode {mode}\"),\n         }\n"
+      },
+      {
+        "path": "cli/src/config/mode.rs",
+        "old_path": null,
+        "lines": [
+          61,
+          0
+        ],
+        "hunks": "@@ -0,0 +1,61 @@\n+//! The modes: one choice of what to prioritise, resolved into the settings it\n+//! stands for.\n+//!\n+//! A mode fills in `model.name` and `model.max_prompt_tokens` only where\n+//! nobody set them (a file, the environment or a flag): a setting written\n+//! explicitly always wins, so a mode is a default, never an override. The\n+//! presets are starting points to be measured, not promises of quality or speed.\n+\n+use super::{Origin, Value};\n+\n+/// A mode's settings.\n+pub struct Preset {\n+    pub name: &'static str,\n+    pub model: &'static str,\n+    pub max_prompt_tokens: usize,\n+    pub about: &'static str,\n+}\n+\n+pub const PRESETS: &[Preset] = &[\n+    Preset {\n+        name: \"fast\",\n+        model: \"pionus-0.5b-v0.3\",\n+        max_prompt_tokens: 1024,\n+        about: \"the smallest fine-tune: the least time and memory per message\",\n+    },\n+    Preset {\n+        name: \"balanced\",\n+        model: \"pionus-1.5b-v0.3\",\n+        max_prompt_tokens: 1024,\n+        about: \"the 1.5B fine-tune: the best messages at the default prompt size\",\n+    },\n+    Preset {\n+        name: \"quality\",\n+        model: \"pionus-1.5b-v0.3\",\n+        max_prompt_tokens: 2048,\n+        about: \"the 1.5B fine-tune with twice the prompt: sees more of a large diff, slower\",\n+    },\n+];\n+\n+/// The names of every mode, `off` (no preset) first.\n+pub const NAMES: &[&str] = &[\"off\", \"fast\", \"balanced\", \"quality\"];\n+\n+/// The settings `mode` stands for, each with the origin that says why.\n+pub fn settings(mode: &str) -> Vec<(&'static str, Value, Origin)> {\n+    let Some(preset) = PRESETS.iter().find(|p| p.name == mode) else {\n+        return Vec::new();\n+    };\n+    let origin = Origin::Mode(preset.name);\n+    vec![\n+        (\n+            \"model.name\",\n+            Value::Text(preset.model.to_owned()),\n+            origin.clone(),\n+        ),\n+        (\n+            \"model.max_prompt_tokens\",\n+            Value::Count(preset.max_prompt_tokens),\n+            origin,\n+        ),\n+    ]\n+}\n"
+      },
+      {
+        "path": "cli/src/config/store.rs",
+        "old_path": null,
+        "lines": [
+          10,
+          0
+        ],
+        "hunks": "@@ -159,2 +159,11 @@ impl Resolved {\n         }\n+        // A mode fills in what no layer set, before the model files follow\n+        // model.name.\n+        if let Some((Value::Text(mode), _)) = values.get(\"model.mode\") {\n+            for (name, value, origin) in super::mode::settings(&mode.clone()) {\n+                if values.get(name).is_some_and(|(_, o)| *o == Origin::Default) {\n+                    values.insert(name, (value, origin));\n+                }\n+            }\n+        }\n         // The model files default to those of model.name, whichever layer\n@@ -296,2 +305,3 @@ fn defaults(env: &dyn Fn(&str) -> Option<String>) -> Vec<(&'static str, Value)>\n         (\"model.name\", text(models::DEFAULT)),\n+        (\"model.mode\", text(\"off\")),\n         (\"model.vulkan_device\", Value::Count(0)),\n"
+      },
+      {
+        "path": "cli/src/config/tests.rs",
+        "old_path": null,
+        "lines": [
+          99,
+          0
+        ],
+        "hunks": "@@ -657 +657,100 @@ fn only_a_keep_loaded_someone_set_counts_as_asked_for() {\n }\n+\n+#[test]\n+fn a_mode_fills_in_the_model_and_the_prompt_where_nothing_set_them() {\n+    let off = resolve(None, None, HOME, vec![]).unwrap();\n+    assert_eq!(off.get(\"model.mode\").unwrap().0.to_string(), \"off\");\n+    assert_eq!(off.settings().model.id, models::DEFAULT);\n+\n+    let fast = resolve(None, None, HOME, vec![(\"model.mode\", \"fast\".into())]).unwrap();\n+    let settings = fast.settings();\n+    assert_eq!(settings.model.id, \"pionus-0.5b-v0.3\");\n+    assert_eq!(settings.max_prompt_tokens, 1024);\n+    assert_eq!(fast.get(\"model.name\").unwrap().1, Origin::Mode(\"fast\"));\n+    assert_eq!(fast.get(\"model.name\").unwrap().1.to_string(), \"mode fast\");\n+    // The model's files follow the model the mode chose.\n+    assert!(\n+        settings\n+            .gguf\n+            .unwrap()\n+            .ends_with(\"pionus-0.5b-v0.3-q4_k_m.gguf\")\n+    );\n+\n+    let quality = resolve(None, None, HOME, vec![(\"model.mode\", \"quality\".into())])\n+        .unwrap()\n+        .settings();\n+    assert_eq!(\n+        (quality.model.id, quality.max_prompt_tokens),\n+        (\"pionus-1.5b-v0.3\", 2048)\n+    );\n+    let balanced = resolve(None, None, HOME, vec![(\"model.mode\", \"balanced\".into())])\n+        .unwrap()\n+        .settings();\n+    assert_eq!(\n+        (balanced.model.id, balanced.max_prompt_tokens),\n+        (\"pionus-1.5b-v0.3\", 1024)\n+    );\n+}\n+\n+#[test]\n+fn a_setting_written_explicitly_beats_the_mode_whatever_the_layer() {\n+    let mode = \"[model]\\nmode = \\\"fast\\\"\\n\";\n+    // A file, the environment and a flag, each against the mode.\n+    let file = resolve(\n+        Some(&format!(\n+            \"{mode}name = \\\"qwen2.5-coder-7b\\\"\\nmax_prompt_tokens = 512\\n\"\n+        )),\n+        None,\n+        HOME,\n+        vec![],\n+    )\n+    .unwrap();\n+    assert_eq!(file.settings().model.id, \"qwen2.5-coder-7b\");\n+    assert_eq!(file.settings().max_prompt_tokens, 512);\n+    let env = resolve(\n+        Some(mode),\n+        None,\n+        &[(\"HOME\", \"/home/me\"), (\"PIONUS_MODEL\", \"qwen2.5-coder-0.5b\")],\n+        vec![],\n+    )\n+    .unwrap();\n+    assert_eq!(env.settings().model.id, \"qwen2.5-coder-0.5b\");\n+    assert_eq!(\n+        env.settings().max_prompt_tokens,\n+        1024,\n+        \"only the model was set\"\n+    );\n+    let flag = resolve(\n+        Some(mode),\n+        None,\n+        HOME,\n+        vec![(\"model.max_prompt_tokens\", \"768\".into())],\n+    )\n+    .unwrap();\n+    assert_eq!(flag.settings().max_prompt_tokens, 768);\n+    assert_eq!(flag.settings().model.id, \"pionus-0.5b-v0.3\");\n+    // The flag beats the file's mode, and the environment's mode too.\n+    let flag_mode = resolve(\n+        Some(mode),\n+        None,\n+        &[(\"HOME\", \"/home/me\"), (\"PIONUS_MODE\", \"quality\")],\n+        vec![(\"model.mode\", \"balanced\".into())],\n+    )\n+    .unwrap();\n+    assert_eq!(flag_mode.settings().max_prompt_tokens, 1024);\n+    assert_eq!(flag_mode.get(\"model.mode\").unwrap().1, Origin::Flag);\n+}\n+\n+#[test]\n+fn a_mode_is_a_machine_setting_and_an_unknown_one_is_an_error() {\n+    let repo = resolve(None, Some(\"[model]\\nmode = \\\"fast\\\"\\n\"), HOME, vec![]);\n+    assert!(\n+        matches!(repo, Err(ConfigError::UserOnly { .. })),\n+        \"{repo:?}\"\n+    );\n+    let unknown = resolve(None, None, HOME, vec![(\"model.mode\", \"turbo\".into())]);\n+    assert!(\n+        matches!(unknown, Err(ConfigError::InvalidValue { .. })),\n+        \"{unknown:?}\"\n+    );\n+}\n"
+      },
+      {
+        "path": "cli/tests/config_cli.rs",
+        "old_path": null,
+        "lines": [
+          44,
+          0
+        ],
+        "hunks": "@@ -288,2 +288,46 @@ fn environment_overrides_files_and_is_shown() {\n \n+#[test]\n+fn a_mode_shows_what_it_chose_and_a_written_setting_beats_it() {\n+    let env = Env::new();\n+    let dir = TempDir::new().unwrap();\n+    env.ok(&[\"config\", \"set\", \"model.mode\", \"fast\"], dir.path());\n+    let listed = env.ok(&[\"config\", \"list\", \"--show-origin\"], dir.path());\n+    assert!(\n+        listed.contains(\"model.name = pionus-0.5b-v0.3  (mode fast)\"),\n+        \"{listed}\"\n+    );\n+    assert!(\n+        listed.contains(\"model.max_prompt_tokens = 1024  (mode fast)\"),\n+        \"{listed}\"\n+    );\n+    let models = env.ok(&[\"model\", \"list\"], dir.path());\n+    assert!(\n+        models.contains(\"In use: pionus-0.5b-v0.3 (model.name, mode fast).\"),\n+        \"{models}\"\n+    );\n+    // The environment is written explicitly: it beats the mode for the model\n+    // and leaves the prompt to it.\n+    let output = env.run_with(\n+        &[\"config\", \"list\", \"--show-origin\"],\n+        dir.path(),\n+        &[(\"PIONUS_MODEL\", \"qwen2.5-coder-7b\")],\n+    );\n+    let listed = String::from_utf8_lossy(&output.stdout);\n+    assert!(\n+        listed.contains(\"model.name = qwen2.5-coder-7b  (environment PIONUS_MODEL)\"),\n+        \"{listed}\"\n+    );\n+    assert!(\n+        listed.contains(\"model.max_prompt_tokens = 1024  (mode fast)\"),\n+        \"{listed}\"\n+    );\n+    // A mode of the repository would reach every machine that opens it.\n+    let repo = staged_repo();\n+    let output = env.run(\n+        &[\"config\", \"set\", \"--repo\", \"model.mode\", \"fast\"],\n+        repo.path(),\n+    );\n+    assert!(!output.status.success());\n+}\n+\n #[test]\n"
+      },
+      {
+        "path": "docs/configuration.md",
+        "old_path": null,
+        "lines": [
+          16,
+          0
+        ],
+        "hunks": "@@ -41,2 +41,3 @@ value, for example when an environment variable is set.\n | `model.name` | `qwen2.5-coder-1.5b`, `qwen2.5-coder-0.5b`, `qwen2.5-coder-7b`, `pionus-1.5b-v0.1`, `pionus-0.5b-v0.1`, `pionus-0.5b-v0.2`, `pionus-1.5b-v0.2`, `pionus-0.5b-v0.3`, `pionus-1.5b-v0.3` | `qwen2.5-coder-1.5b` | `PIONUS_MODEL` | global |\n+| `model.mode` | `off`, `fast`, `balanced`, `quality` | `off` | `PIONUS_MODE` | global |\n | `model.dir` | path | model.name's OpenVINO export in `$XDG_DATA_HOME/pionus/models/` (none for models without one) | `PIONUS_MODEL_DIR` | global |\n@@ -75,2 +76,17 @@ value, for example when an environment variable is set.\n   `pionus model use FILE`) to run a model from disk instead.\n+- `model.mode` (`--mode`) chooses what to prioritise and fills in two settings\n+  where nothing else set them (a file, the environment or a flag: a setting\n+  written explicitly always wins, so a mode is a default, never an override):\n+\n+  | Mode | `model.name` | `model.max_prompt_tokens` |\n+  |---|---|---|\n+  | `fast` | `pionus-0.5b-v0.3` | 1024 |\n+  | `balanced` | `pionus-1.5b-v0.3` | 1024 |\n+  | `quality` | `pionus-1.5b-v0.3` | 2048 |\n+\n+  `off`, the default, changes nothing: an existing configuration behaves as\n+  before. These are starting points to be measured, not promises of speed or\n+  quality; the fine-tunes are experimental and have no OpenVINO export, so a\n+  mode runs on `vulkan` and `cpu` (`pionus model` and `pionus config` show the\n+  model and where it came from, `mode fast` and so on).\n - `model.vulkan_device` picks a GPU on machines with more than one, as\n"
+      },
+      {
+        "path": "docs/roadmap.md",
+        "old_path": null,
+        "lines": [
+          3,
+          0
+        ],
+        "hunks": "@@ -27,2 +27,5 @@\n   further on their own samples, as experimental models.\n+- Modes (`model.mode`, `--mode`): `fast`, `balanced` and `quality` fill in the\n+  model and the prompt size where nothing else set them. The attempt limit and\n+  the extra context of `quality` are not done.\n - Fast load for llama.cpp (`--no-repack --fit off`), turned on per device\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "feat(cli): add model.config option",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, test, refactor.\n- Scopes used here: diff, generate, fixtures, training. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\nfeat(diff): add facts option to prompt\nfeat(generate): reject a reply that moves a number the wrong way\ntest(fixtures): trace a limit on the turned-down subjects answered as a command\nfeat(generate): name only the latest turned-down subjects in the prompt\nfeat(training): score how much of the diff the prompt shows\n",
+          "user": "Files changed:\ncli/src/cli/args.rs | +25 -0\ncli/src/cli/configure.rs | +1 -1\ncli/src/config/keys.rs | +10 -0\ncli/src/config/mod.rs | +4 -0\ncli/src/config/mode.rs | new, +61 -0\ncli/src/config/store.rs | +10 -0\ncli/src/config/tests.rs | +99 -0\ncli/tests/config_cli.rs | +44 -0\ndocs/configuration.md | +16 -0\ndocs/roadmap.md | +3 -0\n\nDiff:\n--- cli/src/cli/args.rs\n@@ -176,2 +176,18 @@ pub(super) struct ModelArgs {\n     model_dir: Option<PathBuf>,\n+    /// What to prioritise: fast, balanced or quality [config: model.mode;\n+    /// env: PIONUS_MODE]\n[... 27 more lines]\n--- cli/src/cli/configure.rs\n@@ -190,3 +190,3 @@ fn warn_if_shadowed(key: &str, target: &Target, changed: &Origin) -> Result<()>\n             Origin::Repo(_) => matches!(changed, Origin::Global(_)),\n-            Origin::Global(_) | Origin::Default => false,\n+            Origin::Global(_) | Origin::Default | Origin::Mode(_) => false,\n         };\n--- cli/src/config/keys.rs\n@@ -70,2 +70,12 @@ pub const KEYS: &[Key] = &[\n     },\n+    Key {\n+        name: \"model.mode\",\n[... 9 more lines]\n--- cli/src/config/mod.rs\n@@ -14,2 +14,3 @@ mod cli;\n mod keys;\n+pub mod mode;\n mod store;\n[... 2 more hunks]\n--- cli/src/config/mode.rs\n@@ -0,0 +1,61 @@\n+//! The modes: one choice of what to prioritise, resolved into the settings it\n+//! stands for.\n+//!\n[... 58 more lines]\n--- cli/src/config/store.rs\n@@ -159,2 +159,11 @@ impl Resolved {\n         }\n+        // A mode fills in what no layer set, before the model files follow\n+        // model.name.\n[... 12 more lines]\n\n(9 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "feat(cli): add model.config option",
+        "rejected": null
+      }
+    ]
+  }
+}

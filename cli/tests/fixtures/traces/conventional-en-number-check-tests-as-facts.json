@@ -1,0 +1,71 @@
+{
+  "format": 1,
+  "tool_version": "0.15.0",
+  "backend": "mock",
+  "options": {
+    "max_prompt_tokens": 1024,
+    "default_convention": "conventional",
+    "diff": "annotated"
+  },
+  "config": {
+    "max_new_tokens": 128
+  },
+  "inputs": {
+    "branch": "main",
+    "subjects": [
+      "parent of ba33b6f",
+      "test(training): ask the late-decisive scenarios for the entity, not the number",
+      "feat(config): give the llama.cpp devices a larger prompt budget",
+      "docs: record what the three modes cost and score",
+      "feat(cli): add model.mode config option",
+      "feat(diff): add facts option to prompt",
+      "feat(generate): reject a reply that moves a number the wrong way"
+    ],
+    "history_files": [
+      [
+        "cli/src/diff/facts_tests.rs"
+      ],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "staged": [
+      {
+        "status": "modified",
+        "path": "cli/src/diff/facts_tests.rs",
+        "old_path": null
+      }
+    ],
+    "files": [
+      {
+        "path": "cli/src/diff/facts_tests.rs",
+        "old_path": null,
+        "lines": [
+          46,
+          0
+        ],
+        "hunks": "@@ -90 +90,47 @@ fn the_numbers_that_changed_are_listed_per_file_and_versions_are_not() {\n }\n+\n+#[test]\n+fn right_paraphrases_pass_and_wrong_ones_are_caught() {\n+    // 30 -> 60: what a person or a model may write about it.\n+    for right in [\n+        \"fix: raise the timeout to 60\",\n+        \"fix: increase TIMEOUT from 30 to 60\",\n+        \"chore: bump timeout from 30 to 60\",\n+        \"fix: timeout is now 60 (was 30)\",\n+        \"fix(net): set TIMEOUT to 60\",\n+        \"fix: double the timeout\",\n+        \"fix: allow slow disks, timeout 30 -> 60\",\n+        \"fix: update the timeout\",\n+        \"fix: raise the timeout to 60 seconds\",\n+        \"fix: a longer timeout, up to 60.\",\n+    ] {\n+        assert_eq!(contradiction_in(right, TIMEOUT), None, \"{right}\");\n+    }\n+    for wrong in [\n+        \"fix: lower the timeout to 30\",\n+        \"fix: reduce the timeout from 60 to 30\",\n+        \"fix: decrease timeout to 30\",\n+        \"fix: shorten nothing, set the timeout to 30\",\n+        \"fix: the timeout goes from 60\",\n+        \"fix: increase the timeout to 30\",\n+    ] {\n+        assert!(contradiction_in(wrong, TIMEOUT).is_some(), \"{wrong}\");\n+    }\n+}\n+\n+#[test]\n+fn an_ambiguous_change_never_rejects_a_reply() {\n+    // Two numbers in one line, or a number that is not what the reply names:\n+    // not a plain pair, so the reply is not judged on it.\n+    let two = \"@@ -1 +1 @@\\n-size = (30, 40)\\n+size = (60, 40)\\n\";\n+    assert_eq!(contradiction_in(\"fix: set the width to 60\", two), None);\n+    assert!(contradiction_in(\"fix: set the width to 30\", two).is_some());\n+    // Several files changing the same number to different values: either\n+    // direction is in the diff, and \"to N\" is only wrong when no change ends there.\n+    let both = \"@@ -1 +1 @@\\n-a = 30\\n+a = 60\\n@@ -9 +9 @@\\n-b = 10\\n+b = 30\\n\";\n+    assert_eq!(contradiction_in(\"fix: set b to 30\", both), None);\n+    assert_eq!(contradiction_in(\"fix: lower the limits\", both), None);\n+    // A removed line with nothing added is not a changed number.\n+    let gone = \"@@ -1,2 +1 @@\\n-const OLD: u64 = 30;\\n const KEEP: u64 = 1;\\n\";\n+    assert_eq!(contradiction_in(\"fix: set it to 30\", gone), None);\n+}\n"
+      }
+    ]
+  },
+  "generation": {
+    "message": {
+      "subject": "test(cli): add facts tests for the timeout",
+      "body": null
+    },
+    "source": "model",
+    "attempts": [
+      {
+        "prompt": {
+          "system": "You write git commit messages from a diff. Reply with the commit message only: no code fences, no quotes, no explanation.\n\nRules:\n- Subject line of at most 72 characters, without a trailing period.\n- Write in English, in the imperative mood (\"Add\", not \"Added\").\n- Use Conventional Commits: `type(scope): description`.\n- Types used here: feat, docs, test, refactor.\n- Scopes used here: cli, config, diff, generate, training. Omit the scope if none fits.\n- Add a body only if the reason for the change is not obvious.\n\nRecent subjects from this repository, follow their style:\ntest(training): ask the late-decisive scenarios for the entity, not the number\nfeat(config): give the llama.cpp devices a larger prompt budget\ndocs: record what the three modes cost and score\nfeat(cli): add model.mode config option\nfeat(diff): add facts option to prompt\n",
+          "user": "Files changed:\ncli/src/diff/facts_tests.rs | +46 -0\n\nDiff:\n--- cli/src/diff/facts_tests.rs\n@@ -90 +90,47 @@ fn the_numbers_that_changed_are_listed_per_file_and_versions_are_not() {\n }\n+\n+#[test]\n+fn right_paraphrases_pass_and_wrong_ones_are_caught() {\n+    // 30 -> 60: what a person or a model may write about it.\n+    for right in [\n+        \"fix: raise the timeout to 60\",\n+        \"fix: increase TIMEOUT from 30 to 60\",\n+        \"chore: bump timeout from 30 to 60\",\n+        \"fix: timeout is now 60 (was 30)\",\n+        \"fix(net): set TIMEOUT to 60\",\n+        \"fix: double the timeout\",\n+        \"fix: allow slow disks, timeout 30 -> 60\",\n+        \"fix: update the timeout\",\n+        \"fix: raise the timeout to 60 seconds\",\n+        \"fix: a longer timeout, up to 60.\",\n+    ] {\n+        assert_eq!(contradiction_in(right, TIMEOUT), None, \"{right}\");\n+    }\n+    for wrong in [\n+        \"fix: lower the timeout to 30\",\n+        \"fix: reduce the timeout from 60 to 30\",\n+        \"fix: decrease timeout to 30\",\n+        \"fix: shorten nothing, set the timeout to 30\",\n+        \"fix: the timeout goes from 60\",\n+        \"fix: increase the timeout to 30\",\n+    ] {\n+        assert!(contradiction_in(wrong, TIMEOUT).is_some(), \"{wrong}\");\n+    }\n+}\n+\n+#[test]\n+fn an_ambiguous_change_never_rejects_a_reply() {\n+    // Two numbers in one line, or a number that is not what the reply names:\n+    // not a plain pair, so the reply is not judged on it.\n+    let two = \"@@ -1 +1 @@\\n-size = (30, 40)\\n+size = (60, 40)\\n\";\n+    assert_eq!(contradiction_in(\"fix: set the width to 60\", two), None);\n+    assert!(contradiction_in(\"fix: set the width to 30\", two).is_some());\n[... 9 more lines]\n\n(1 files are only partly shown; rely on the file list.)\n"
+        },
+        "raw": "test(cli): add facts tests for the timeout",
+        "rejected": null
+      }
+    ]
+  }
+}
