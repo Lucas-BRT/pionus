@@ -10,7 +10,7 @@ use crate::{
 };
 
 const BAR: StaticClass = class!(
-    "flex items-center gap-3 rounded-xl border border-border bg-terminal px-4 py-3.5",
+    "flex items-center gap-3 max-sm:items-start rounded-xl border border-border bg-terminal px-4 py-3.5",
     "text-left font-mono text-[0.85rem] leading-relaxed text-terminal-foreground",
     "select-all [overflow-wrap:anywhere]",
 );
@@ -26,7 +26,7 @@ pub async fn command_line(
     Ok(view! {
         <div class=(class!(BAR, attrs.remove("class"))) (attrs)>
             <span class="text-primary">"$"</span>
-            <span>(child)</span>
+            <span class="min-w-0">(child)</span>
             button(
                 variant: ButtonVariant::Ghost,
                 size: ButtonSize::Icon,
