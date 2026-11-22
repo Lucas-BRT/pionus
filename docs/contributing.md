@@ -45,6 +45,17 @@ none of the machine's git config, pionus config, models or
 `PIONUS_*` variables: run commands through `cli/tests/common::isolate`.
 Nothing that reaches the output depends on `HashMap` iteration order.
 
+## Branches and pull requests
+
+- **Branches:** `feat/<slug>` or `fix/<slug>`, always created from `develop`.
+- **Pull requests:** every change goes to `develop` by PR, and `develop` reaches
+  `main` by PR. `main` is protected, administrators included: never push to it.
+  CI runs on pushes and PRs to `develop` and `main`; the required checks are
+  `test` and `package`.
+- **Hooks:** versioned in `.githooks/`. Once per clone run
+  `git config core.hooksPath .githooks`: `commit-msg` rejects subjects that are
+  not Conventional Commits, `pre-push` runs `cargo fmt --check` and clippy.
+
 ## Commits
 
 - **One purpose per commit.** Split a file with changes for two purposes by
@@ -75,7 +86,8 @@ Nothing that reaches the output depends on `HashMap` iteration order.
 ## Releases
 
 Bump `version` in `cli/Cargo.toml` (semver) in a commit
-`chore: release X.Y.Z` on `main`. `.github/workflows/release.yml` tests,
+`chore: release X.Y.Z` on `develop`. When the PR from `develop` merges into `main`,
+`.github/workflows/release.yml` runs: if `v<version>` has no tag yet it tests,
 packages and publishes the release, with notes from the commit subjects
 (`pionus-tools release-notes`). Tags and releases are never made by hand. The
 tarball is reproducible: `cli/tests/scripts/test-install.sh` packages twice
