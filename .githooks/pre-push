@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# The same formatting and lint steps as the CI test job.
+cargo fmt --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
