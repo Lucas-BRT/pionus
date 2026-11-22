@@ -16,6 +16,7 @@ default member), `website/` (read [website/AGENTS.md](website/AGENTS.md)),
 |---|---|
 | Tests ship in the same commit; a bug fix's test fails without the fix | review |
 | One purpose per commit; each passes `scripts/check.sh --staged` | review, CI |
+| Branches `feat/<slug>` or `fix/<slug>` start from `develop`; PR to `develop`; `develop` reaches `main` by PR; never push to `main` | branch protection |
 | Subjects: Conventional Commits, English, ≤ 72 columns | review, release notes |
 | No tags or releases by hand: bump `cli/Cargo.toml` in `chore: release X.Y.Z` | release workflow |
 | Fixtures and traces are generated (`cli/tests/fixtures/make-traces.sh`), never hand-edited | `replay_fixtures` |
@@ -26,6 +27,8 @@ default member), `website/` (read [website/AGENTS.md](website/AGENTS.md)),
 ## Workflow
 
 - **Checks:** `scripts/check.sh` before any commit; it says what it skipped.
+- **Hooks:** once per clone, `git config core.hooksPath .githooks` turns on the
+  Conventional Commits check (`commit-msg`) and fmt + clippy (`pre-push`).
 - **Before each commit**, run `pionus --trace /tmp/trace.json` on the
   staged change. A wrong message becomes a trace fixture, in its own commit.
 - **Read first:** tests, commits and releases: [docs/contributing.md](docs/contributing.md).
